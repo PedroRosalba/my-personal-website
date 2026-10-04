@@ -17,7 +17,9 @@ export function ScrollDriver() {
         .map((el) => {
           const stop = stopById[el.dataset.stop!];
           const rect = el.getBoundingClientRect();
-          return { y: rect.top + window.scrollY + rect.height / 2, z: stop.z, focusX: stop.focusX, id: stop.id };
+          // a stop is reached when its section is aligned to the top of the viewport —
+          // exactly where a nav jump (#anchor) lands
+          return { y: rect.top + window.scrollY + window.innerHeight / 2, z: stop.z, focusX: stop.focusX, id: stop.id };
         })
         .sort((a, b) => a.y - b.y);
       update();

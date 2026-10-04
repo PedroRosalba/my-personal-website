@@ -21,12 +21,18 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Hairline seam above the transit and final arches; Contact stop moved back so the Eclipse wraps the final gateway.
 - Experience and Contact are now distinct stops; Open Graph image and README added.
 
+## Iteration 3
+- Traveller: walk cycle verified in motion; no walk cycle during a nav dash; becomes a dark silhouette and faces
+  the camera at Contact.
+- Stops are now reached when a section is aligned to the top of the viewport, so nav jumps land exactly on a stop
+  (they used to land ~8% short, leaving the traveller half-turned at Contact).
+- Mobile verified at 390 and 360 wide (no horizontal overflow); stations are one screen tall on mobile.
+- Reduced motion verified (camera snaps, no dash); ~60 fps in headless Chrome at 1440×900.
+
 ## Next (highest value first)
-1. Traveller: verify the walk cycle and the Contact turn in motion; consider a darker silhouette at Contact.
-2. Mobile: Projects index and panel scrolling; check 360px width.
-3. Reduced-motion screenshots; performance check (draw calls, DPR, frame time on battery).
-4. Fog sea near the camera is nearly black at Arrival — consider slightly more visible billows.
-5. Education / Experience: content from Pedro; 3D stays simplified.
+1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
+2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
+3. Real-device check (touch scrolling on iOS/Android, low-power GPU).
 
 ## QA
 `next build && next start -p 3210`, then the Playwright scripts kept outside the repo (scratchpad) drive Chrome.

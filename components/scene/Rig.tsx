@@ -75,7 +75,7 @@ export function Rig() {
 
     // Keep the world clear of the HTML: shift the picture, not the camera.
     const journeyX = mobile ? 0 : -0.12 * size.width;
-    const journeyY = mobile ? 0.14 * size.height : 0;
+    const journeyY = mobile ? 0.21 * size.height : 0;
     const revealX = mobile ? 0 : Math.min(280, size.width * 0.2);
     const revealY = mobile ? 0.27 * size.height : 0;
     camera.setViewOffset(
