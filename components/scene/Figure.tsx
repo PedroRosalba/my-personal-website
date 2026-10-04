@@ -36,7 +36,7 @@ export function Figure() {
     body.current.rotation.x = -0.06 * s.moving;
 
     // idle: turn slightly toward the nearest landmark; at Contact: turn to face the camera
-    const atContact = clamp01((FINAL_GATE_Z + 30 - frame.z) / 12);
+    const atContact = clamp01((FINAL_GATE_Z + 58 - frame.z) / 12);
     const towardLandmark = -Math.atan2(frame.focusX, 14) * (1 - s.moving);
     const backward = frame.speed > 0.4 && atContact < 0.5 ? Math.PI : 0;
     const targetYaw = atContact > 0 ? Math.PI * atContact : backward + towardLandmark;

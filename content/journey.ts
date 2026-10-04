@@ -15,7 +15,7 @@ export type Stop = { id: string; z: number; focusX: number };
 const lastGateZ = gateZ(projects.length - 1);
 
 export const TRANSIT_Z = -45; // colossal first gateway the causeway passes through
-export const FINAL_GATE_Z = lastGateZ - 105;
+export const FINAL_GATE_Z = lastGateZ - 150;
 export const CAUSEWAY_END_Z = FINAL_GATE_Z - 2;
 
 export const stops: Stop[] = [
@@ -24,8 +24,8 @@ export const stops: Stop[] = [
   { id: "education", z: -150, focusX: 0 },
   { id: "projects", z: -186, focusX: 2 },
   ...projects.map((p, i) => ({ id: `project-${p.slug}`, z: gateZ(i) + 13, focusX: GATE_X })),
-  { id: "experience", z: lastGateZ - 45, focusX: 0 },
-  { id: "contact", z: FINAL_GATE_Z + 16, focusX: 0 },
+  { id: "experience", z: lastGateZ - 40, focusX: 0 },
+  { id: "contact", z: FINAL_GATE_Z + 44, focusX: 0 },
 ];
 
 export const stopById = Object.fromEntries(stops.map((s) => [s.id, s]));

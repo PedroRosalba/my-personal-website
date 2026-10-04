@@ -42,7 +42,7 @@ export function Rig() {
     frame.z = frame.reduced ? s.targetZ : damp(frame.z, s.targetZ, 3.4, dt);
     frame.speed = (frame.z - prevZ) / dt;
     frame.focusX = frame.reduced ? s.focusX : damp(frame.focusX, s.focusX, 2.6, dt);
-    frame.progress = clamp01(-frame.z / -(FINAL_GATE_Z + 16));
+    frame.progress = clamp01(-frame.z / -(FINAL_GATE_Z + 44));
 
     // project reveal
     const activeIndex = s.activeProject ? projects.findIndex((p) => p.slug === s.activeProject) : -1;

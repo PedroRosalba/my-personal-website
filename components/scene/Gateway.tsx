@@ -51,9 +51,9 @@ function archGeometry(ow: number, oh: number) {
 }
 
 /** A thin band following the arch: the seam. */
-function seamGeometry(ow: number, oh: number, thickness: number) {
-  const outer = ow / 2 + thickness;
-  const inner = ow / 2;
+function seamGeometry(ow: number, oh: number, thickness: number, inset = false) {
+  const outer = inset ? ow / 2 : ow / 2 + thickness;
+  const inner = inset ? ow / 2 - thickness : ow / 2;
   const cy = oh - ow / 2;
   const shape = new Shape();
   shape.moveTo(-outer, 0);
@@ -146,7 +146,10 @@ export function Gateway({
     () => seamGeometry(openWidth, openHeight, kind === "project" ? 0.11 : 0.16),
     [openWidth, openHeight, kind],
   );
+  // ribs sit just inside the passage walls so they read as rings of light receding into depth
+  const rib = useMemo(() => seamGeometry(openWidth, openHeight, 0.045, true), [openWidth, openHeight]);
   const seamMaterial = useMemo(() => new MeshBasicMaterial({ color: ACCENT, toneMapped: false }), []);
+  const ribMaterial = useMemo(() => new MeshBasicMaterial({ color: ACCENT, toneMapped: false }), []);
   const portal = useMemo(
     () =>
       new ShaderMaterial({
@@ -168,8 +171,8 @@ export function Gateway({
   );
   const ribs = useMemo(() => {
     if (kind !== "transit") return [];
-    const count = Math.floor(depth / 2.5);
-    return Array.from({ length: count }, (_, i) => depth / 2 - 1.2 - i * 2.5);
+    const count = Math.floor(depth / 5);
+    return Array.from({ length: count }, (_, i) => depth / 2 - 3 - i * 5);
   }, [kind, depth]);
 
   useFrame((_, rawDt) => {
@@ -196,10 +199,13 @@ export function Gateway({
     level.current = damp(level.current, target, 5, dt);
     const l = level.current;
     seamMaterial.color.copy(ACCENT).multiplyScalar(0.12 + l * 1.5);
+    // ribs stay faint from outside and wake only while the traveller is inside the passage
+    const inside = 1 - clamp01(Math.abs(frame.z - position[2]) / (depth * 0.9));
+    ribMaterial.color.copy(ACCENT).multiplyScalar(0.05 + inside * 0.7);
     portal.uniforms.uTime.value = frame.time;
     portal.uniforms.uOpen.value = kind === "final" ? 0.55 + 0.45 * l : open;
     portal.uniforms.uGlow.value = l;
-    if (light.current) light.current.intensity = (kind === "final" ? 220 : kind === "transit" ? 160 : 90) * l * (0.4 + open);
+    if (light.current) light.current.intensity = (kind === "final" ? 220 : kind === "transit" ? 45 : 90) * l * (0.4 + open);
   });
 
   const interactive = kind === "project" && slug && onOpen;
@@ -242,9 +248,16 @@ export function Gateway({
       {/* seam on the face toward the traveller */}
       <mesh geometry={seam} material={seamMaterial} position={[0, 0, depth / 2 + 0.03]} />
 
+      {kind !== "project" ? (
+        // a single hairline splitting the monolith above the arch, up into the dark
+        <mesh material={seamMaterial} position={[0, (openHeight + height) / 2 + 1.5, depth / 2 + 0.03]}>
+          <planeGeometry args={[0.1, height - openHeight - 3]} />
+        </mesh>
+      ) : null}
+
       {kind === "transit" ? (
         // the passage: ribs of light receding through the monolith
-        ribs.map((z) => <mesh key={z} geometry={seam} material={seamMaterial} position={[0, 0, z]} />)
+        ribs.map((z) => <mesh key={z} geometry={rib} material={ribMaterial} position={[0, 0, z]} />)
       ) : (
         <mesh geometry={arch} material={portal} position={[0, 0, -depth / 2 + 0.4]} {...handlers} />
       )}

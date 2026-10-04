@@ -15,13 +15,18 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Verified with real screenshots (desktop 1440×900, mobile 390×844): all stations, reveal, no-WebGL, no-JS content,
   direct project URL, keyboard tab order, Enter to open, Esc/Close/Back to close.
 
+## Iteration 2
+- Reviewed motion frames (transit corridor, nav dash, Contact settle).
+- Transit corridor now has faint ribs of light that wake only while the traveller is inside (V2 language).
+- Hairline seam above the transit and final arches; Contact stop moved back so the Eclipse wraps the final gateway.
+- Experience and Contact are now distinct stops; Open Graph image and README added.
+
 ## Next (highest value first)
-1. Arrival: the transit monolith is a plain dark slab — add restrained surface detail; let more corona show.
-2. Traveller: check the Contact turn and walk cycle in motion; it should read as a silhouette at Contact.
-3. Motion pass: verify the dash and the transit corridor in motion (record frames), tune FOV kick and ribs.
-4. Mobile: check About, Projects index, Contact with footer; panel scroll.
-5. Open Graph image, README, performance check (draw calls, DPR), reduced-motion screenshots.
-6. Education / Experience: content from Pedro; 3D stays simplified.
+1. Traveller: verify the walk cycle and the Contact turn in motion; consider a darker silhouette at Contact.
+2. Mobile: Projects index and panel scrolling; check 360px width.
+3. Reduced-motion screenshots; performance check (draw calls, DPR, frame time on battery).
+4. Fog sea near the camera is nearly black at Arrival — consider slightly more visible billows.
+5. Education / Experience: content from Pedro; 3D stays simplified.
 
 ## QA
 `next build && next start -p 3210`, then the Playwright scripts kept outside the repo (scratchpad) drive Chrome.
