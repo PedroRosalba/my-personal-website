@@ -65,6 +65,34 @@ A small human figure walks a narrow causeway suspended across a dark, fog-filled
 - Scale shifts per station to avoid monotony: intimate (About) → large (Education) → monumental (Projects) → open emptiness (Contact).
 - Accent light intensity grows along the journey: violet starts faint and is strongest at Contact. The colour itself signals progress.
 
+### World identity — what makes this a place, not a backdrop
+
+The first Design exploration read as "minimal black portfolio + purple gateway". That is rejected. The environment itself must carry the identity; the HTML UI stays quieter than the world.
+
+Key question for every frame: **"Does this feel like entering a strange cinematic universe?"** — not "does this look like a polished landing page?"
+
+The Threshold universe has four permanent features, visible in some form from every station:
+
+1. **The Eclipse.** A colossal dark disc hangs on the horizon at the end of the causeway, ringed by a thin, uneven corona. It is the destination, the only "sun", and the main light source. Its corona is the principal home of the violet accent and brightens as the journey progresses (faint at Arrival, strongest at Contact).
+2. **The fog sea.** The causeway is suspended above a slowly drifting sea of fog. Nothing is visibly anchored to a ground; structures rise out of the fog.
+3. **The colonnade.** Enormous matte monoliths stand in ordered rows on both sides of the causeway, receding into the fog — architecture at an inhuman scale, never random debris. Some are broken into aligned floating segments.
+4. **The sky.** Sparse, cold stars and one very faint ring arc crossing the sky. No nebula clouds, no galaxy wallpaper, no colour.
+
+Rules:
+- One strong focal object per station; everything else recedes into fog.
+- Slow background motion only (fog drift, corona shimmer, star twinkle, ETH diamond rotation).
+- Order over noise: structures are aligned, repeated, architectural. No particle soup, no random floating objects.
+- Violet lives in the corona, gateway seams, portals, tunnel and the final gateway. Everything else is greyscale.
+- The world evolves along the journey (fog thins, corona grows) but is always the same universe.
+
+### Ethereum landmark
+
+Ethereum is part of Pedro's technical interests and appears **once**, as worldbuilding:
+- one ETH diamond (two-pyramid octahedral form), dark metallic/matte, with a very subtle violet rim light
+- slow rotation and slight float, integrated into an architectural pylon/gateway
+- it is the landmark of the Web3-related project gateway, not a free-floating easter egg
+- no prices, tokens, dashboards, extra crypto logos or Web3 marketing language
+
 ### Character
 
 - Small, faceless human figure; matte off-white/pale grey; no glow, no costume detail.
