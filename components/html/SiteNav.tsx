@@ -27,12 +27,12 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
         <ul>
           {items.map((item) => (
             <li key={item.id}>
-              <a
+              <Link
                 href={`${prefix}#${item.id}`}
                 aria-current={onHome && current === item.id ? "true" : undefined}
               >
                 {item.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

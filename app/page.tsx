@@ -41,12 +41,12 @@ export default function Home() {
             <h1 id="hero-name">{profile.name}</h1>
             <p className="lead">{profile.positioning}</p>
             <div className="actions">
-              <a className="button button-primary" href="#projects">
+              <Link className="button button-primary" href="#projects">
                 View projects <span aria-hidden="true">→</span>
-              </a>
-              <a className="button" href="#contact">
+              </Link>
+              <Link className="button" href="#contact">
                 Get in touch
-              </a>
+              </Link>
             </div>
           </div>
           <p className="scroll-cue" aria-hidden="true">
@@ -153,7 +153,7 @@ export default function Home() {
             <span>
               © {new Date().getFullYear()} {profile.name}
             </span>
-            <a href="#top">Back to top ↑</a>
+            <Link href="#top">Back to top ↑</Link>
           </footer>
         </section>
       </main>

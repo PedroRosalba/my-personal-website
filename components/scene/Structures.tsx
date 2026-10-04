@@ -99,14 +99,13 @@ const buildColonnade = () => {
 export function Colonnade() {
   const { ref, count } = useInstances(buildColonnade);
   const material = useMemo(() => {
-    const m = new MeshStandardMaterial({ color: "#3d3d47", roughness: 1 });
+    const m = new MeshStandardMaterial({ color: "#3d3d47", roughness: 1, transparent: true });
     // Far monoliths dissolve into the haze instead of walling off the Eclipse.
     m.onBeforeCompile = (shader) => {
       shader.fragmentShader = shader.fragmentShader.replace(
         "#include <dithering_fragment>",
         `#include <dithering_fragment>
-        float fadeNoise = fract(52.9829189 * fract(dot(gl_FragCoord.xy, vec2(0.06711056, 0.00583715))));
-        if (smoothstep(380.0, 240.0, vFogDepth) < fadeNoise) discard;`,
+        gl_FragColor.a *= smoothstep(430.0, 290.0, vFogDepth);`,
       );
     };
     return m;

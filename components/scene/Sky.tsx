@@ -36,7 +36,7 @@ const eclipseFragment = /* glsl */ `
       + 0.08 * sin(a * 17.0 + uTime * 0.02 + 4.0);
     float beads = 0.72 + 0.28 * sin(a * 5.0 + 2.0) * sin(a * 11.0 - 1.0 + uTime * 0.02);
     float d = max(r - R, 0.0);
-    float glow = exp(-d * 80.0) * 0.8 * beads + exp(-d * mix(24.0, 5.0, streak * streak)) * 0.5 * streak;
+    float glow = exp(-d * 70.0) * 0.9 * beads + exp(-d * mix(20.0, 3.6, streak * streak)) * 0.62 * streak;
     float rim = smoothstep(0.0035, 0.0, abs(r - R - 0.001)) * (0.5 + 0.5 * beads);
     float disc = smoothstep(R + 0.002, R - 0.002, r);
     float edge = smoothstep(1.0, 0.75, r);

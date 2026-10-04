@@ -4,7 +4,8 @@
 import { projects } from "./projects";
 
 export const GATE_X = 9; // project gateways stand to the right of the causeway
-export const GATE_SPACING = 40;
+// wider than the camera's trailing distance, so an earlier gateway never blocks the next one
+export const GATE_SPACING = 70;
 export const FIRST_GATE_Z = -215;
 
 export const gateZ = (index: number) => FIRST_GATE_Z - GATE_SPACING * index;

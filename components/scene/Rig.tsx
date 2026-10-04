@@ -54,12 +54,14 @@ export function Rig() {
 
     // journey camera: low, behind the figure, long lens
     const back = mobile ? 31 : 26;
-    pos.set(frame.focusX * (mobile ? 0.8 : 0.3), 3, frame.z + back);
-    look.set(frame.focusX * (mobile ? 0.9 : 0.5), 4.4, frame.z - 40);
+    // The camera never leaves the causeway (it would pass through earlier gateways);
+    // it only turns toward the landmark.
+    pos.set(frame.focusX * 0.12, 3, frame.z + back);
+    look.set(frame.focusX * (mobile ? 1.25 : 0.62), 4.4, frame.z - 40);
 
     if (frame.revealIndex >= 0) {
       const gz = gateZ(frame.revealIndex);
-      revealPos.set(GATE_X, 3.6, gz + 19);
+      revealPos.set(GATE_X, 3.6, gz + (mobile ? 30 : 19));
       revealLook.set(GATE_X, 4.9, gz);
       pos.lerp(revealPos, r);
       look.lerp(revealLook, r);
@@ -75,7 +77,7 @@ export function Rig() {
     const journeyX = mobile ? 0 : -0.12 * size.width;
     const journeyY = mobile ? 0.14 * size.height : 0;
     const revealX = mobile ? 0 : Math.min(280, size.width * 0.2);
-    const revealY = mobile ? 0.3 * size.height : 0;
+    const revealY = mobile ? 0.27 * size.height : 0;
     camera.setViewOffset(
       size.width,
       size.height,
