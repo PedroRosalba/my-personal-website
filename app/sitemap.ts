@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { projects } from "@/content/projects";
 import { siteUrl } from "@/content/profile";
+import { skillsPage } from "@/content/skills";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -10,5 +11,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly" as const,
       priority: 0.8,
     })),
+    { url: `${siteUrl}${skillsPage.path}`, changeFrequency: "monthly", priority: 0.7 },
   ];
 }
