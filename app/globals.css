@@ -216,6 +216,8 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 
 /* ---------- skills page ---------- */
 
+.site-header nav a[aria-current="page"] { color: var(--ink); }
+
 .skills-intro > * + * { margin-top: 16px; }
 .skills-title { font-size: clamp(36px, 4.2vw, 54px); font-weight: 300; letter-spacing: -0.02em; line-height: 1.08; margin-top: 8px !important; }
 .skills-section { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 40px; }
