@@ -264,6 +264,13 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .code-block { padding: 14px; font-size: 12px; }
 }
 
+/* narrow phones: six nav items must fit in one row without clipping */
+@media (max-width: 379px) {
+  .site-header { padding-left: 16px; padding-right: 16px; }
+  .site-header ul { gap: 4px; }
+  .site-header nav a { font-size: 12px; letter-spacing: -0.01em; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scene { transition: none; }
   .panel { animation: none; }
