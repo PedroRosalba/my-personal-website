@@ -273,6 +273,11 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .site-header nav a { font-size: 12px; letter-spacing: -0.01em; }
 }
 
+/* short phones: the Projects station must stay one screen tall */
+@media (max-width: 760px) and (max-height: 620px) {
+  .skills-teaser { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .scene { transition: none; }
   .panel { animation: none; }
