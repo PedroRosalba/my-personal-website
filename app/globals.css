@@ -214,6 +214,29 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 .back-link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-bottom: 24px; font-size: 14px; color: var(--ink-3); text-decoration: none; }
 .back-link:hover { color: var(--ink); }
 
+/* ---------- skills page ---------- */
+
+.skills-intro > * + * { margin-top: 16px; }
+.skills-title { font-size: clamp(36px, 4.2vw, 54px); font-weight: 300; letter-spacing: -0.02em; line-height: 1.08; margin-top: 8px !important; }
+.skills-section { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 40px; }
+.skills-section > * + * { margin-top: 16px; }
+.skills-note { font-size: 15px; color: var(--ink-2); }
+.skills-aside { font-size: 13px; color: var(--ink-3); }
+/* main is pointer-events: none for the 3D world; this page has no world, so its text stays selectable */
+.skills-page { pointer-events: auto; }
+.real-run { margin: 0; }
+.real-run > * + * { margin-top: 12px; }
+
+.code-block {
+  margin: 0; padding: 16px 18px; max-width: 100%; overflow-x: auto;
+  background: rgba(10, 10, 14, 0.82); border: 1px solid var(--line); border-radius: 2px;
+  font-family: var(--font-mono), ui-monospace, monospace; font-size: 13px; line-height: 1.7; color: var(--ink);
+  pointer-events: auto; -webkit-user-select: text; user-select: text;
+}
+/* long commands wrap with a hanging indent instead of widening the page */
+.code-line { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 2ch; text-indent: -2ch; }
+.code-comment { color: var(--ink-3); -webkit-user-select: none; user-select: none; }
+
 /* ---------- mobile ---------- */
 
 @media (max-width: 760px) {
@@ -236,6 +259,7 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .project-meta { grid-template-columns: 1fr 1fr; }
   .project-meta div:last-child { grid-column: 1 / -1; }
   .next-link { margin-left: 0; }
+  .code-block { padding: 14px; font-size: 12px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
