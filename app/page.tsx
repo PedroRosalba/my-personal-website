@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { profile, siteUrl, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
+import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
@@ -105,6 +106,11 @@ export default function Home() {
                   </li>
                 ))}
               </ol>
+              <p className="skills-teaser">
+                <Link className="next-link" href={skillsPage.path}>
+                  {skillsPage.teaser} <span aria-hidden="true">→</span>
+                </Link>
+              </p>
             </div>
           </div>
           {projects.map((p, i) => (
