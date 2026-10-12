@@ -29,6 +29,17 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Mobile verified at 390 and 360 wide (no horizontal overflow); stations are one screen tall on mobile.
 - Reduced motion verified (camera snaps, no dash); ~60 fps in headless Chrome at 1440×900.
 
+## Iteration 4 — background light wave (branch `feature/pillar-light-wave`, on top of PR #2)
+- `components/scene/lightWave.ts`: one `LIGHT_WAVE` config (pillars: speed, intensity, width, stagger, inset, fog;
+  sea: length, speed, intensity) and a shared clock driven by `frame.time` (frozen under reduced motion).
+- Colonnade monoliths: a soft violet swell rises through each one (per-monolith phase), dark at the foot, cap and
+  rim so it reads as liquid light inside a dark tank. Injected into the existing standard material via
+  `onBeforeCompile`; added after the scene fog through a thinner haze, or the fog would swallow it entirely.
+- Fog sea: a slow swell of the accent rolls toward the Eclipse, brightening the billow crests.
+- Gateways, stele and causeway are untouched (the wave belongs to the background, not the landmarks).
+- Lesson: never put a non-linear function of `uv`/`position` in the vertex shader for a box — every corner has
+  u ∈ {0, 1}, so the varying interpolates flat. Compute it in the fragment shader.
+
 ## Next (highest value first)
 1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
