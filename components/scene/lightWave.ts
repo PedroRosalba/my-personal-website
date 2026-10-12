@@ -16,13 +16,13 @@ export const LIGHT_WAVE = {
   /** how sharp the crest is: 1 = gentle sine, higher = a crest with longer dark between beats */
   shape: 2.2,
   /** peak added brightness on the fog sea */
-  ground: 0.19,
+  ground: 0.34,
   /** peak added brightness on the monoliths, in display space */
-  pillars: 0.62,
+  pillars: 1.0,
   /** the monolith glow is seen through haze: 1 = the scene fog, lower = it carries further */
   haze: 0.3,
-  /** how far the crest colour lifts from the accent violet toward pale lavender (0 = accent only) */
-  lift: 0.55,
+  /** how far the crest colour saturates from the accent violet toward electric violet (0 = accent only) */
+  lift: 1.0,
 };
 
 /** GLSL: the swell at world z, 0 → 1. Shared by the fog sea and the monoliths so they move as one. */
@@ -34,9 +34,9 @@ export const LIGHT_WAVE_GLSL = /* glsl */ `
     float w = 0.5 + 0.5 * cos(phase * 6.2831853);
     return pow(w, uLightWave.z);
   }
-  // display-space colour of the swell: violet on the flanks, lifting toward pale lavender at the crest
+  // display-space colour of the swell: the accent violet on the flanks, a saturated electric violet at the crest
   vec3 lightWaveColor(float swell) {
-    return mix(vec3(0.56, 0.4, 1.0), vec3(0.86, 0.8, 1.0), swell * uLightWave.w);
+    return mix(vec3(0.56, 0.4, 1.0), vec3(0.74, 0.3, 1.25), swell * uLightWave.w);
   }
 `;
 
