@@ -58,7 +58,7 @@ const fragment = /* glsl */ `
 
     // the light wave rolling across the fog toward the traveller; its front bows with the billows
     float swell = lightWave(vWorld.z, abs(p.x) * 0.15 + (n - 0.5) * 120.0);
-    color += uAccent * swell * uSwell * (0.4 + 0.6 * billow) * (1.0 - haze_(dist));
+    color += lightWaveColor(swell) * swell * uSwell * (0.4 + 0.6 * billow) * (1.0 - haze_(dist));
 
     // dissolve into the horizon haze
     float haze = haze_(dist);

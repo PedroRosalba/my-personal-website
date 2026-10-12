@@ -1,6 +1,6 @@
 import { useFrame } from "@react-three/fiber";
-import { MeshStandardMaterial, Vector3 } from "three";
-import { ACCENT_RAW, frame } from "./state";
+import { MeshStandardMaterial } from "three";
+import { frame } from "./state";
 
 /**
  * One slow swell of the accent colour rolling through the whole background, from the Eclipse toward
@@ -21,29 +21,34 @@ export const LIGHT_WAVE = {
   pillars: 0.62,
   /** the monolith glow is seen through haze: 1 = the scene fog, lower = it carries further */
   haze: 0.3,
+  /** how far the crest colour lifts from the accent violet toward pale lavender (0 = accent only) */
+  lift: 0.55,
 };
 
 /** GLSL: the swell at world z, 0 → 1. Shared by the fog sea and the monoliths so they move as one. */
 export const LIGHT_WAVE_GLSL = /* glsl */ `
-  uniform vec3 uLightWave; // length, speed, shape
+  uniform vec4 uLightWave; // length, speed, shape, lift
   uniform float uLightWaveTime;
   float lightWave(float z, float bow) {
     float phase = (z + bow - uLightWaveTime * uLightWave.y) / uLightWave.x;
     float w = 0.5 + 0.5 * cos(phase * 6.2831853);
     return pow(w, uLightWave.z);
   }
+  // display-space colour of the swell: violet on the flanks, lifting toward pale lavender at the crest
+  vec3 lightWaveColor(float swell) {
+    return mix(vec3(0.56, 0.4, 1.0), vec3(0.86, 0.8, 1.0), swell * uLightWave.w);
+  }
 `;
 
 // One clock and one set of controls, shared by every material that follows the wave.
 export const lightWaveUniforms = {
   uLightWaveTime: { value: 0 },
-  uLightWave: { value: [LIGHT_WAVE.length, LIGHT_WAVE.speed, LIGHT_WAVE.shape] },
+  uLightWave: { value: [LIGHT_WAVE.length, LIGHT_WAVE.speed, LIGHT_WAVE.shape, LIGHT_WAVE.lift] },
 };
 
 const monolithUniforms = {
   uLwIntensity: { value: LIGHT_WAVE.pillars },
   uLwHaze: { value: LIGHT_WAVE.haze },
-  uLwColor: { value: ACCENT_RAW.clone().lerp(new Vector3(1, 1, 1), 0.1) },
 };
 
 const vertexHead = /* glsl */ `
@@ -69,20 +74,20 @@ const fragmentHead = /* glsl */ `
   ${LIGHT_WAVE_GLSL}
   uniform float uLwIntensity;
   uniform float uLwHaze;
-  uniform vec3 uLwColor;
   varying float vLwH;
   varying float vLwZ;
   float lwGlow = 0.0;
+  float lwSwell = 0.0;
 `;
 
 // The monolith takes the swell as it passes: brightest where it meets the fog, fading toward the cap.
 const fragmentShape = /* glsl */ `
   #include <emissivemap_fragment>
   {
-    float swell = lightWave(vLwZ, 0.0);
+    lwSwell = lightWave(vLwZ, 0.0);
     float low = 1.0 - smoothstep(0.1, 0.9, vLwH);
     float facing = 0.7 + 0.3 * abs(dot(normal, normalize(vViewPosition)));
-    lwGlow = swell * (0.25 + 0.75 * low) * facing;
+    lwGlow = lwSwell * (0.25 + 0.75 * low) * facing;
   }
 `;
 
@@ -93,7 +98,7 @@ const fragmentLight = /* glsl */ `
   #ifdef USE_FOG
   {
     float haze = 1.0 - exp(-fogDensity * fogDensity * vFogDepth * vFogDepth * uLwHaze);
-    gl_FragColor.rgb += uLwColor * lwGlow * uLwIntensity * (1.0 - haze);
+    gl_FragColor.rgb += lightWaveColor(lwSwell) * lwGlow * uLwIntensity * (1.0 - haze);
   }
   #endif
 `;
