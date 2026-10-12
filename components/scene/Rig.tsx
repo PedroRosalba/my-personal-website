@@ -14,7 +14,7 @@ const revealPos = new Vector3();
 const revealLook = new Vector3();
 
 /** How long the traveller takes to cross the forecourt and step into the gateway. */
-const WALK_SECONDS = 2.2;
+const WALK_SECONDS = 2.8;
 
 /** Camera choreography. Everything is derived from scroll progress — nothing is steered directly. */
 export function Rig() {
