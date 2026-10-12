@@ -12,13 +12,13 @@ export const LIGHT_WAVE = {
   /** crest-to-crest distance in world units; long, so roughly one crest is in view at a time */
   length: 720,
   /** crest travel toward the camera, in world units per second (length / speed = seconds per beat) */
-  speed: 95,
+  speed: 140,
   /** how sharp the crest is: 1 = gentle sine, higher = a crest with longer dark between beats */
   shape: 2.2,
   /** peak added brightness on the fog sea */
-  ground: 0.14,
+  ground: 0.19,
   /** peak added brightness on the monoliths, in display space */
-  pillars: 0.5,
+  pillars: 0.62,
   /** the monolith glow is seen through haze: 1 = the scene fog, lower = it carries further */
   haze: 0.3,
 };
