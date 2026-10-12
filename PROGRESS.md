@@ -30,13 +30,15 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Reduced motion verified (camera snaps, no dash); ~60 fps in headless Chrome at 1440×900.
 
 ## Iteration 4 — background light wave (branch `feature/pillar-light-wave`, on top of PR #2)
-- `components/scene/lightWave.ts`: one `LIGHT_WAVE` config (pillars: speed, intensity, width, stagger, inset, fog;
-  sea: length, speed, intensity) and a shared clock driven by `frame.time` (frozen under reduced motion).
-- Colonnade monoliths: a soft violet swell rises through each one (per-monolith phase), dark at the foot, cap and
-  rim so it reads as liquid light inside a dark tank. Injected into the existing standard material via
-  `onBeforeCompile`; added after the scene fog through a thinner haze, or the fog would swallow it entirely.
-- Fog sea: a slow swell of the accent rolls toward the Eclipse, brightening the billow crests.
-- Gateways, stele and causeway are untouched (the wave belongs to the background, not the landmarks).
+- One slow swell of the accent rolls through the whole background toward the traveller (`LIGHT_WAVE` in
+  `components/scene/lightWave.ts`: length, speed, shape, ground, pillars, haze). The fog sea brightens as the
+  crest crosses it and the colonnade monoliths wake as it passes them, so the background rises and falls together,
+  about one beat every 7–8 s. Shared GLSL and uniforms keep the sea and the monoliths in step; the clock is
+  `frame.time`, so it freezes under reduced motion.
+- Monolith glow is injected into the existing standard material via `onBeforeCompile` and added after the scene
+  fog through a thinner haze; the monoliths stand deep enough in the fog to lose it otherwise.
+- Rejected on the way (Pedro): per-pillar vertical bands and anything on the project gateways. The motion belongs
+  to the background and the ground, never the landmarks.
 - Lesson: never put a non-linear function of `uv`/`position` in the vertex shader for a box — every corner has
   u ∈ {0, 1}, so the varying interpolates flat. Compute it in the fragment shader.
 

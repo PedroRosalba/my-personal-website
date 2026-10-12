@@ -4,7 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Mesh, ShaderMaterial } from "three";
 import { ACCENT_RAW, HORIZON_GLSL, frame } from "./state";
-import { LIGHT_WAVE } from "./lightWave";
+import { LIGHT_WAVE, LIGHT_WAVE_GLSL, lightWaveUniforms } from "./lightWave";
 
 const vertex = /* glsl */ `
   varying vec3 vWorld;
@@ -21,9 +21,10 @@ const fragment = /* glsl */ `
   uniform float uIntensity;
   uniform vec3 uAccent;
   uniform vec3 uCamera;
-  uniform vec3 uSwell; // crest spacing, speed toward the Eclipse, intensity
+  uniform float uSwell; // peak brightness of the light wave on the fog
 
   ${HORIZON_GLSL}
+  ${LIGHT_WAVE_GLSL}
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float noise(vec2 p) {
     vec2 i = floor(p), f = fract(p);
@@ -55,11 +56,9 @@ const fragment = /* glsl */ `
     float path = exp(-abs(p.x) / (120.0 + 500.0 * toward)) * toward;
     color += mix(vec3(0.5, 0.48, 0.62), uAccent, 0.55) * path * (0.2 + 0.5 * billow) * uIntensity;
 
-    // a slow swell of the accent rolling across the fog toward the Eclipse; its front bows with the billows
-    float front = vWorld.z + uTime * uSwell.y + abs(p.x) * 0.25 + (n - 0.5) * 90.0;
-    float swell = 0.5 + 0.5 * cos(front * 6.2831853 / uSwell.x);
-    swell = swell * swell * swell;
-    color += uAccent * swell * uSwell.z * (0.35 + 0.65 * billow) * (1.0 - haze_(dist));
+    // the light wave rolling across the fog toward the traveller; its front bows with the billows
+    float swell = lightWave(vWorld.z, abs(p.x) * 0.15 + (n - 0.5) * 120.0);
+    color += uAccent * swell * uSwell * (0.4 + 0.6 * billow) * (1.0 - haze_(dist));
 
     // dissolve into the horizon haze
     float haze = haze_(dist);
@@ -81,7 +80,8 @@ export function FogSea() {
           uIntensity: { value: 0.4 },
           uAccent: { value: ACCENT_RAW },
           uCamera: { value: [0, 0, 0] },
-          uSwell: { value: [LIGHT_WAVE.sea.length, LIGHT_WAVE.sea.speed, LIGHT_WAVE.sea.intensity] },
+          uSwell: { value: LIGHT_WAVE.ground },
+          ...lightWaveUniforms,
         },
         fog: false,
       }),
