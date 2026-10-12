@@ -42,6 +42,14 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Lesson: never put a non-linear function of `uv`/`position` in the vertex shader for a box — every corner has
   u ∈ {0, 1}, so the varying interpolates flat. Compute it in the fragment shader.
 
+## Iteration 5 — the traveller walks into the project (branch `feature/traveller-walks-in`, on top of PR #3)
+- Opening a project no longer hides the traveller: he leaves the causeway, crosses the forecourt, steps through
+  the arch and fades violet into the portal, while the camera swings round and the panel slides in (3 s walk,
+  content never waits). `frame.walk` (0→1) is advanced by the Rig; `Figure.tsx` follows a Catmull-Rom way-in
+  built from the figure's position when the reveal starts (or the gateway's stop, if he was far away).
+- Closing the panel puts him straight back on the causeway behind the retreating camera. Reduced motion keeps
+  the old cut. Gateways, panel and camera framing untouched.
+
 ## Next (highest value first)
 1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
