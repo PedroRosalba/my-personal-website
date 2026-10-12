@@ -10,6 +10,7 @@ import { FogSea } from "./FogSea";
 import { Causeway, Colonnade, Stele } from "./Structures";
 import { Gateway } from "./Gateway";
 import { EthDiamond } from "./EthDiamond";
+import { LightWaveClock } from "./lightWave";
 
 export function World({ onOpen }: { onOpen: (slug: string) => void }) {
   return (
@@ -23,6 +24,7 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
       <directionalLight position={[-40, 50, 120]} intensity={0.5} color="#8c8c98" />
 
       <Rig />
+      <LightWaveClock />
       <Sky />
       <FogSea />
       <Colonnade />

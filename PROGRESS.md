@@ -29,6 +29,19 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Mobile verified at 390 and 360 wide (no horizontal overflow); stations are one screen tall on mobile.
 - Reduced motion verified (camera snaps, no dash); ~60 fps in headless Chrome at 1440×900.
 
+## Iteration 4 — background light wave (branch `feature/pillar-light-wave`, on top of PR #2)
+- One slow swell of the accent rolls through the whole background toward the traveller (`LIGHT_WAVE` in
+  `components/scene/lightWave.ts`: length, speed, shape, ground, pillars, haze). The fog sea brightens as the
+  crest crosses it and the colonnade monoliths wake as it passes them, so the background rises and falls together,
+  about one beat every 7–8 s. Shared GLSL and uniforms keep the sea and the monoliths in step; the clock is
+  `frame.time`, so it freezes under reduced motion.
+- Monolith glow is injected into the existing standard material via `onBeforeCompile` and added after the scene
+  fog through a thinner haze; the monoliths stand deep enough in the fog to lose it otherwise.
+- Rejected on the way (Pedro): per-pillar vertical bands and anything on the project gateways. The motion belongs
+  to the background and the ground, never the landmarks.
+- Lesson: never put a non-linear function of `uv`/`position` in the vertex shader for a box — every corner has
+  u ∈ {0, 1}, so the varying interpolates flat. Compute it in the fragment shader.
+
 ## Next (highest value first)
 1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
