@@ -28,7 +28,7 @@ function wayIn(index: number, fromZ: number) {
       new Vector3(2.8, 0, Math.min(startZ - 3, gz + 8.5)),
       new Vector3(GATE_X - 0.6, 0, gz + 4.8),
       new Vector3(GATE_X, 0, gz + 2.4),
-      new Vector3(GATE_X, 0, gz - 3.5),
+      new Vector3(GATE_X, 0, gz + 0.2),
     ],
     false,
     "centripetal",
@@ -42,20 +42,30 @@ export function Figure() {
   const legR = useRef<Group>(null!);
   const armL = useRef<Group>(null!);
   const armR = useRef<Group>(null!);
-  const state = useRef({ phase: 0, moving: 0, yaw: 0, way: null as CatmullRomCurve3 | null, wayIndex: -1, t: 0 });
+  const state = useRef({
+    phase: 0,
+    moving: 0,
+    yaw: 0,
+    heading: 0,
+    way: null as CatmullRomCurve3 | null,
+    wayIndex: -1,
+    t: 0,
+  });
 
   useFrame((_, rawDt) => {
     const dt = Math.min(rawDt, 0.05);
     const s = state.current;
-    const walking = frame.walk > 0 && frame.revealIndex >= 0;
+    // in while a project is open; back out, along the same way, after it closes
+    const walking = frame.walk > 0 && (frame.revealIndex >= 0 || s.way !== null);
 
     let moving: number;
     let targetYaw: number;
     let glow = 0;
+    let fade = 0;
     const atContact = clamp01((FINAL_GATE_Z + 64 - frame.z) / 12);
 
     if (walking) {
-      if (s.wayIndex !== frame.revealIndex || !s.way) {
+      if (!s.way || (frame.revealIndex >= 0 && s.wayIndex !== frame.revealIndex)) {
         s.way = wayIn(frame.revealIndex, frame.z);
         s.wayIndex = frame.revealIndex;
         s.t = 0;
@@ -66,13 +76,17 @@ export function Figure() {
       const prevT = s.t;
       s.t = eased;
       s.way.getPointAt(eased, point);
-      s.way.getTangentAt(Math.min(eased, 0.995), tangent);
-      const travelled = (eased - prevT) * s.way.getLength();
+      s.way.getTangentAt(Math.min(Math.max(eased, 0.005), 0.995), tangent);
+      const delta = eased - prevT;
+      const travelled = Math.abs(delta) * s.way.getLength();
       moving = 1;
       s.phase += travelled * 2.9; // long, purposeful strides
-      targetYaw = Math.atan2(-tangent.x, -tangent.z);
-      // he glows as he steps into the light
-      glow = smooth(clamp01((eased - 0.72) / 0.22));
+      if (delta < 0) tangent.negate(); // walking back out
+      if (delta !== 0) s.heading = Math.atan2(-tangent.x, -tangent.z);
+      targetYaw = s.heading;
+      // he glows as he steps into the light, and dissolves into it
+      glow = smooth(clamp01((eased - 0.66) / 0.22));
+      fade = smooth(clamp01((eased - 0.84) / 0.14));
       root.current.position.copy(point);
     } else {
       s.way = null;
@@ -101,18 +115,27 @@ export function Figure() {
     // turning: snap when the way bends sharply, otherwise ease
     s.yaw = frame.reduced ? targetYaw : damp(s.yaw, targetYaw, walking ? 7 : 3, dt);
     root.current.rotation.y = s.yaw;
-    // gone once he is through the arch; the portal plane hides him before that
-    root.current.visible = frame.walk < 1;
+    // gone once he has dissolved into the portal
+    root.current.visible = frame.walk < 1 && fade < 0.999;
 
     // pale anchor along the journey; a dark silhouette against the final door of light;
     // violet as he walks into a gateway
     material.emissiveIntensity = 0.22 * (1 - 0.9 * atContact) + glow * 1.6;
     material.color.copy(PALE).lerp(SHADE, atContact).lerp(ACCENT, glow * 0.8);
     material.emissive.copy(PALE).lerp(ACCENT, glow);
+    material.opacity = 1 - fade;
   });
 
   const material = useMemo(
-    () => new MeshStandardMaterial({ color: PALE, roughness: 1, emissive: PALE, emissiveIntensity: 0.22 }),
+    () =>
+      new MeshStandardMaterial({
+        color: PALE,
+        roughness: 1,
+        emissive: PALE,
+        emissiveIntensity: 0.22,
+        transparent: true,
+        opacity: 1,
+      }),
     [],
   );
 
