@@ -7,6 +7,7 @@ export const frame = {
   focusX: 0,
   reveal: 0, // 0..1 project reveal blend
   revealIndex: -1,
+  walk: 0, // 0..1 the traveller's walk from the causeway into the open gateway
   progress: 0, // 0 at Arrival → 1 at Contact
   time: 0, // animation clock (frozen under reduced motion)
   reduced: false,

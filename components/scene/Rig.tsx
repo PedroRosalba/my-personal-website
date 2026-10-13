@@ -13,6 +13,9 @@ const look = new Vector3();
 const revealPos = new Vector3();
 const revealLook = new Vector3();
 
+/** How long the traveller takes to cross the forecourt and step into the gateway. */
+const WALK_SECONDS = 2.8;
+
 /** Camera choreography. Everything is derived from scroll progress — nothing is steered directly. */
 export function Rig() {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
@@ -52,6 +55,12 @@ export function Rig() {
     if (frame.reveal < 0.002 && revealTarget === 0) frame.revealIndex = -1;
     const r = smooth(clamp01(frame.reveal));
 
+    // the traveller walks into the open gateway while the camera swings round to it,
+    // and walks back out to the causeway when the panel closes
+    const step = dt / WALK_SECONDS;
+    if (frame.reduced) frame.walk = activeIndex >= 0 ? 1 : 0;
+    else frame.walk = activeIndex >= 0 ? Math.min(1, frame.walk + step) : Math.max(0, frame.walk - step);
+
     // journey camera: low, behind the figure, long lens
     const back = mobile ? 31 : 26;
     // The camera never leaves the causeway (it would pass through earlier gateways);
@@ -61,8 +70,8 @@ export function Rig() {
 
     if (frame.revealIndex >= 0) {
       const gz = gateZ(frame.revealIndex);
-      revealPos.set(GATE_X, 3.6, gz + (mobile ? 30 : 19));
-      revealLook.set(GATE_X, 4.9, gz);
+      revealPos.set(GATE_X - 0.8, 3.8, gz + (mobile ? 34 : 25));
+      revealLook.set(GATE_X - 0.4, 4.6, gz);
       pos.lerp(revealPos, r);
       look.lerp(revealLook, r);
     }
