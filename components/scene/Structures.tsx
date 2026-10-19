@@ -4,6 +4,7 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { InstancedMesh, MeshStandardMaterial, Object3D } from "three";
 import { CAUSEWAY_END_Z, FINAL_GATE_Z } from "@/content/journey";
 import { STONE } from "./state";
+import { applyLightWave } from "./lightWave";
 
 const hash = (n: number) => {
   const x = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -108,7 +109,7 @@ export function Colonnade() {
         gl_FragColor.a *= smoothstep(430.0, 290.0, vFogDepth);`,
       );
     };
-    return m;
+    return applyLightWave(m);
   }, []);
   return (
     <instancedMesh ref={ref} args={[undefined, undefined, count]} material={material}>

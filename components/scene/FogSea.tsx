@@ -4,6 +4,7 @@ import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { Mesh, ShaderMaterial } from "three";
 import { ACCENT_RAW, HORIZON_GLSL, frame } from "./state";
+import { LIGHT_WAVE, LIGHT_WAVE_GLSL, lightWaveUniforms } from "./lightWave";
 
 const vertex = /* glsl */ `
   varying vec3 vWorld;
@@ -20,8 +21,10 @@ const fragment = /* glsl */ `
   uniform float uIntensity;
   uniform vec3 uAccent;
   uniform vec3 uCamera;
+  uniform float uSwell; // peak brightness of the light wave on the fog
 
   ${HORIZON_GLSL}
+  ${LIGHT_WAVE_GLSL}
   float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
   float noise(vec2 p) {
     vec2 i = floor(p), f = fract(p);
@@ -33,6 +36,8 @@ const fragment = /* glsl */ `
     for (int i = 0; i < 5; i++) { v += a * noise(p); p = p * 2.03 + 17.0; a *= 0.5; }
     return v;
   }
+
+  float haze_(float dist) { return smoothstep(300.0, 2400.0, dist); }
 
   void main() {
     vec2 p = vWorld.xz;
@@ -51,8 +56,12 @@ const fragment = /* glsl */ `
     float path = exp(-abs(p.x) / (120.0 + 500.0 * toward)) * toward;
     color += mix(vec3(0.5, 0.48, 0.62), uAccent, 0.55) * path * (0.2 + 0.5 * billow) * uIntensity;
 
+    // the light wave rolling across the fog toward the traveller; its front bows with the billows
+    float swell = lightWave(vWorld.z, abs(p.x) * 0.15 + (n - 0.5) * 120.0);
+    color += lightWaveColor(swell) * swell * uSwell * (0.4 + 0.6 * billow) * (1.0 - haze_(dist));
+
     // dissolve into the horizon haze
-    float haze = smoothstep(300.0, 2400.0, dist);
+    float haze = haze_(dist);
     color = mix(color, horizonColor(uIntensity, uAccent), haze);
     gl_FragColor = vec4(color, 1.0);
   }
@@ -71,6 +80,8 @@ export function FogSea() {
           uIntensity: { value: 0.4 },
           uAccent: { value: ACCENT_RAW },
           uCamera: { value: [0, 0, 0] },
+          uSwell: { value: LIGHT_WAVE.ground },
+          ...lightWaveUniforms,
         },
         fog: false,
       }),
