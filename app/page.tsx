@@ -1,6 +1,7 @@
 import Link from "next/link";
-import { profile, siteUrl, type TimelineItem } from "@/content/profile";
+import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
+import { openSource } from "@/content/openSource";
 import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
@@ -8,16 +9,39 @@ import { ProjectCard } from "@/components/html/ProjectCard";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
 
-function Timeline({ items, empty }: { items: TimelineItem[]; empty: string }) {
-  if (!items.length) return <p className="muted">{empty}</p>;
+function ProofLinks({ links }: { links: LinkItem[] }) {
   return (
-    <ol className="timeline">
+    <ul className="proof">
+      {links.map((link) => (
+        <li key={link.href}>
+          <a href={link.href} target="_blank" rel="noreferrer">
+            {link.label} <span aria-hidden="true">↗</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Timeline({ items, compact = false }: { items: TimelineItem[]; compact?: boolean }) {
+  return (
+    <ol className={compact ? "timeline timeline-compact" : "timeline"}>
       {items.map((item) => (
         <li key={`${item.title}-${item.period}`}>
           <p className="timeline-period">{item.period}</p>
-          <h3 className="timeline-title">{item.title}</h3>
-          <p className="timeline-place">{item.place}</p>
-          {item.detail ? <p className="timeline-detail">{item.detail}</p> : null}
+          <div>
+            <h3 className="timeline-title">
+              {item.title}
+              {compact ? null : <span className="timeline-place"> · {item.place}</span>}
+            </h3>
+            {item.detail ? <p className="timeline-detail">{item.detail}</p> : null}
+            {item.proof?.length ? <ProofLinks links={item.proof} /> : null}
+            {item.note ? (
+              <p className="timeline-note">
+                {profile.contact.cv ? <a href={profile.contact.cv}>{item.note}</a> : item.note}
+              </p>
+            ) : null}
+          </div>
         </li>
       ))}
     </ol>
@@ -81,9 +105,10 @@ export default function Home() {
 
         <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
           <div className="copy">
-            <p className="eyebrow">02 — Education</p>
-            <h2 id="education-h">Education</h2>
-            <Timeline items={profile.education} empty="Education details are being added." />
+            <p className="eyebrow">02 — Education &amp; Honors</p>
+            <h2 id="education-h">Math first, then code.</h2>
+            <Timeline items={profile.education} />
+            <Timeline items={profile.honors} compact />
           </div>
         </section>
 
@@ -92,7 +117,7 @@ export default function Home() {
             <div className="copy">
               <p className="eyebrow">03 — Projects</p>
               <h2 id="projects-h">Selected work</h2>
-              <p>Three projects. Open one for the outcome, my role, the stack and the technical highlights.</p>
+              <p>Three gateways, each with proof you can open: the repository, the PRs, the result.</p>
               <ol className="project-index">
                 {projects.map((p, i) => (
                   <li key={p.slug}>
@@ -122,17 +147,49 @@ export default function Home() {
           ))}
         </section>
 
+        <section id="open-source" className="station" data-stop="open-source" aria-labelledby="open-source-h">
+          <div className="copy">
+            <p className="eyebrow">04 — Open source</p>
+            <h2 id="open-source-h">Fixes sent upstream.</h2>
+            <ul className="oss-list">
+              {openSource.map((item) => (
+                <li key={item.project}>
+                  <a href={item.href} target="_blank" rel="noreferrer">
+                    <span className="oss-project">{item.project}</span>
+                    <span className="oss-count">{item.count}</span>
+                    <span className="oss-what">{item.what}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+            {profile.writing ? (
+              <p className="section-more">
+                <a className="next-link" href={profile.writing}>
+                  How the bugs were found, in writing <span aria-hidden="true">→</span>
+                </a>
+              </p>
+            ) : null}
+          </div>
+        </section>
+
         <section id="experience" className="station" data-stop="experience" aria-labelledby="experience-h">
           <div className="copy">
-            <p className="eyebrow">04 — Experience</p>
+            <p className="eyebrow">05 — Experience</p>
             <h2 id="experience-h">Experience</h2>
-            <Timeline items={profile.experience} empty="Experience details are being added." />
+            <Timeline items={profile.experience} />
+            {profile.contact.cv ? (
+              <p className="section-more">
+                <a className="next-link" href={profile.contact.cv}>
+                  Full CV, with numbers <span aria-hidden="true">↓</span>
+                </a>
+              </p>
+            ) : null}
           </div>
         </section>
 
         <section id="contact" className="station" data-stop="contact" aria-labelledby="contact-h">
           <div className="copy">
-            <p className="eyebrow">05 — Contact</p>
+            <p className="eyebrow">06 — Contact</p>
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>
@@ -151,6 +208,11 @@ export default function Home() {
               {contact.cv ? (
                 <a className="button" href={contact.cv}>
                   Download CV <span aria-hidden="true">↓</span>
+                </a>
+              ) : null}
+              {profile.writing ? (
+                <a className="button" href={profile.writing}>
+                  Writing <span aria-hidden="true">↗</span>
                 </a>
               ) : null}
             </div>
@@ -173,7 +235,9 @@ export default function Home() {
             url: siteUrl,
             description: profile.positioning,
             jobTitle: "Software Engineer",
-            knowsAbout: ["Software engineering", "Artificial intelligence", "Systems programming", "Rust", "TypeScript", "WebGL"],
+            email: contact.email ? `mailto:${contact.email}` : undefined,
+            alumniOf: { "@type": "CollegeOrUniversity", name: "IMPA Tech" },
+            knowsAbout: ["Rust", "TypeScript", "Payments", "Zero-knowledge proofs", "AI agents", "Build systems"],
             sameAs: contact.links.map((l) => l.href),
           },
           { "@context": "https://schema.org", "@type": "WebSite", name: profile.name, url: siteUrl },

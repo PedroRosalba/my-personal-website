@@ -24,7 +24,8 @@ export const stops: Stop[] = [
   { id: "education", z: -150, focusX: 0 },
   { id: "projects", z: -186, focusX: 2 },
   ...projects.map((p, i) => ({ id: `project-${p.slug}`, z: gateZ(i) + 13, focusX: GATE_X })),
-  { id: "experience", z: lastGateZ - 40, focusX: 0 },
+  { id: "open-source", z: lastGateZ - 28, focusX: 0 },
+  { id: "experience", z: lastGateZ - 66, focusX: 0 },
   { id: "contact", z: FINAL_GATE_Z + 44, focusX: 0 },
 ];
 

@@ -52,8 +52,20 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - The reveal camera stands a little further back and lower (25 m instead of 19 m) so the forecourt and the walk
   are in frame; Pedro found the old framing too tight for the animation. Gateways and the panel are untouched.
 
+## Iteration 6 — real experience (branch `feature/real-experience`, on top of PR #4)
+- Content from the CV, not drafts: positioning, About, Education & Honors (IMPA Tech, ETHGlobal, ETHDenver,
+  olympiads), Experience (eNor, Herodotus, Mediolano, Blockchain League, Pensi) with proof links per row.
+  eNor shows "Closed source. Full scope on the CV." and links the PDF.
+- Gateways are now Ravi, Turborepo (upstream fixes) and Cran (ETHDenver 2025, ETH landmark). The three old
+  repos are gone from the causeway. Daloc and Risklayer are deliberately absent (Pedro can't claim them).
+- New `open-source` stop between the last gateway and Experience (`content/openSource.ts`), its own camera stop.
+- CV PDF at `/pedro-rosalba-cv.pdf`, linked from the nav, Experience and Contact. Writing links appear only when
+  `NEXT_PUBLIC_BLOG_URL` is set.
+- Nav: Education, Writing and Skills hide on phones; Writing and Skills also hide at 761–1100 px.
+- Verified 1440×900, 1024×768, 390×844: every station fits one screen, no horizontal scroll, no console errors.
+
 ## Next (highest value first)
-1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
+1. Content from Pedro (see CONTENT_TODO.md): talk/podcast URLs, Ravi demos, photo, blog URL, domain.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
 3. Real-device check (touch scrolling on iOS/Android, low-power GPU).
 

@@ -144,10 +144,38 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 .facts dt, .project-meta dt { font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
 .facts dd { margin-top: 8px; font-size: 15px; }
 
-.timeline > li { border-top: 1px solid var(--line); padding: 18px 0; }
-.timeline-period { font-family: var(--font-mono), monospace; font-size: 12px; color: var(--ink-3) !important; }
-.timeline-title { font-size: 19px; font-weight: 400; margin-top: 6px; }
-.timeline-place, .timeline-detail { font-size: 15px; }
+.timeline > li { border-top: 1px solid var(--line); padding: 12px 0; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 4px 14px; }
+.timeline-period { font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.9; color: var(--ink-3) !important; }
+.timeline-title { font-size: 17px; font-weight: 400; line-height: 1.35; }
+.timeline-place { color: var(--ink-3); font-weight: 400; }
+.timeline-detail { font-size: 14px; line-height: 1.5; margin-top: 4px; }
+.timeline-note { font-size: 13px; margin-top: 6px; color: var(--ink-3) !important; }
+.timeline-note a { color: var(--ink-3); text-underline-offset: 3px; }
+.timeline-note a:hover { color: var(--ink); }
+.timeline + .timeline { margin-top: 0; }
+.timeline-compact > li { padding: 10px 0; }
+.timeline-compact .timeline-title { font-size: 15px; }
+.proof { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 6px; }
+.proof a {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 28px;
+  font-family: var(--font-mono), monospace; font-size: 12px; color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid var(--line-strong);
+}
+.proof a:hover { color: var(--ink); border-color: var(--ink-3); }
+.section-more .next-link { margin-left: 0; }
+
+/* ---------- open source ---------- */
+
+.oss-list { border-top: 1px solid var(--line); }
+.oss-list li { border-bottom: 1px solid var(--line); }
+.oss-list a {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 12px; padding: 12px 0;
+  text-decoration: none; color: var(--ink);
+}
+.oss-project { font-size: 17px; }
+.oss-count { font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.9; color: var(--ink-3); text-align: right; }
+.oss-what { grid-column: 1 / -1; font-size: 14px; line-height: 1.45; color: var(--ink-2); }
+.oss-list a:hover .oss-project { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
 
 /* ---------- projects ---------- */
 
@@ -241,6 +269,11 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 .code-line { display: block; white-space: pre-wrap; overflow-wrap: anywhere; padding-left: 2ch; text-indent: -2ch; }
 .code-comment { color: var(--ink-3); -webkit-user-select: none; user-select: none; }
 
+/* tablets and small laptops: the route links (Writing, Skills) go first; the sections and the CV stay */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .nav-wide.nav-route { display: none; }
+}
+
 /* ---------- mobile ---------- */
 
 @media (max-width: 760px) {
@@ -250,6 +283,16 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .site-name { min-height: 36px; display: inline-flex; align-items: center; }
   .site-header ul { justify-content: space-between; gap: 8px; }
   .site-header nav a { font-size: 13px; }
+  .nav-wide { display: none; }
+  .timeline > li { grid-template-columns: 84px minmax(0, 1fr); gap: 10px; padding: 9px 0; }
+  .timeline-period { font-size: 11px; }
+  .timeline-title { font-size: 15px; }
+  .timeline-compact > li { padding: 8px 0; }
+  /* one screen per station: the CV link below carries the detail */
+  #experience .timeline-detail { display: none; }
+  #experience .proof { margin-top: 2px; }
+  .oss-list a { padding: 9px 0; }
+  .oss-what { font-size: 13px; }
   /* copy sits at the bottom, so a station must not be taller than the screen */
   .station, .station:not(.hero), #projects .station { min-height: 100svh; }
   .station { align-items: flex-end; padding-bottom: 56px; }
@@ -266,7 +309,7 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .code-block { padding: 14px; font-size: 12px; }
 }
 
-/* narrow phones: six nav items must fit in one row without clipping */
+/* narrow phones: six nav items (the .nav-wide ones are hidden) must fit in one row without clipping */
 @media (max-width: 379px) {
   .site-header { padding-left: 16px; padding-right: 16px; }
   .site-header ul { gap: 4px; }

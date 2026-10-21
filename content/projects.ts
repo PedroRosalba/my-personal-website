@@ -1,7 +1,9 @@
 // Single source of truth for projects.
 // Drives: home project cards, /projects/[slug] pages, metadata, JSON-LD, sitemap
 // and the 3D gateways (order = gateway order along the causeway).
-// All facts below come from the public GitHub repositories.
+// Every fact below can be checked from the linked repositories and PRs.
+
+import { profile } from "./profile";
 
 export type Project = {
   slug: string;
@@ -17,62 +19,74 @@ export type Project = {
   landmark: "portal" | "eth";
 };
 
+const writing = profile.writing ? [{ label: "Writing", href: profile.writing }] : [];
+
 export const projects: Project[] = [
   {
-    slug: "rust-tx-processor",
-    title: "Rust Transaction Processor",
+    slug: "ravi",
+    title: "Ravi",
     outcome:
-      "A CLI payment engine that streams a CSV of transactions and outputs final account balances, including disputes, resolutions and chargebacks.",
-    role: "Design and implementation",
+      "An open-source platform for running AI agents on machines you control, reached from WhatsApp, Slack and the CLI. I help maintain it and work on its security and sandboxing.",
+    role: "Maintainer — permissions, security, sandboxes",
     year: "2026",
-    stack: ["Rust", "CSV streaming", "Fixed-point arithmetic"],
+    stack: ["TypeScript", "Bun", "NATS", "E2B", "Cloudflare Workers"],
     highlights: [
-      "Money is a fixed-point type (i64 scaled by 10,000) with checked arithmetic — no floating-point path, overflow surfaces as an explicit error.",
-      "Invalid rows and rejected transactions are logged to stderr while processing continues without panicking.",
-      "Full dispute lifecycle: held funds, resolve, and chargeback with account locking.",
-      "Ships with a load generator for stress-testing large CSV inputs.",
+      "Merged: agents get permissions only when they are granted explicitly, behind a stricter bash guard.",
+      "In review: state files are owner-only, the gateway is HTTPS-only, and runtime context keys are stored as digests at rest.",
+      "In review: E2B sandboxes with deny-all egress, the API key never inside the VM, and every sandbox output treated as hostile.",
+      "In review: connected sandboxes, where a Cloudflare Tunnel and a Gate Worker verify short-lived, Console-minted grants before a task reaches a machine.",
     ],
-    links: [{ label: "GitHub", href: "https://github.com/PedroRosalba/rust-tx-processor" }],
+    links: [
+      { label: "Repository", href: "https://github.com/filipexyz/ravi" },
+      { label: "My PRs", href: "https://github.com/filipexyz/ravi/pulls?q=is%3Apr+author%3APedroRosalba" },
+      ...writing,
+    ],
     video: null,
     landmark: "portal",
   },
   {
-    slug: "stealth-address-template",
-    title: "Stealth Address Template",
+    slug: "turborepo",
+    title: "Turborepo, upstream",
     outcome:
-      "A starter app for private payments on Starknet: senders pay to one-time stealth addresses, recipients scan and claim.",
-    role: "Design and implementation",
+      "Sixteen merged fixes to Turborepo's Rust core, most of them places where the cache said hit, or skipped a task, when it should not have.",
+    role: "Open-source contributor",
     year: "2026",
-    stack: ["TypeScript", "Next.js", "Starknet", "Cavos"],
+    stack: ["Rust", "Cargo", "uv", "pnpm", "Git internals"],
     highlights: [
-      "Two complete flows: a sender wizard for stealth payments and a recipient wizard for meta-address setup, scanning and claiming.",
-      "Integrates a Starknet stealth-address SDK with factory and registry contract ABIs.",
-      "Wallet connection handled through Cavos, so the template works as a base for new apps.",
+      "Cargo.lock changes are attributed to the crates whose dependencies changed, instead of invalidating the whole workspace.",
+      "File hashing matches git's text=auto binary detection, so the same checkout hashes the same everywhere.",
+      "Cached symlinks are restored when outputs already exist on disk, and the restore manifest is written before a local hit returns.",
+      "Python and Rust tool configuration (ruff, pytest, uv, Clippy) is part of the task hash, and survives `turbo prune`.",
     ],
     links: [
       {
-        label: "GitHub",
-        href: "https://github.com/PedroRosalba/basecamp-cavos-stealthaddress-template",
+        label: "Merged PRs",
+        href: "https://github.com/vercel/turborepo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
       },
+      ...writing,
+    ],
+    video: null,
+    landmark: "portal",
+  },
+  {
+    slug: "cran",
+    title: "Cran",
+    outcome:
+      "An AI companion whose memory stays private: conversation memory is stored under homomorphic encryption, so retrieval works without decrypting it. Built at ETHDenver 2025.",
+    role: "Hackathon team",
+    year: "2025",
+    stack: ["Python", "LangChain", "Microsoft SEAL (FHE)", "Next.js", "EVM"],
+    highlights: [
+      "Retrieval-augmented memory over encrypted embeddings, computed with SEAL's homomorphic encryption.",
+      "Contracts deployed on Sepolia, Base Sepolia, Flow EVM, Zircuit and Somnia testnets.",
+      "Won the zkSync, Flow and Somnia bounties at ETHDenver 2025.",
+    ],
+    links: [
+      { label: "Repository", href: "https://github.com/Arthur-Jacobina/cran" },
+      { label: "Devfolio", href: "https://devfolio.co/projects/cranberry-bd29" },
     ],
     video: null,
     landmark: "eth",
-  },
-  {
-    slug: "space-invaders-topology",
-    title: "Collaborative Space Invaders",
-    outcome:
-      "A multiplayer Space Invaders where everyone in a room cooperates to clear the ships, with game state shared over the Topology network.",
-    role: "Design and implementation",
-    year: "2024",
-    stack: ["TypeScript", "Next.js", "Topology (CRDT objects)"],
-    highlights: [
-      "Game state lives in replicated Topology objects; a GameBoard object tracks players, ships and bullets.",
-      "Multiple players share one room and one board, with positions updated as the game runs.",
-    ],
-    links: [{ label: "GitHub", href: "https://github.com/PedroRosalba/space-invaders-topology" }],
-    video: null,
-    landmark: "portal",
   },
 ];
 

@@ -6,10 +6,12 @@ import { useJourney } from "@/lib/store";
 import { profile } from "@/content/profile";
 import { skillsPage } from "@/content/skills";
 
+// `wide`: hidden on phones, where only six items fit in one row (the section is still a scroll away).
 const items = [
   { id: "about", label: "About" },
-  { id: "education", label: "Education" },
+  { id: "education", label: "Education", wide: true },
   { id: "projects", label: "Projects" },
+  { id: "open-source", label: "Open source" },
   { id: "experience", label: "Experience" },
   { id: "contact", label: "Contact" },
 ];
@@ -29,7 +31,7 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
       <nav aria-label="Primary">
         <ul>
           {items.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className={item.wide ? "nav-wide" : undefined}>
               <Link
                 href={`${prefix}#${item.id}`}
                 aria-current={onHome && current === item.id ? "true" : undefined}
@@ -38,12 +40,22 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
               </Link>
             </li>
           ))}
-          {/* A route, not a scroll stop: kept apart from the section items above. */}
-          <li>
+          {/* Routes and files, not scroll stops: kept apart from the section items above. */}
+          {profile.writing ? (
+            <li className="nav-wide nav-route">
+              <a href={profile.writing}>Writing</a>
+            </li>
+          ) : null}
+          <li className="nav-wide nav-route">
             <Link href={skillsPage.path} aria-current={pathname === skillsPage.path ? "page" : undefined}>
               {skillsPage.label}
             </Link>
           </li>
+          {profile.contact.cv ? (
+            <li className="nav-route">
+              <a href={profile.contact.cv}>CV</a>
+            </li>
+          ) : null}
         </ul>
       </nav>
     </header>
