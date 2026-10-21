@@ -2,7 +2,8 @@ import Link from "next/link";
 import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { featuredRoles, earlierRoles, type Role } from "@/content/experience";
-import { media } from "@/content/media";
+import { community } from "@/content/media";
+import { hackathons } from "@/content/hackathons";
 import { writingBySeries } from "@/content/writing";
 import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
@@ -65,7 +66,7 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         {index === 0 ? (
           <>
             <p className="eyebrow">01 — Experience</p>
-            <h2 id="experience-h">Production experience</h2>
+            <h2 id="experience-h">Experience</h2>
           </>
         ) : null}
         <div className="role-head">
@@ -114,6 +115,7 @@ export default function Home() {
             <p className="eyebrow">{profile.role}</p>
             <h1 id="hero-name">{profile.name}</h1>
             <p className="lead">{profile.positioning}</p>
+            <p className="hero-overview">{profile.overview}</p>
             <div className="actions">
               <Link className="button button-primary" href="#experience">
                 See the work <span aria-hidden="true">→</span>
@@ -136,7 +138,7 @@ export default function Home() {
           ))}
           <div className="station" data-stop="experience-earlier">
             <div className="copy">
-              <p className="eyebrow">Earlier</p>
+              <p className="eyebrow">Also</p>
               <ol className="timeline">
                 {earlierRoles.map((role) => (
                   <li key={role.slug}>
@@ -166,10 +168,41 @@ export default function Home() {
           </div>
         </section>
 
+        <section id="hackathons" className="station" data-stop="hackathons" aria-labelledby="hackathons-h">
+          <div className="copy">
+            <p className="eyebrow">02 — Hackathons</p>
+            <h2 id="hackathons-h">Built in a weekend, judged the same day.</h2>
+            <ul className="cards">
+              {hackathons.map((h) => (
+                <li key={h.project} className="card-row">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="card-thumb" src={h.image} alt="" loading="lazy" />
+                  <div>
+                    <p className="timeline-period">
+                      {h.event} {h.year}
+                    </p>
+                    <h3 className="card-row-title">
+                      <a href={h.links[0].href} target="_blank" rel="noreferrer">
+                        {h.project}
+                      </a>
+                    </h3>
+                    <p className="card-row-text">{h.pitch}</p>
+                    <ul className="prizes" aria-label="Prizes">
+                      {h.prizes.map((prize) => (
+                        <li key={prize}>{prize}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+
         <section id="projects" aria-labelledby="projects-h">
           <div className="station" data-stop="projects">
             <div className="copy">
-              <p className="eyebrow">02 — Projects</p>
+              <p className="eyebrow">03 — Projects</p>
               <h2 id="projects-h">Open source, upstream</h2>
               <p>An agent platform I help maintain, and fixes sent to the tools I build on.</p>
               <ol className="project-index">
@@ -203,7 +236,7 @@ export default function Home() {
 
         <section id="writing" className="station" data-stop="writing" aria-labelledby="writing-h">
           <div className="copy">
-            <p className="eyebrow">03 — Writing</p>
+            <p className="eyebrow">04 — Writing</p>
             <h2 id="writing-h">Notes from the work.</h2>
             {writingBySeries.length ? (
               writingBySeries.map((s) => (
@@ -238,41 +271,51 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
+        <section id="community" className="station" data-stop="community" aria-labelledby="community-h">
           <div className="copy">
-            <p className="eyebrow">04 — Education &amp; Honors</p>
-            <h2 id="education-h">Math first, then code.</h2>
-            <Timeline items={profile.education} />
-            <Timeline items={profile.honors} compact />
-          </div>
-        </section>
-
-        <section id="media" className="station" data-stop="media" aria-labelledby="media-h">
-          <div className="copy">
-            <p className="eyebrow">05 — Talks</p>
-            <h2 id="media-h">On stage.</h2>
-            <ul className="talks" aria-label="Talks and podcasts">
-              {media.map((item) => (
-                <li key={item.href}>
+            <p className="eyebrow">05 — Community</p>
+            <h2 id="community-h">Teaching, talks and meetups.</h2>
+            <ul className="cards cards-wide">
+              {community.map((item) => (
+                <li key={item.title} className={item.image ? "card-row" : "card-row card-row-plain"}>
                   {item.youtube ? (
                     <YouTubeClip clip={item.youtube} title={item.title} language={item.language} />
+                  ) : item.image ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="card-thumb" src={item.image} alt="" loading="lazy" />
                   ) : null}
-                  <a href={item.href} target="_blank" rel="noreferrer">
-                    <span className="timeline-period">{item.period}</span>
-                    <span>
-                      {item.title} <span className="timeline-place">· {item.where}</span>
-                    </span>
-                    <span aria-hidden="true">↗</span>
-                  </a>
+                  <div>
+                    <p className="timeline-period">{item.period}</p>
+                    <h3 className="card-row-title">
+                      {item.href ? (
+                        <a href={item.href} target="_blank" rel="noreferrer">
+                          {item.title}
+                        </a>
+                      ) : (
+                        item.title
+                      )}
+                    </h3>
+                    <p className="card-row-text">{item.where}</p>
+                  </div>
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
+        <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
+          <div className="copy">
+            <p className="eyebrow">06 — Education</p>
+            <h2 id="education-h">Math first, then code.</h2>
+            <Timeline items={profile.education} />
+            <Timeline items={profile.honors} compact />
+          </div>
+        </section>
+
+
         <section id="contact" className="station" data-stop="contact" aria-labelledby="contact-h">
           <div className="copy">
-            <p className="eyebrow">06 — Contact</p>
+            <p className="eyebrow">07 — Contact</p>
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>

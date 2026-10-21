@@ -22,7 +22,7 @@ export type Project = {
   highlights: string[];
   links: { label: string; href: string }[];
   /** A snapshot of the work, linking to the post it comes from when there is one. */
-  image: { src: string; alt: string; post?: string } | null;
+  image: { src: string; alt: string; post?: string; href?: string } | null;
   video: string | null;
   /** Click-to-load YouTube clip shown in the panel. */
   youtube?: YouTubeClip & { language?: string };
@@ -46,19 +46,19 @@ export const projects: Project[] = [
       { label: "Sandboxes and secrets", post: "ravi-sandboxes-context-shared-data-security" },
     ],
     highlights: [
-      "Merged: agents get permissions only when they are granted explicitly, behind a stricter bash guard.",
-      "In review: owner-only state files, an HTTPS-only gateway, and runtime context keys stored as digests at rest.",
-      "In review: E2B sandboxes with deny-all egress, the API key never inside the VM, and every sandbox output treated as hostile.",
-      "In review: connected sandboxes, where a Cloudflare Tunnel and a Gate Worker verify short-lived grants before a task reaches a machine.",
+      "Permissions: agents act only with an explicit grant, behind a stricter bash guard.",
+      "Secrets at rest: owner-only state files, an HTTPS-only gateway, and context keys stored as digests.",
+      "Sandboxes: E2B VMs with deny-all egress, the API key kept out of the VM, and every output treated as hostile.",
+      "Connected sandboxes: a Cloudflare Tunnel and a Gate Worker check short-lived grants before a task reaches a machine.",
     ],
     links: [
       { label: "Repository", href: "https://github.com/PedroRosalba/ravi" },
       { label: "PRs upstream", href: "https://github.com/filipexyz/ravi/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
     image: {
-      src: "/shots/ravi-sandbox.jpg",
-      alt: "Diagram: the sandbox reaches Ravi only through the gateway, never the database.",
-      post: "ravi-sandboxes-context-shared-data-security",
+      src: "/shots/ravi-github.jpg",
+      alt: "Ravi on GitHub: run AI agents on machines you control.",
+      href: "https://github.com/filipexyz/ravi",
     },
     video: null,
     landmark: "portal",
@@ -100,9 +100,9 @@ export const projects: Project[] = [
   {
     slug: "cloudflare",
     title: "Cloudflare Workers",
-    tagline: "Fixes in review for the Workers Rust SDK and the runtime's TypeScript types.",
+    tagline: "Fixes for the Workers Rust SDK and the runtime's TypeScript types.",
     outcome:
-      "Fixes to Cloudflare's Workers stack, in review: workers-rs, the Rust SDK, and workerd's TypeScript types. Each one is a binding that panicked, dropped data or described the wrong type.",
+      "Fixes to Cloudflare's Workers stack: workers-rs, the Rust SDK, and workerd's TypeScript types. Each one is a binding that panicked, dropped data or described the wrong type.",
     role: "Open-source contributor",
     year: "2026",
     stack: ["Rust", "wasm-bindgen", "TypeScript", "workerd"],

@@ -17,9 +17,10 @@ const cv = "/pedro-rosalba-cv.pdf";
 
 export const profile = {
   name: "Pedro Rosalba",
-  role: "Software engineer · Rust · ZK · Agents",
-  positioning:
-    "I build money-movement systems in Rust, zero-knowledge infrastructure and the tooling around AI agents, and I send fixes upstream to the tools I use.",
+  role: "Software engineer",
+  positioning: "A native problem solver, across the stack.",
+  overview:
+    "Olympiad math first, then zero-knowledge proofs at Herodotus. Now I build agent infrastructure and send fixes upstream to Turborepo and Cloudflare Workers.",
   education: [
     {
       title: "Mathematics and Computer Science",
@@ -28,34 +29,6 @@ export const profile = {
     },
   ] as TimelineItem[],
   honors: [
-    {
-      title: "ETHGlobal Prague — awards",
-      place: "Hackathon",
-      period: "2025",
-      proof: [
-        {
-          label: "Certificate",
-          href: "https://violet-rainy-shrimp-423.mypinata.cloud/ipfs/bafybeica5stcskml2lfg556kvojlzyp7m66hd7qvkeyjvflmezgnuh3f6a",
-        },
-      ],
-    },
-    {
-      title: "ETHDenver — zkSync 2nd, Somnia 2nd, Flow 3rd",
-      place: "Hackathon, with Cran",
-      period: "2025",
-      proof: [{ label: "Devfolio", href: "https://devfolio.co/projects/cranberry-bd29" }],
-    },
-    {
-      title: "ETHGlobal Brussels — awards",
-      place: "Hackathon",
-      period: "2024",
-      proof: [
-        {
-          label: "Certificate",
-          href: "https://violet-rainy-shrimp-423.mypinata.cloud/ipfs/bafybeicmj26ff2t4pedr4tl6dgy5crmpfaylxqqi2m6ia6ylomhbxgfn6i",
-        },
-      ],
-    },
     {
       title: "IMC honorable mention · 12th, Brazil IMO selection test",
       place: "Mathematics",

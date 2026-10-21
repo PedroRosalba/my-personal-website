@@ -38,7 +38,7 @@ export function ProjectArticle({
         <Snapshot
           src={project.image.src}
           alt={project.image.alt}
-          href={project.image.post ? postHref(project.image.post) : null}
+          href={project.image.post ? postHref(project.image.post) : (project.image.href ?? null)}
         />
       ) : null}
 

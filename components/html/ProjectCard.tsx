@@ -20,7 +20,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         {project.title}
       </h3>
       <p className="card-outcome">{project.tagline}</p>
-      {image ? <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : null} /> : null}
+      {image ? <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : (image.href ?? null)} /> : null}
       <p className="eyebrow focus-label">Focused on</p>
       <FocusList project={project} />
       <Link

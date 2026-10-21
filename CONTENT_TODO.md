@@ -10,10 +10,10 @@ Education & Honors, Experience with proof links, Open source stop, gateways = Ra
 - [ ] Ethereum Brasil 2025 talk and the Herodotus podcast: no public page or recording found — send links if they exist
 - [ ] OnlyDust closed down (profile 503s); the maintainer line lives on the CV only now
 - [ ] Ravi YouTube video (Portuguese) → `projects[ravi].youtube = { id, start, end, language: "PT" }`
-- [ ] Podcast link(s) → `content/media.ts` (YouTube gets a click-to-play clip)
+- [ ] Podcast link(s) → `community` in `content/media.ts` (YouTube gets a click-to-play clip)
 - [x] Herodotus builds (Daloc, Risklayer) linked as "Builds I worked on" (Pedro, 2026-10-21)
 - [ ] When a blog post is published (draft: false), flip `live: true` in `content/writing.ts` so production links it
-- [ ] Risklayer snapshot: risklayer.online resets the connection (2026-10-21), so only Daloc has a snapshot
+- [ ] Herodotus visual: Pedro wants a Risklayer animation (screen recording, muted loop) inside the gateway arch, not a static screenshot. Blocked: risklayer.online resets the connection (2026-10-21)
 - [ ] Cloudflare write-up → add `post` to its focus areas in `content/projects.ts`
 - [ ] X posts about Risklayer (only as links, never "I built this")
 - [ ] A real photo for About (`public/…` + `profile.about.photo`)

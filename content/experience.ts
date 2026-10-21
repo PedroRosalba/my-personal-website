@@ -1,5 +1,4 @@
-// Production experience, newest first. The first `featured` roles get a station each on the causeway;
-// the rest share one "Earlier" station. Numbers stay on the CV; the site keeps what a visitor can open.
+// Production experience. Featured roles get a station each on the causeway; the rest share one "Also" station. Numbers stay on the CV; the site keeps what a visitor can open.
 
 import type { LinkItem } from "./profile";
 
@@ -22,22 +21,6 @@ export type Role = {
 };
 
 export const featuredRoles: Role[] = [
-  {
-    slug: "enor",
-    company: "eNor",
-    href: "https://enorsecurities.com/",
-    role: "Software Engineer",
-    period: "2026",
-    summary: "A Rust money-movement platform: payments, ledgers and custody for a regulated securities firm.",
-    bullets: [
-      "Central-bank integrations: the BCR Transfer365 instant-payment rail (ISO 20022) and LBTR gross settlement.",
-      "Double-entry and TigerBeetle ledgers over Kafka/Redpanda, with transactional outbox relays and circuit breakers between services.",
-      "Crypto swap and custody: exchange orders signed through Cloud KMS, Fireblocks custody with MFA-gated withdrawals, and IP-jurisdiction compliance in front of every money action.",
-    ],
-    stack: ["Rust", "Axum", "Kafka/Redpanda", "TigerBeetle", "GKE", "Terraform"],
-    proof: [],
-    note: "Closed source. Scope and numbers are on the CV.",
-  },
   {
     slug: "herodotus",
     company: "Herodotus",
@@ -62,11 +45,22 @@ export const featuredRoles: Role[] = [
       { label: "Daloc", href: "https://daloc.xyz" },
       { label: "Risklayer", href: "https://risklayer.online" },
     ],
-    image: { src: "/shots/daloc.jpg", alt: "Daloc, onchain prime brokerage: landing page.", href: "https://daloc.xyz" },
   },
 ];
 
+// Shorter rows, one shared station.
 export const earlierRoles: Role[] = [
+  {
+    slug: "enor",
+    company: "eNor",
+    href: "https://enorsecurities.com/",
+    role: "Software Engineer",
+    period: "2026",
+    summary: "Rust payments, ledgers and custody for a regulated securities firm. Closed source; the scope is on the CV.",
+    bullets: [],
+    stack: [],
+    proof: [],
+  },
   {
     slug: "mediolano",
     company: "Mediolano",
@@ -83,27 +77,5 @@ export const earlierRoles: Role[] = [
         href: "https://github.com/mediolano-os/mediolano-contracts/pulls?q=is%3Apr+author%3APedroRosalba",
       },
     ],
-  },
-  {
-    slug: "blockchain-league",
-    company: "Rio de Janeiro University Blockchain League",
-    href: "https://linktr.ee/liga_carioca_de_blockchain",
-    role: "Founder",
-    period: "2024 – 2026",
-    summary: "A blockchain engineering community built on workshops, hackathons and meetups.",
-    bullets: [],
-    stack: [],
-    proof: [],
-  },
-  {
-    slug: "pensi",
-    company: "Colégio e Curso Pensi",
-    href: "",
-    role: "Math Olympiad Instructor",
-    period: "2023 – 2025",
-    summary: "",
-    bullets: [],
-    stack: [],
-    proof: [],
   },
 ];
