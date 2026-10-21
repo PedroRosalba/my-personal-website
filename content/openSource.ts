@@ -42,10 +42,4 @@ export const openSource: OpenSourceItem[] = [
     count: "Maintainer",
     href: prs("filipexyz/ravi"),
   },
-  {
-    project: "OnlyDust",
-    what: "Maintainer of a Starknet project: issues, applicants, code review",
-    count: "Maintainer",
-    href: "https://app.onlydust.com/users/PedroRosalba/overview",
-  },
 ];

@@ -100,6 +100,21 @@ export default function Home() {
                 ))}
               </dl>
             ) : null}
+            {profile.talks.length ? (
+              <ul className="talks" aria-label="Talks">
+                {profile.talks.map((talk) => (
+                  <li key={talk.href}>
+                    <a href={talk.href} target="_blank" rel="noreferrer">
+                      <span className="timeline-period">{talk.period}</span>
+                      <span>
+                        {talk.title} <span className="timeline-place">· {talk.place}</span>
+                      </span>
+                      <span aria-hidden="true">↗</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         </section>
 

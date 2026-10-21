@@ -79,7 +79,7 @@ export const projects: Project[] = [
     highlights: [
       "Retrieval-augmented memory over encrypted embeddings, computed with SEAL's homomorphic encryption.",
       "Contracts deployed on Sepolia, Base Sepolia, Flow EVM, Zircuit and Somnia testnets.",
-      "Won the zkSync, Flow and Somnia bounties at ETHDenver 2025.",
+      "Three prizes at ETHDenver 2025: zkSync 2nd (AI agent on ZKsync Era), Somnia 2nd (fully on-chain consumer dApp), Flow 3rd (best AI agents).",
     ],
     links: [
       { label: "Repository", href: "https://github.com/Arthur-Jacobina/cran" },

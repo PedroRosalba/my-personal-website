@@ -6,7 +6,9 @@ Rule: the site shows clickable proof; the CV (`public/pedro-rosalba-cv.pdf`, bui
 Done (feature/real-experience): positioning and About from the CV, contact email + LinkedIn, CV download,
 Education & Honors, Experience with proof links, Open source stop, gateways = Ravi, Turborepo, Cran.
 
-- [ ] Talk / podcast URLs (Invisible Garden at Devconnect 2025, Ethereum Brasil 2025, Devin Rio meetup, Herodotus podcast) → proof links on the Herodotus row, or a "Transmissions" stop
+- [x] Talks with public pages: Invisible Garden 2025 (HDP mentor session) and the Devin Meetup Rio 2026 → About
+- [ ] Ethereum Brasil 2025 talk and the Herodotus podcast: no public page or recording found — send links if they exist
+- [ ] OnlyDust closed down (profile 503s); the maintainer line lives on the CV only now
 - [ ] Ravi demo videos → `projects[ravi].video`
 - [ ] X posts about Risklayer (only as links, never "I built this")
 - [ ] A real photo for About (`public/…` + `profile.about.photo`)

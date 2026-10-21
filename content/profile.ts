@@ -35,6 +35,20 @@ export const profile = {
       { label: "Speaks", value: "PT · EN · ES" },
     ],
   },
+  talks: [
+    {
+      title: "Herodotus Data Processor, mentor session",
+      place: "Invisible Garden, Buenos Aires",
+      period: "2025",
+      href: "https://luma.com/porsxgac",
+    },
+    {
+      title: "Goroutines vs Tokio in agent harnesses",
+      place: "Devin Meetup, Rio de Janeiro",
+      period: "2026",
+      href: "https://luma.com/l2f11j2p",
+    },
+  ],
   education: [
     {
       title: "B.Sc. in Mathematics and Computer Science",
@@ -55,7 +69,7 @@ export const profile = {
       ],
     },
     {
-      title: "ETHDenver — zkSync, Flow and Somnia bounties",
+      title: "ETHDenver — zkSync 2nd, Somnia 2nd, Flow 3rd",
       place: "Hackathon, with Cran",
       period: "2025",
       proof: [{ label: "Devfolio", href: "https://devfolio.co/projects/cranberry-bd29" }],
@@ -100,6 +114,7 @@ export const profile = {
           label: "hdp-cairo PRs",
           href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
         },
+        { label: "Invisible Garden 2025", href: "https://invisible.garden/people/pedro-dandrea-rosalba" },
       ],
     },
     {
@@ -134,6 +149,7 @@ export const profile = {
     links: [
       { label: "GitHub", href: "https://github.com/PedroRosalba" },
       { label: "LinkedIn", href: "https://www.linkedin.com/in/pedro-dandrea-rosalba-031b85291/" },
+      { label: "X", href: "https://x.com/0xrosalbito" },
     ] as LinkItem[],
     cv: cv as string | null,
   },
