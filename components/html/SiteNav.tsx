@@ -6,20 +6,22 @@ import { useJourney } from "@/lib/store";
 import { profile } from "@/content/profile";
 import { skillsPage } from "@/content/skills";
 
-// `wide`: hidden on phones, where only six items fit in one row (the section is still a scroll away).
 const items = [
-  { id: "about", label: "About" },
-  { id: "education", label: "Education", wide: true },
-  { id: "projects", label: "Projects" },
-  { id: "open-source", label: "Open source" },
   { id: "experience", label: "Experience" },
+  { id: "projects", label: "Projects" },
+  { id: "education", label: "Education" },
+  { id: "media", label: "Talks" },
   { id: "contact", label: "Contact" },
 ];
 
 /** Persistent navigation. Plain anchors: works before, during and without WebGL. */
 export function SiteNav({ onHome = false }: { onHome?: boolean }) {
   const section = useJourney((s) => s.section);
-  const current = section.startsWith("project-") ? "projects" : section;
+  const current = section.startsWith("project-")
+    ? "projects"
+    : section.startsWith("experience-")
+      ? "experience"
+      : section;
   const prefix = onHome ? "" : "/";
   const pathname = usePathname();
 
@@ -31,7 +33,7 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
       <nav aria-label="Primary">
         <ul>
           {items.map((item) => (
-            <li key={item.id} className={item.wide ? "nav-wide" : undefined}>
+            <li key={item.id}>
               <Link
                 href={`${prefix}#${item.id}`}
                 aria-current={onHome && current === item.id ? "true" : undefined}

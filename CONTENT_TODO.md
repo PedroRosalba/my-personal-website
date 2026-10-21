@@ -9,7 +9,10 @@ Education & Honors, Experience with proof links, Open source stop, gateways = Ra
 - [x] Talks with public pages: Invisible Garden 2025 (HDP mentor session) and the Devin Meetup Rio 2026 → About
 - [ ] Ethereum Brasil 2025 talk and the Herodotus podcast: no public page or recording found — send links if they exist
 - [ ] OnlyDust closed down (profile 503s); the maintainer line lives on the CV only now
-- [ ] Ravi demo videos → `projects[ravi].video`
+- [ ] Ravi YouTube video (Portuguese) → `projects[ravi].youtube = { id, start, end, language: "PT" }`
+- [ ] Podcast link(s) → `content/media.ts` (YouTube gets a click-to-play clip)
+- [ ] Herodotus product links → `content/experience.ts` proof (only once Pedro confirms he can claim them)
+- [ ] Featured posts in `content/media.ts` must be published on the blog (draft: false)
 - [ ] X posts about Risklayer (only as links, never "I built this")
 - [ ] A real photo for About (`public/…` + `profile.about.photo`)
 - [ ] Blog URL → `NEXT_PUBLIC_BLOG_URL` (turns on Writing in the nav, the Open source stop, Contact and the project panels)

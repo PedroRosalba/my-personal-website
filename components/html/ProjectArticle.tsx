@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Project } from "@/content/projects";
+import { YouTubeClip } from "./YouTubeClip";
 
 /** The one project presentation, shared by the panel and the standalone page. */
 export function ProjectArticle({
@@ -28,6 +29,8 @@ export function ProjectArticle({
 
       {project.video ? (
         <video className="project-video" src={project.video} controls preload="metadata" playsInline />
+      ) : project.youtube ? (
+        <YouTubeClip clip={project.youtube} title={project.title} language={project.youtube.language} />
       ) : null}
 
       <dl className="project-meta">

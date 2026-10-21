@@ -4,6 +4,7 @@
 // Every fact below can be checked from the linked repositories and PRs.
 
 import { profile } from "./profile";
+import type { YouTubeClip } from "./media";
 
 export type Project = {
   slug: string;
@@ -15,6 +16,8 @@ export type Project = {
   highlights: string[];
   links: { label: string; href: string }[];
   video: string | null;
+  /** Click-to-load YouTube clip shown in the panel. */
+  youtube?: YouTubeClip & { language?: string };
   /** 3D hint only: which landmark the gateway carries. */
   landmark: "portal" | "eth";
 };
@@ -69,24 +72,26 @@ export const projects: Project[] = [
     landmark: "portal",
   },
   {
-    slug: "cran",
-    title: "Cran",
+    slug: "cloudflare",
+    title: "Cloudflare Workers, upstream",
     outcome:
-      "An AI companion whose memory stays private: conversation memory is stored under homomorphic encryption, so retrieval works without decrypting it. Built at ETHDenver 2025.",
-    role: "Hackathon team",
-    year: "2025",
-    stack: ["Python", "LangChain", "Microsoft SEAL (FHE)", "Next.js", "EVM"],
+      "Sixteen fixes to Cloudflare's Workers stack, in review: ten to workers-rs, the Rust SDK, and six to workerd's TypeScript types. Each one is a binding that panicked, dropped data or described the wrong type.",
+    role: "Open-source contributor",
+    year: "2026",
+    stack: ["Rust", "wasm-bindgen", "TypeScript", "workerd"],
     highlights: [
-      "Retrieval-augmented memory over encrypted embeddings, computed with SEAL's homomorphic encryption.",
-      "Contracts deployed on Sepolia, Base Sepolia, Flow EVM, Zircuit and Somnia testnets.",
-      "Three prizes at ETHDenver 2025: zkSync 2nd (AI agent on ZKsync Era), Somnia 2nd (fully on-chain consumer dApp), Flow 3rd (best AI agents).",
+      "KV and Queues: Rust maps were serialised as {}; they now reach JavaScript as JSON objects.",
+      "R2: Object::range() panicked on a plain JS object, and listed objects without metadata failed to parse.",
+      "Durable Objects: alarm options are sent in camelCase, and Storage gains its get options (allowConcurrency, noCache).",
+      "workerd types: ArrayBufferView inputs, missing cloudflare:workers exports, and a bulk getWithMetadata result without cacheStatus.",
     ],
     links: [
-      { label: "Repository", href: "https://github.com/Arthur-Jacobina/cran" },
-      { label: "Devfolio", href: "https://devfolio.co/projects/cranberry-bd29" },
+      { label: "workers-rs PRs", href: "https://github.com/cloudflare/workers-rs/pulls?q=is%3Apr+author%3APedroRosalba" },
+      { label: "workerd PRs", href: "https://github.com/cloudflare/workerd/pulls?q=is%3Apr+author%3APedroRosalba" },
+      ...writing,
     ],
     video: null,
-    landmark: "eth",
+    landmark: "portal",
   },
 ];
 

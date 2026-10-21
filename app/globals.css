@@ -165,8 +165,33 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 .section-more .next-link { margin-left: 0; }
 
 .talks { margin-top: 28px !important; }
+.media-sub { margin-top: 32px !important; }
+.role-head > * + * { margin-top: 6px; }
+.role-title { font-size: clamp(24px, 2.4vw, 30px); font-weight: 300; letter-spacing: -0.01em; line-height: 1.2; }
+.role-title a { text-decoration: underline; text-decoration-color: var(--line-strong); text-underline-offset: 5px; }
+.role-title a:hover { text-decoration-color: var(--accent); }
+.role-summary { font-size: 16px; }
+.role .project-highlights { font-size: 14px; gap: 8px; }
+.timeline-place a { color: inherit; text-underline-offset: 3px; }
+
+.clip-still, .clip-frame {
+  position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; margin: 8px 0 4px;
+  border: 1px solid var(--line); border-radius: 2px; background: #0e0e12; padding: 0; overflow: hidden;
+}
+.clip-still { cursor: pointer; }
+.clip-still img { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.6) brightness(0.75); transition: filter 200ms; }
+.clip-still:hover img { filter: saturate(0.9) brightness(0.9); }
+.clip-play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%;
+  background: rgba(5, 5, 7, 0.7); border: 1px solid var(--ink-3); color: var(--ink); font-size: 18px;
+}
+.clip-lang {
+  position: absolute; right: 10px; bottom: 10px; padding: 2px 8px; background: rgba(5, 5, 7, 0.75);
+  font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-2);
+}
 .talks a {
-  display: grid; grid-template-columns: 52px minmax(0, 1fr) 14px; gap: 10px; align-items: baseline;
+  display: grid; grid-template-columns: 84px minmax(0, 1fr) 14px; gap: 10px; align-items: baseline;
   padding: 8px 0; font-size: 14px; line-height: 1.45; color: var(--ink-2); text-decoration: none;
 }
 .talks li + li { border-top: 1px solid var(--line); }
@@ -296,9 +321,8 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .timeline-period { font-size: 11px; }
   .timeline-title { font-size: 15px; }
   .timeline-compact > li { padding: 8px 0; }
-  /* one screen per station: the CV link below carries the detail */
-  #experience .timeline-detail { display: none; }
-  #experience .proof { margin-top: 2px; }
+  .role .project-highlights { font-size: 13px; gap: 6px; }
+  .role-summary { font-size: 15px; }
   .oss-list a { padding: 9px 0; }
   .oss-what { font-size: 13px; }
   /* copy sits at the bottom, so a station must not be taller than the screen */

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
-import { openSource } from "@/content/openSource";
+import { featuredRoles, earlierRoles, type Role } from "@/content/experience";
+import { media, writing } from "@/content/media";
 import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
+import { YouTubeClip } from "@/components/html/YouTubeClip";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
 
@@ -36,11 +38,6 @@ function Timeline({ items, compact = false }: { items: TimelineItem[]; compact?:
             </h3>
             {item.detail ? <p className="timeline-detail">{item.detail}</p> : null}
             {item.proof?.length ? <ProofLinks links={item.proof} /> : null}
-            {item.note ? (
-              <p className="timeline-note">
-                {profile.contact.cv ? <a href={profile.contact.cv}>{item.note}</a> : item.note}
-              </p>
-            ) : null}
           </div>
         </li>
       ))}
@@ -48,8 +45,51 @@ function Timeline({ items, compact = false }: { items: TimelineItem[]; compact?:
   );
 }
 
+function Company({ role }: { role: Role }) {
+  return role.href ? (
+    <a href={role.href} target="_blank" rel="noreferrer">
+      {role.company}
+    </a>
+  ) : (
+    <>{role.company}</>
+  );
+}
+
+function RoleStation({ role, index }: { role: Role; index: number }) {
+  const cv = profile.contact.cv;
+  return (
+    <div className="station" data-stop={`experience-${role.slug}`}>
+      <div className="copy role">
+        {index === 0 ? (
+          <>
+            <p className="eyebrow">01 — Experience</p>
+            <h2 id="experience-h">Production experience</h2>
+          </>
+        ) : null}
+        <div className="role-head">
+          <p className="timeline-period">{role.period}</p>
+          <h3 className="role-title">
+            {role.role} · <Company role={role} />
+          </h3>
+          <p className="role-summary">{role.summary}</p>
+        </div>
+        <ul className="project-highlights">
+          {role.bullets.map((b) => (
+            <li key={b}>{b}</li>
+          ))}
+        </ul>
+        <p className="card-stack">{role.stack.join(" · ")}</p>
+        {role.proof.length ? <ProofLinks links={role.proof} /> : null}
+        {role.note ? (
+          <p className="timeline-note">{cv ? <a href={cv}>{role.note}</a> : role.note}</p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
-  const { about, contact } = profile;
+  const { contact } = profile;
   return (
     <>
       {/* Static world: visible before WebGL loads and when it is unavailable. */}
@@ -66,12 +106,14 @@ export default function Home() {
             <h1 id="hero-name">{profile.name}</h1>
             <p className="lead">{profile.positioning}</p>
             <div className="actions">
-              <Link className="button button-primary" href="#projects">
-                View projects <span aria-hidden="true">→</span>
+              <Link className="button button-primary" href="#experience">
+                See the work <span aria-hidden="true">→</span>
               </Link>
-              <Link className="button" href="#contact">
-                Get in touch
-              </Link>
+              {contact.cv ? (
+                <a className="button" href={contact.cv}>
+                  CV <span aria-hidden="true">↓</span>
+                </a>
+              ) : null}
             </div>
           </div>
           <p className="scroll-cue" aria-hidden="true">
@@ -79,60 +121,48 @@ export default function Home() {
           </p>
         </section>
 
-        <section id="about" className="station" data-stop="about" aria-labelledby="about-h">
-          <div className="copy">
-            <p className="eyebrow">01 — About</p>
-            <h2 id="about-h">{about.headline}</h2>
-            {about.photo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img className="about-photo" src={about.photo} alt={`Portrait of ${profile.name}`} width={96} height={96} />
-            ) : null}
-            {about.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-            {about.facts.length ? (
-              <dl className="facts">
-                {about.facts.map((f) => (
-                  <div key={f.label}>
-                    <dt>{f.label}</dt>
-                    <dd>{f.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            ) : null}
-            {profile.talks.length ? (
-              <ul className="talks" aria-label="Talks">
-                {profile.talks.map((talk) => (
-                  <li key={talk.href}>
-                    <a href={talk.href} target="_blank" rel="noreferrer">
-                      <span className="timeline-period">{talk.period}</span>
-                      <span>
-                        {talk.title} <span className="timeline-place">· {talk.place}</span>
-                      </span>
-                      <span aria-hidden="true">↗</span>
-                    </a>
+        <section id="experience" aria-labelledby="experience-h">
+          {featuredRoles.map((role, i) => (
+            <RoleStation role={role} index={i} key={role.slug} />
+          ))}
+          <div className="station" data-stop="experience-earlier">
+            <div className="copy">
+              <p className="eyebrow">Earlier</p>
+              <ol className="timeline">
+                {earlierRoles.map((role) => (
+                  <li key={role.slug}>
+                    <p className="timeline-period">{role.period}</p>
+                    <div>
+                      <h3 className="timeline-title">
+                        {role.role}
+                        <span className="timeline-place">
+                          {" "}
+                          · <Company role={role} />
+                        </span>
+                      </h3>
+                      {role.summary ? <p className="timeline-detail">{role.summary}</p> : null}
+                      {role.proof.length ? <ProofLinks links={role.proof} /> : null}
+                    </div>
                   </li>
                 ))}
-              </ul>
-            ) : null}
-          </div>
-        </section>
-
-        <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
-          <div className="copy">
-            <p className="eyebrow">02 — Education &amp; Honors</p>
-            <h2 id="education-h">Math first, then code.</h2>
-            <Timeline items={profile.education} />
-            <Timeline items={profile.honors} compact />
+              </ol>
+              {contact.cv ? (
+                <p className="section-more">
+                  <a className="next-link" href={contact.cv}>
+                    Full CV, with numbers <span aria-hidden="true">↓</span>
+                  </a>
+                </p>
+              ) : null}
+            </div>
           </div>
         </section>
 
         <section id="projects" aria-labelledby="projects-h">
           <div className="station" data-stop="projects">
             <div className="copy">
-              <p className="eyebrow">03 — Projects</p>
-              <h2 id="projects-h">Selected work</h2>
-              <p>Three gateways, each with proof you can open: the repository, the PRs, the result.</p>
+              <p className="eyebrow">02 — Projects</p>
+              <h2 id="projects-h">Open source, upstream</h2>
+              <p>An agent platform I help maintain, and fixes sent to the tools I build on. Open one for the PRs.</p>
               <ol className="project-index">
                 {projects.map((p, i) => (
                   <li key={p.slug}>
@@ -162,49 +192,62 @@ export default function Home() {
           ))}
         </section>
 
-        <section id="open-source" className="station" data-stop="open-source" aria-labelledby="open-source-h">
+        <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
           <div className="copy">
-            <p className="eyebrow">04 — Open source</p>
-            <h2 id="open-source-h">Fixes sent upstream.</h2>
-            <ul className="oss-list">
-              {openSource.map((item) => (
-                <li key={item.project}>
+            <p className="eyebrow">03 — Education &amp; Honors</p>
+            <h2 id="education-h">Math first, then code.</h2>
+            <Timeline items={profile.education} />
+            <Timeline items={profile.honors} compact />
+          </div>
+        </section>
+
+        <section id="media" className="station" data-stop="media" aria-labelledby="media-h">
+          <div className="copy">
+            <p className="eyebrow">04 — Talks &amp; writing</p>
+            <h2 id="media-h">On stage and in writing.</h2>
+            <ul className="talks" aria-label="Talks and podcasts">
+              {media.map((item) => (
+                <li key={item.href}>
+                  {item.youtube ? (
+                    <YouTubeClip clip={item.youtube} title={item.title} language={item.language} />
+                  ) : null}
                   <a href={item.href} target="_blank" rel="noreferrer">
-                    <span className="oss-project">{item.project}</span>
-                    <span className="oss-count">{item.count}</span>
-                    <span className="oss-what">{item.what}</span>
+                    <span className="timeline-period">{item.period}</span>
+                    <span>
+                      {item.title} <span className="timeline-place">· {item.where}</span>
+                    </span>
+                    <span aria-hidden="true">↗</span>
                   </a>
                 </li>
               ))}
             </ul>
-            {profile.writing ? (
-              <p className="section-more">
-                <a className="next-link" href={profile.writing}>
-                  How the bugs were found, in writing <span aria-hidden="true">→</span>
-                </a>
-              </p>
-            ) : null}
-          </div>
-        </section>
-
-        <section id="experience" className="station" data-stop="experience" aria-labelledby="experience-h">
-          <div className="copy">
-            <p className="eyebrow">05 — Experience</p>
-            <h2 id="experience-h">Experience</h2>
-            <Timeline items={profile.experience} />
-            {profile.contact.cv ? (
-              <p className="section-more">
-                <a className="next-link" href={profile.contact.cv}>
-                  Full CV, with numbers <span aria-hidden="true">↓</span>
-                </a>
-              </p>
+            {writing.length ? (
+              <>
+                <h3 className="eyebrow media-sub">Selected writing</h3>
+                <ul className="talks" aria-label="Selected writing">
+                  {writing.map((post) => (
+                    <li key={post.slug}>
+                      <a href={post.href}>
+                        <span className="timeline-period">{post.series}</span>
+                        <span>{post.title}</span>
+                        <span aria-hidden="true">→</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <p className="section-more">
+                  <a className="next-link" href={profile.writing!}>
+                    All writing <span aria-hidden="true">→</span>
+                  </a>
+                </p>
+              </>
             ) : null}
           </div>
         </section>
 
         <section id="contact" className="station" data-stop="contact" aria-labelledby="contact-h">
           <div className="copy">
-            <p className="eyebrow">06 — Contact</p>
+            <p className="eyebrow">05 — Contact</p>
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>
