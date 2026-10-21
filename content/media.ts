@@ -1,8 +1,6 @@
 // Talks, podcasts and selected writing. A YouTube entry renders as a still that loads the player
 // on click (youtube-nocookie), cut to `start`–`end` seconds when set; anything else is a link card.
 
-import { profile } from "./profile";
-
 export type YouTubeClip = { id: string; start?: number; end?: number };
 
 export type MediaItem = {
@@ -33,14 +31,3 @@ export const media: MediaItem[] = [
     href: "https://luma.com/l2f11j2p",
   },
 ];
-
-// Posts shown on the site. Each must be published (draft: false) on the blog, or its link 404s in production.
-const featuredPosts = [
-  { slug: "who-is-typing-agents-shells-and-money", title: "Who is typing? Agents, shells and money", series: "Ravi" },
-  { slug: "turbo-skipped-task-whose-inputs-changed", title: "Why did Turbo skip a task whose inputs changed?", series: "Turborepo" },
-  { slug: "turbo-cache-hit-wrong-outputs", title: "Why did Turbo say cache hit and leave my outputs wrong?", series: "Turborepo" },
-];
-
-export const writing = profile.writing
-  ? featuredPosts.map((p) => ({ ...p, href: `${profile.writing}/posts/${p.slug}` }))
-  : [];

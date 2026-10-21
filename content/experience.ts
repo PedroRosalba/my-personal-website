@@ -16,6 +16,9 @@ export type Role = {
   proof: LinkItem[];
   /** Shown when the work itself can't be linked. */
   note?: string;
+  /** Products shipped there that a visitor can open, with a snapshot of the first. */
+  builds?: LinkItem[];
+  image?: { src: string; alt: string; href: string };
 };
 
 export const featuredRoles: Role[] = [
@@ -28,7 +31,7 @@ export const featuredRoles: Role[] = [
     summary: "A Rust money-movement platform: payments, ledgers and custody for a regulated securities firm.",
     bullets: [
       "Central-bank integrations: the BCR Transfer365 instant-payment rail (ISO 20022) and LBTR gross settlement.",
-      "Double-entry and TigerBeetle ledgers over Kafka/Redpanda, with transactional outbox relays and circuit breakers across nine services.",
+      "Double-entry and TigerBeetle ledgers over Kafka/Redpanda, with transactional outbox relays and circuit breakers between services.",
       "Crypto swap and custody: exchange orders signed through Cloud KMS, Fireblocks custody with MFA-gated withdrawals, and IP-jurisdiction compliance in front of every money action.",
     ],
     stack: ["Rust", "Axum", "Kafka/Redpanda", "TigerBeetle", "GKE", "Terraform"],
@@ -45,7 +48,7 @@ export const featuredRoles: Role[] = [
     bullets: [
       "Extended hdp-cairo, the Herodotus Data Processor, from EVM storage proofs to plain Merkle and Patricia-trie state proofs, so off-chain systems can prove the state they read.",
       "Low-latency infrastructure for DeFi lending and prime brokerage: real-time order-book pipelines and RFQ quoting.",
-      "Risk tooling: on-chain credit pricing, and an AI risk analysis across 30+ DeFi protocols mapped onto the infrastructure they depend on.",
+      "Risk tooling: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on.",
     ],
     stack: ["Cairo", "Rust", "TypeScript", "Python"],
     proof: [
@@ -55,6 +58,11 @@ export const featuredRoles: Role[] = [
       },
       { label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" },
     ],
+    builds: [
+      { label: "Daloc", href: "https://daloc.xyz" },
+      { label: "Risklayer", href: "https://risklayer.online" },
+    ],
+    image: { src: "/shots/daloc.jpg", alt: "Daloc, onchain prime brokerage: landing page.", href: "https://daloc.xyz" },
   },
 ];
 

@@ -2,12 +2,14 @@ import Link from "next/link";
 import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
 import { featuredRoles, earlierRoles, type Role } from "@/content/experience";
-import { media, writing } from "@/content/media";
+import { media } from "@/content/media";
+import { writingBySeries } from "@/content/writing";
 import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
 import { YouTubeClip } from "@/components/html/YouTubeClip";
+import { Snapshot } from "@/components/html/Snapshot";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
 
@@ -73,7 +75,14 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
           </h3>
           <p className="role-summary">{role.summary}</p>
         </div>
-        <ul className="project-highlights">
+        {role.image ? <Snapshot src={role.image.src} alt={role.image.alt} href={role.image.href} /> : null}
+        {role.builds?.length ? (
+          <div className="builds">
+            <p className="eyebrow focus-label">Builds I worked on</p>
+            <ProofLinks links={role.builds} />
+          </div>
+        ) : null}
+        <ul className="project-highlights role-bullets">
           {role.bullets.map((b) => (
             <li key={b}>{b}</li>
           ))}
@@ -162,7 +171,7 @@ export default function Home() {
             <div className="copy">
               <p className="eyebrow">02 — Projects</p>
               <h2 id="projects-h">Open source, upstream</h2>
-              <p>An agent platform I help maintain, and fixes sent to the tools I build on. Open one for the PRs.</p>
+              <p>An agent platform I help maintain, and fixes sent to the tools I build on.</p>
               <ol className="project-index">
                 {projects.map((p, i) => (
                   <li key={p.slug}>
@@ -192,9 +201,46 @@ export default function Home() {
           ))}
         </section>
 
+        <section id="writing" className="station" data-stop="writing" aria-labelledby="writing-h">
+          <div className="copy">
+            <p className="eyebrow">03 — Writing</p>
+            <h2 id="writing-h">Notes from the work.</h2>
+            {writingBySeries.length ? (
+              writingBySeries.map((s) => (
+                <div className="series" key={s.key}>
+                  <h3 className="series-title">{s.title}</h3>
+                  <p className="series-blurb">{s.blurb}</p>
+                  <ol className="series-posts">
+                    {s.posts.map((post, i) => (
+                      <li key={post.slug}>
+                        <a href={post.href}>
+                          <span className="index-number">{String(i + 1).padStart(2, "0")}</span>
+                          <span>{post.title}</span>
+                          <span className="index-arrow" aria-hidden="true">
+                            →
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ))
+            ) : (
+              <p className="muted">Write-ups on Turborepo and Ravi are on their way.</p>
+            )}
+            {profile.writing ? (
+              <p className="section-more">
+                <a className="next-link" href={profile.writing}>
+                  All writing <span aria-hidden="true">→</span>
+                </a>
+              </p>
+            ) : null}
+          </div>
+        </section>
+
         <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
           <div className="copy">
-            <p className="eyebrow">03 — Education &amp; Honors</p>
+            <p className="eyebrow">04 — Education &amp; Honors</p>
             <h2 id="education-h">Math first, then code.</h2>
             <Timeline items={profile.education} />
             <Timeline items={profile.honors} compact />
@@ -203,8 +249,8 @@ export default function Home() {
 
         <section id="media" className="station" data-stop="media" aria-labelledby="media-h">
           <div className="copy">
-            <p className="eyebrow">04 — Talks &amp; writing</p>
-            <h2 id="media-h">On stage and in writing.</h2>
+            <p className="eyebrow">05 — Talks</p>
+            <h2 id="media-h">On stage.</h2>
             <ul className="talks" aria-label="Talks and podcasts">
               {media.map((item) => (
                 <li key={item.href}>
@@ -221,33 +267,12 @@ export default function Home() {
                 </li>
               ))}
             </ul>
-            {writing.length ? (
-              <>
-                <h3 className="eyebrow media-sub">Selected writing</h3>
-                <ul className="talks" aria-label="Selected writing">
-                  {writing.map((post) => (
-                    <li key={post.slug}>
-                      <a href={post.href}>
-                        <span className="timeline-period">{post.series}</span>
-                        <span>{post.title}</span>
-                        <span aria-hidden="true">→</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <p className="section-more">
-                  <a className="next-link" href={profile.writing!}>
-                    All writing <span aria-hidden="true">→</span>
-                  </a>
-                </p>
-              </>
-            ) : null}
           </div>
         </section>
 
         <section id="contact" className="station" data-stop="contact" aria-labelledby="contact-h">
           <div className="copy">
-            <p className="eyebrow">05 — Contact</p>
+            <p className="eyebrow">06 — Contact</p>
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>

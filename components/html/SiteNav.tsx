@@ -6,10 +6,12 @@ import { useJourney } from "@/lib/store";
 import { profile } from "@/content/profile";
 import { skillsPage } from "@/content/skills";
 
+// `wide`: hidden on phones, where only six items fit in one row (the section is still a scroll away).
 const items = [
   { id: "experience", label: "Experience" },
   { id: "projects", label: "Projects" },
-  { id: "education", label: "Education" },
+  { id: "writing", label: "Writing" },
+  { id: "education", label: "Education", wide: true },
   { id: "media", label: "Talks" },
   { id: "contact", label: "Contact" },
 ];
@@ -33,7 +35,7 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
       <nav aria-label="Primary">
         <ul>
           {items.map((item) => (
-            <li key={item.id}>
+            <li key={item.id} className={"wide" in item && item.wide ? "nav-wide" : undefined}>
               <Link
                 href={`${prefix}#${item.id}`}
                 aria-current={onHome && current === item.id ? "true" : undefined}
@@ -43,11 +45,6 @@ export function SiteNav({ onHome = false }: { onHome?: boolean }) {
             </li>
           ))}
           {/* Routes and files, not scroll stops: kept apart from the section items above. */}
-          {profile.writing ? (
-            <li className="nav-wide nav-route">
-              <a href={profile.writing}>Writing</a>
-            </li>
-          ) : null}
           <li className="nav-wide nav-route">
             <Link href={skillsPage.path} aria-current={pathname === skillsPage.path ? "page" : undefined}>
               {skillsPage.label}

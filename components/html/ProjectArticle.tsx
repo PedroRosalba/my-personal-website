@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Project } from "@/content/projects";
+import { postHref } from "@/content/writing";
 import { YouTubeClip } from "./YouTubeClip";
+import { FocusList } from "./FocusList";
+import { Snapshot } from "./Snapshot";
 
 /** The one project presentation, shared by the panel and the standalone page. */
 export function ProjectArticle({
@@ -31,6 +34,12 @@ export function ProjectArticle({
         <video className="project-video" src={project.video} controls preload="metadata" playsInline />
       ) : project.youtube ? (
         <YouTubeClip clip={project.youtube} title={project.title} language={project.youtube.language} />
+      ) : project.image ? (
+        <Snapshot
+          src={project.image.src}
+          alt={project.image.alt}
+          href={project.image.post ? postHref(project.image.post) : null}
+        />
       ) : null}
 
       <dl className="project-meta">
@@ -47,6 +56,9 @@ export function ProjectArticle({
           <dd>{project.stack.join(" · ")}</dd>
         </div>
       </dl>
+
+      <h3 className="eyebrow">Focused on</h3>
+      <FocusList project={project} />
 
       <h3 className="eyebrow">Technical highlights</h3>
       <ul className="project-highlights">

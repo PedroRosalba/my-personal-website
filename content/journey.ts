@@ -19,7 +19,7 @@ export const FINAL_GATE_Z = lastGateZ - 150;
 export const CAUSEWAY_END_Z = FINAL_GATE_Z - 2;
 
 // Page order: hero, experience (one station per featured role, then "earlier"), projects and their gateways,
-// education, media, contact. z only ever decreases, so scrolling always walks forward.
+// writing, education, talks, contact. z only ever decreases, so scrolling always walks forward.
 export const stops: Stop[] = [
   { id: "top", z: 0, focusX: 0 },
   { id: "experience-enor", z: -74, focusX: 0 },
@@ -27,8 +27,9 @@ export const stops: Stop[] = [
   { id: "experience-earlier", z: -150, focusX: 0 },
   { id: "projects", z: -186, focusX: 2 },
   ...projects.map((p, i) => ({ id: `project-${p.slug}`, z: gateZ(i) + 13, focusX: GATE_X })),
-  { id: "education", z: lastGateZ - 28, focusX: 0 },
-  { id: "media", z: lastGateZ - 66, focusX: 0 },
+  { id: "writing", z: lastGateZ - 26, focusX: 0 },
+  { id: "education", z: lastGateZ - 52, focusX: 0 },
+  { id: "media", z: lastGateZ - 80, focusX: 0 },
   { id: "contact", z: FINAL_GATE_Z + 44, focusX: 0 },
 ];
 

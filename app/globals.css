@@ -197,6 +197,42 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
 .talks li + li { border-top: 1px solid var(--line); }
 .talks a:hover { color: var(--ink); }
 
+/* ---------- snapshots, focus, writing ---------- */
+
+.snapshot {
+  display: block; overflow: hidden; border: 1px solid var(--line); border-radius: 2px; background: #0b0b0f;
+  aspect-ratio: 16 / 9;
+}
+.snapshot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center; transition: transform 400ms ease, opacity 200ms; opacity: 0.92; }
+a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
+.project-article .snapshot { aspect-ratio: auto; }
+.project-article .snapshot img { height: auto; object-fit: contain; }
+
+.focus-label { font-size: 11px; }
+.focus { display: flex; flex-wrap: wrap; gap: 8px; }
+.focus li > * {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 34px; padding: 0 12px;
+  border: 1px solid var(--line-strong); border-radius: 999px; font-size: 13px; color: var(--ink-2);
+  text-decoration: none; background: rgba(5, 5, 7, 0.4);
+}
+.focus li > a { color: var(--ink); }
+.focus li > a:hover { border-color: var(--accent); }
+.project-card .focus-label { margin-top: 18px; }
+.builds { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
+.builds .proof { margin-top: 0; }
+.role .snapshot { aspect-ratio: 16 / 6; }
+
+.series { border-top: 1px solid var(--line); padding-top: 16px; }
+.series + .series { margin-top: 20px !important; }
+.series-title { font-size: 18px; font-weight: 400; }
+.series-blurb { font-size: 14px; margin-top: 4px; }
+.series-posts { margin-top: 10px; }
+.series-posts a {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr) 16px; gap: 10px; align-items: baseline;
+  padding: 6px 0; font-size: 15px; line-height: 1.35; color: var(--ink); text-decoration: none;
+}
+.series-posts a:hover .index-arrow { transform: translateX(4px); }
+
 /* ---------- open source ---------- */
 
 .oss-list { border-top: 1px solid var(--line); }
@@ -321,8 +357,15 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   .timeline-period { font-size: 11px; }
   .timeline-title { font-size: 15px; }
   .timeline-compact > li { padding: 8px 0; }
-  .role .project-highlights { font-size: 13px; gap: 6px; }
+  /* phones get the snapshot and the links; the bullets and stack stay on desktop and in the CV */
+  .role-bullets, .role .card-stack { display: none; }
   .role-summary { font-size: 15px; }
+  .snapshot { aspect-ratio: 16 / 8; }
+  .project-card .card-outcome { font-size: 15px; }
+  .focus li > * { min-height: 30px; padding: 0 10px; font-size: 12px; }
+  .series-posts a { font-size: 14px; padding: 5px 0; }
+  .series-blurb { display: none; }
+  .series { padding-top: 12px; }
   .oss-list a { padding: 9px 0; }
   .oss-what { font-size: 13px; }
   /* copy sits at the bottom, so a station must not be taller than the screen */
