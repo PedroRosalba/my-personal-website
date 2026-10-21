@@ -168,41 +168,10 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="hackathons" className="station" data-stop="hackathons" aria-labelledby="hackathons-h">
-          <div className="copy">
-            <p className="eyebrow">02 — Hackathons</p>
-            <h2 id="hackathons-h">Built in a weekend, judged the same day.</h2>
-            <ul className="cards">
-              {hackathons.map((h) => (
-                <li key={h.project} className="card-row">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="card-thumb" src={h.image} alt="" loading="lazy" />
-                  <div>
-                    <p className="timeline-period">
-                      {h.event} {h.year}
-                    </p>
-                    <h3 className="card-row-title">
-                      <a href={h.links[0].href} target="_blank" rel="noreferrer">
-                        {h.project}
-                      </a>
-                    </h3>
-                    <p className="card-row-text">{h.pitch}</p>
-                    <ul className="prizes" aria-label="Prizes">
-                      {h.prizes.map((prize) => (
-                        <li key={prize}>{prize}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </section>
-
         <section id="projects" aria-labelledby="projects-h">
           <div className="station" data-stop="projects">
             <div className="copy">
-              <p className="eyebrow">03 — Projects</p>
+              <p className="eyebrow">02 — Projects</p>
               <h2 id="projects-h">Open source, upstream</h2>
               <p>An agent platform I help maintain, and fixes sent to the tools I build on.</p>
               <ol className="project-index">
@@ -236,7 +205,7 @@ export default function Home() {
 
         <section id="writing" className="station" data-stop="writing" aria-labelledby="writing-h">
           <div className="copy">
-            <p className="eyebrow">04 — Writing</p>
+            <p className="eyebrow">03 — Writing</p>
             <h2 id="writing-h">Notes from the work.</h2>
             {writingBySeries.length ? (
               writingBySeries.map((s) => (
@@ -273,7 +242,7 @@ export default function Home() {
 
         <section id="community" className="station" data-stop="community" aria-labelledby="community-h">
           <div className="copy">
-            <p className="eyebrow">05 — Community</p>
+            <p className="eyebrow">04 — Community</p>
             <h2 id="community-h">Teaching, talks and meetups.</h2>
             <ul className="cards cards-wide">
               {community.map((item) => (
@@ -305,17 +274,47 @@ export default function Home() {
 
         <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
           <div className="copy">
-            <p className="eyebrow">06 — Education</p>
+            <p className="eyebrow">05 — Education &amp; Awards</p>
             <h2 id="education-h">Math first, then code.</h2>
             <Timeline items={profile.education} />
-            <Timeline items={profile.honors} compact />
+            <h3 className="eyebrow media-sub">Awards</h3>
+            <ul className="awards">
+              {hackathons.map((h) => (
+                <li key={h.project}>
+                  <details className="award">
+                    <summary>
+                      <span className="timeline-period">{h.year}</span>
+                      <span className="award-title">
+                        {h.event} — {h.project}
+                        <span className="award-prizes">{h.prizes.join(" · ")}</span>
+                      </span>
+                      <span className="award-toggle" aria-hidden="true" />
+                    </summary>
+                    <div className="award-body">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img className="card-thumb" src={h.image} alt="" loading="lazy" />
+                      <div>
+                        <p className="card-row-text">{h.pitch}</p>
+                        <ProofLinks links={h.links} />
+                      </div>
+                    </div>
+                  </details>
+                </li>
+              ))}
+              {profile.honors.map((item) => (
+                <li key={item.title} className="award-plain">
+                  <span className="timeline-period">{item.period}</span>
+                  <span className="award-title">{item.title}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         </section>
 
 
         <section id="contact" className="station" data-stop="contact" aria-labelledby="contact-h">
           <div className="copy">
-            <p className="eyebrow">07 — Contact</p>
+            <p className="eyebrow">06 — Contact</p>
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>

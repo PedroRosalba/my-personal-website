@@ -218,6 +218,21 @@ h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.0
   padding: 3px 8px; border: 1px solid var(--line-strong); border-radius: 999px;
 }
 
+.awards { border-top: 1px solid var(--line); }
+.awards > li { border-bottom: 1px solid var(--line); }
+.award summary, .award-plain {
+  display: grid; grid-template-columns: 92px minmax(0, 1fr) 16px; gap: 14px; align-items: baseline; padding: 11px 0;
+}
+.award summary { cursor: pointer; list-style: none; }
+.award summary::-webkit-details-marker { display: none; }
+.award-title { font-size: 15px; line-height: 1.4; color: var(--ink); }
+.award-prizes { display: block; margin-top: 2px; font-family: var(--font-mono), monospace; font-size: 11px; letter-spacing: 0.03em; color: var(--ink-3); }
+.award-toggle::before { content: "+"; font-family: var(--font-mono), monospace; color: var(--ink-3); }
+.award[open] .award-toggle::before { content: "−"; }
+.award summary:hover .award-title { text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: 4px; }
+.award-body { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; padding: 0 0 14px 106px; }
+.award-body .proof { margin-top: 6px; }
+
 /* ---------- snapshots, focus, writing ---------- */
 
 .snapshot {
@@ -394,6 +409,9 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
   .hero-overview { font-size: 15px; }
+  .award summary, .award-plain { grid-template-columns: 76px minmax(0, 1fr) 14px; gap: 10px; padding: 9px 0; }
+  .award-title { font-size: 14px; }
+  .award-body { grid-template-columns: 56px minmax(0, 1fr); gap: 10px; padding-left: 0; }
   .series { padding-top: 12px; }
   .oss-list a { padding: 9px 0; }
   .oss-what { font-size: 13px; }

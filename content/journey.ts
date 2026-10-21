@@ -18,13 +18,12 @@ export const TRANSIT_Z = -45; // colossal first gateway the causeway passes thro
 export const FINAL_GATE_Z = lastGateZ - 150;
 export const CAUSEWAY_END_Z = FINAL_GATE_Z - 2;
 
-// Page order: hero, experience (featured role, then "also"), hackathons, projects and their gateways,
-// writing, community, education, contact. Hackathons come before projects so they are seen early. z only ever decreases, so scrolling always walks forward.
+// Page order: hero, experience (featured role, then "also"), projects and their gateways,
+// writing, community, education (hackathon awards are dropdowns there), contact. z only ever decreases, so scrolling always walks forward.
 export const stops: Stop[] = [
   { id: "top", z: 0, focusX: 0 },
   { id: "experience-herodotus", z: -84, focusX: 0 },
-  { id: "experience-earlier", z: -118, focusX: 3 }, // beside the stele
-  { id: "hackathons", z: -152, focusX: 0 },
+  { id: "experience-earlier", z: -128, focusX: 3 }, // past the stele
   { id: "projects", z: -186, focusX: 2 },
   ...projects.map((p, i) => ({ id: `project-${p.slug}`, z: gateZ(i) + 13, focusX: GATE_X })),
   { id: "writing", z: lastGateZ - 26, focusX: 0 },

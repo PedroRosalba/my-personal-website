@@ -64,6 +64,14 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Nav: Education, Writing and Skills hide on phones; Writing and Skills also hide at 761–1100 px.
 - Verified 1440×900, 1024×768, 390×844: every station fits one screen, no horizontal scroll, no console errors.
 
+## Iteration 7 — proof layout (2026-10-21)
+- Order: hero → experience (Herodotus, then "also": eNor, Mediolano) → projects (Ravi, Turborepo, Cloudflare) →
+  writing → community → education & awards (hackathons are dropdowns) → contact. No numbers on projects.
+- Gateway landmarks: `TurboMark` (outer arcs spin up near the gateway and on open) and `CloudMark` (orange sparks
+  assemble into a cloud near the gateway, swirl on open). Ravi keeps the plain portal.
+- Fix: opening a project (gateway click, list link or "Next") scrolls the page under the panel to that project's
+  station, and closing lands there too, so the card and the gateway always agree.
+
 ## Next (highest value first)
 1. Content from Pedro (see CONTENT_TODO.md): talk/podcast URLs, Ravi demos, photo, blog URL, domain.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).

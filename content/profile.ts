@@ -30,12 +30,17 @@ export const profile = {
   ] as TimelineItem[],
   honors: [
     {
-      title: "IMC honorable mention · 12th, Brazil IMO selection test",
+      title: "Honorable mention, International Mathematics Competition (IMC)",
       place: "Mathematics",
       period: "2023",
     },
     {
-      title: "Brazilian Math Olympiad — silver and bronze",
+      title: "12th place, Brazil IMO team selection test",
+      place: "Mathematics",
+      period: "2023",
+    },
+    {
+      title: "Silver and bronze medals, Brazilian Math Olympiad (OBM)",
       place: "Mathematics",
       period: "2018 – 2023",
     },

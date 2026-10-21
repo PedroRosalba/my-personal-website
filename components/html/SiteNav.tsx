@@ -9,11 +9,10 @@ import { skillsPage } from "@/content/skills";
 // `wide`: hidden on phones, where only six items fit in one row (the section is still a scroll away).
 const items = [
   { id: "experience", label: "Experience" },
-  { id: "hackathons", label: "Hackathons" },
   { id: "projects", label: "Projects" },
   { id: "writing", label: "Writing" },
   { id: "community", label: "Community", wide: true },
-  { id: "education", label: "Education", wide: true },
+  { id: "education", label: "Education" },
   { id: "contact", label: "Contact" },
 ];
 

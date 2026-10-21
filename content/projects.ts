@@ -27,7 +27,7 @@ export type Project = {
   /** Click-to-load YouTube clip shown in the panel. */
   youtube?: YouTubeClip & { language?: string };
   /** 3D hint only: which landmark the gateway carries. */
-  landmark: "portal" | "eth";
+  landmark: "portal" | "eth" | "turbo" | "cloud";
 };
 
 export const projects: Project[] = [
@@ -52,13 +52,14 @@ export const projects: Project[] = [
       "Connected sandboxes: a Cloudflare Tunnel and a Gate Worker check short-lived grants before a task reaches a machine.",
     ],
     links: [
+      { label: "ravi.bot", href: "https://ravi.bot" },
       { label: "Repository", href: "https://github.com/PedroRosalba/ravi" },
       { label: "PRs upstream", href: "https://github.com/filipexyz/ravi/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
     image: {
-      src: "/shots/ravi-github.jpg",
-      alt: "Ravi on GitHub: run AI agents on machines you control.",
-      href: "https://github.com/filipexyz/ravi",
+      src: "/shots/ravi-site.jpg",
+      alt: "ravi.bot: agents that work together, from anywhere.",
+      href: "https://ravi.bot",
     },
     video: null,
     landmark: "portal",
@@ -95,7 +96,7 @@ export const projects: Project[] = [
       post: "turbo-cache-hit-wrong-outputs",
     },
     video: null,
-    landmark: "portal",
+    landmark: "turbo",
   },
   {
     slug: "cloudflare",
@@ -119,7 +120,7 @@ export const projects: Project[] = [
     ],
     image: null,
     video: null,
-    landmark: "portal",
+    landmark: "cloud",
   },
 ];
 
