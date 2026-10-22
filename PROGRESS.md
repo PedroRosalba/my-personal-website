@@ -1,6 +1,7 @@
 # Threshold — overnight build log
 
 Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.claude/skills/immersive-portfolio/`.
+Current work: `feature/real-experience` (PR #6). Status and deploy notes: `docs/STATUS.md`.
 
 ## Done
 - Docs: world identity (Eclipse, fog sea, colonnade, sky), Ethereum landmark, E1 reference.
@@ -52,8 +53,33 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - The reveal camera stands a little further back and lower (25 m instead of 19 m) so the forecourt and the walk
   are in frame; Pedro found the old framing too tight for the animation. Gateways and the panel are untouched.
 
+## Iteration 6 — real experience (branch `feature/real-experience`, on top of PR #4)
+- Content from the CV, not drafts: positioning, About, Education & Honors (IMPA Tech, ETHGlobal, ETHDenver,
+  olympiads), Experience (eNor, Herodotus, Mediolano, Blockchain League, Pensi) with proof links per row.
+  eNor shows "Closed source. Full scope on the CV." and links the PDF.
+- Gateways are now Ravi, Turborepo (upstream fixes) and Cran (ETHDenver 2025, ETH landmark). The three old
+  repos are gone from the causeway. Daloc and Risklayer are deliberately absent (Pedro can't claim them).
+- New `open-source` stop between the last gateway and Experience (`content/openSource.ts`), its own camera stop.
+- CV PDF at `/pedro-rosalba-cv.pdf`, linked from the nav, Experience and Contact. Writing links appear only when
+  `NEXT_PUBLIC_BLOG_URL` is set.
+- Nav: Education, Writing and Skills hide on phones; Writing and Skills also hide at 761–1100 px.
+- Verified 1440×900, 1024×768, 390×844: every station fits one screen, no horizontal scroll, no console errors.
+
+## Iteration 7 — proof layout (2026-10-21)
+- Order: hero → experience (Herodotus, then "also": eNor, Mediolano) → projects (Ravi, Turborepo, Cloudflare) →
+  writing → community → education & awards (hackathons are dropdowns) → contact. No numbers on projects.
+- Gateway landmarks: `TurboMark` (outer arcs spin up near the gateway and on open) and `CloudMark` (orange sparks
+  assemble into a cloud near the gateway, swirl on open). Ravi keeps the plain portal.
+- Fix: opening a project (gateway click, list link or "Next") scrolls the page under the panel to that project's
+  station, and closing lands there too, so the card and the gateway always agree.
+
+## Iteration 8 — Herodotus gateway (2026-10-21)
+- Four gateways: Herodotus (Ethereum diamond, the only one with the portal's tunnel of light), Ravi (`RobotMark`),
+  Turborepo (`TurboMark`), Cloudflare (`CloudMark`). `Gateway portal={false}` keeps the opening dark.
+- Copy rule: contributions say what improved and why, never "fixed X"; no review status anywhere.
+
 ## Next (highest value first)
-1. Content from Pedro (see CONTENT_TODO.md): email, LinkedIn, CV, photo, education, experience, confirm copy.
+1. Content from Pedro (see CONTENT_TODO.md): podcast, Risklayer capture, blog URL, domain.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
 3. Real-device check (touch scrolling on iOS/Android, low-power GPU).
 
