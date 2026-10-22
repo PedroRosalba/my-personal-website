@@ -26,11 +26,41 @@ export type Project = {
   video: string | null;
   /** Click-to-load YouTube clip shown in the panel. */
   youtube?: YouTubeClip & { language?: string };
+  /** More snapshots for the panel, shown after `image`. */
+  gallery?: { src: string; alt: string; href?: string }[];
   /** 3D hint only: which landmark the gateway carries. */
-  landmark: "portal" | "eth" | "turbo" | "cloud";
+  landmark: "portal" | "eth" | "turbo" | "cloud" | "robot";
+  /** The portal's tunnel of light. Only the Herodotus (Ethereum) gateway keeps it; the rest show their mark alone. */
+  portal?: boolean;
 };
 
 export const projects: Project[] = [
+  {
+    slug: "herodotus",
+    title: "Herodotus",
+    tagline: "Zero-knowledge state proofs for Ethereum, then DeFi infrastructure.",
+    outcome:
+      "At Herodotus I worked on storage proofs and the Herodotus Data Processor, then on infrastructure for DeFi lending. Builds I worked on: Daloc, an onchain prime brokerage, and Risklayer, a DeFi risk terminal.",
+    role: "Software Engineer",
+    year: "2024 – 2026",
+    stack: ["Cairo", "Rust", "TypeScript", "Python"],
+    focus: [{ label: "State proofs" }, { label: "Prime brokerage" }, { label: "DeFi risk" }],
+    highlights: [
+      "State proofs: extended hdp-cairo from EVM storage proofs to plain Merkle and Patricia-trie proofs, so off-chain systems such as matching engines and oracles can prove the state they read.",
+      "Prime brokerage: real-time order-book pipelines and RFQ quoting behind Daloc, for trading on credit across chains.",
+      "Risk: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on, behind Risklayer.",
+      "Community: mentored a Herodotus Data Processor session at Invisible Garden, Buenos Aires 2025.",
+    ],
+    links: [
+      { label: "Daloc", href: "https://daloc.xyz" },
+      { label: "Risklayer", href: "https://risklayer.online" },
+      { label: "hdp-cairo PRs", href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged" },
+    ],
+    image: { src: "/shots/daloc.jpg", alt: "Daloc: one account, every chain. Onchain prime brokerage.", href: "https://daloc.xyz" },
+    video: null,
+    landmark: "eth",
+    portal: true,
+  },
   {
     slug: "ravi",
     title: "Ravi",
@@ -62,27 +92,27 @@ export const projects: Project[] = [
       href: "https://ravi.bot",
     },
     video: null,
-    landmark: "portal",
+    landmark: "robot",
   },
   {
     slug: "turborepo",
     title: "Turborepo",
-    tagline: "Active contributor to Turborepo's Rust core: cache correctness and hashing.",
+    tagline: "Active contributor to Turborepo's Rust core: caching, change detection and multi-language support.",
     outcome:
-      "Merged fixes to Turborepo's Rust core, most of them places where the cache said hit, or skipped a task, when it should not have.",
+      "I contribute to Turborepo's Rust core, mostly its cache and its support for Rust, Go and Python workspaces: cache hits you can trust, and hashes that follow exactly what changed.",
     role: "Open-source contributor",
     year: "2026",
     stack: ["Rust", "Cargo", "uv", "pnpm", "Git internals"],
     focus: [
-      { label: "Cache correctness", post: "turbo-cache-hit-wrong-outputs" },
-      { label: "Affected detection and hashing", post: "turbo-skipped-task-whose-inputs-changed" },
-      { label: "Rust, Go and Python support", post: "stress-testing-turborepo-rust-go-python" },
+      { label: "Caching", post: "turbo-cache-hit-wrong-outputs" },
+      { label: "Change detection", post: "turbo-skipped-task-whose-inputs-changed" },
+      { label: "Multi-language support", post: "stress-testing-turborepo-rust-go-python" },
     ],
     highlights: [
-      "Cargo.lock changes are attributed to the crates whose dependencies changed, instead of invalidating the whole workspace.",
-      "File hashing matches git's text=auto binary detection, so the same checkout hashes the same everywhere.",
-      "Cached symlinks are restored when outputs already exist on disk, and the restore manifest is written before a local hit returns.",
-      "Python and Rust tool configuration (ruff, pytest, uv, Clippy) is part of the task hash, and survives turbo prune.",
+      "Caching: improved local cache restores, symlinks included, so a cache hit leaves outputs exactly as a fresh build would.",
+      "Change detection: task hashes and --affected follow the files and Cargo.lock entries that really changed, so fewer tasks rerun and none are skipped.",
+      "Multi-language support: Rust, Go and Python workspaces hash their tool configuration (Clippy, ruff, pytest, uv) and keep it through turbo prune, part of Turborepo's move beyond JavaScript.",
+      "Consistency: file hashing matches git's own text detection and pnpm 8 single-project lockfiles are understood, so the same repository hashes the same on every machine.",
     ],
     links: [
       {
@@ -90,29 +120,25 @@ export const projects: Project[] = [
         href: "https://github.com/vercel/turborepo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
       },
     ],
-    image: {
-      src: "/shots/turborepo-cache-hit.jpg",
-      alt: "Diagram: both cache bugs lived in the shortcut that skips opening the archive.",
-      post: "turbo-cache-hit-wrong-outputs",
-    },
+    image: { src: "/shots/turborepo-site.jpg", alt: "turborepo.dev: your codebase, faster.", href: "https://turborepo.dev" },
     video: null,
     landmark: "turbo",
   },
   {
     slug: "cloudflare",
     title: "Cloudflare Workers",
-    tagline: "Fixes for the Workers Rust SDK and the runtime's TypeScript types.",
+    tagline: "Contributor to the Workers Rust SDK and the runtime's TypeScript types.",
     outcome:
-      "Fixes to Cloudflare's Workers stack: workers-rs, the Rust SDK, and workerd's TypeScript types. Each one is a binding that panicked, dropped data or described the wrong type.",
+      "I contribute to Cloudflare's Workers platform from Rust and TypeScript: bringing the Rust SDK's bindings in line with their JavaScript counterparts, and making the runtime's types describe what it really returns.",
     role: "Open-source contributor",
     year: "2026",
     stack: ["Rust", "wasm-bindgen", "TypeScript", "workerd"],
-    focus: [{ label: "Rust SDK bindings" }, { label: "Runtime type definitions" }],
+    focus: [{ label: "Rust SDK parity" }, { label: "Runtime types" }, { label: "Build tooling" }],
     highlights: [
-      "KV and Queues: Rust maps were serialised as {}; they now reach JavaScript as JSON objects.",
-      "R2: Object::range() panicked on a plain JS object, and listed objects without metadata failed to parse.",
-      "Durable Objects: alarm options are sent in camelCase, and Storage gains its get options (allowConcurrency, noCache).",
-      "workerd types: ArrayBufferView inputs, missing cloudflare:workers exports, and a bulk getWithMetadata result without cacheStatus.",
+      "Storage bindings: KV, Queues and R2 in workers-rs carry Rust data to JavaScript faithfully, maps and partial metadata included.",
+      "Durable Objects: alarm and storage options reach the runtime as it expects, with the read options JavaScript already had.",
+      "Runtime types: workerd's TypeScript definitions match the runtime for byte inputs, RPC exports and bulk KV reads.",
+      "Build tooling: worker-build reads wasm-bindgen's package metadata and keeps the project's pinned version.",
     ],
     links: [
       { label: "workers-rs PRs", href: "https://github.com/cloudflare/workers-rs/pulls?q=is%3Apr+author%3APedroRosalba" },

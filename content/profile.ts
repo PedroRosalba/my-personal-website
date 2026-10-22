@@ -20,7 +20,7 @@ export const profile = {
   role: "Software engineer",
   positioning: "A native problem solver, across the stack.",
   overview:
-    "Olympiad math first, then zero-knowledge proofs at Herodotus. Now I build agent infrastructure and send fixes upstream to Turborepo and Cloudflare Workers.",
+    "Former mathlete, then cryptography and blockchain. Now building core software, for the web and beyond.",
   education: [
     {
       title: "Mathematics and Computer Science",

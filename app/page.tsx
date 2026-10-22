@@ -90,6 +90,13 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         </ul>
         <p className="card-stack">{role.stack.join(" · ")}</p>
         {role.proof.length ? <ProofLinks links={role.proof} /> : null}
+        {role.slug === "herodotus" ? (
+          <p className="section-more">
+            <Link className="next-link" href="/projects/herodotus" scroll={false}>
+              See the work: Daloc, Risklayer, hdp-cairo <span aria-hidden="true">→</span>
+            </Link>
+          </p>
+        ) : null}
         {role.note ? (
           <p className="timeline-note">{cv ? <a href={cv}>{role.note}</a> : role.note}</p>
         ) : null}
@@ -172,8 +179,8 @@ export default function Home() {
           <div className="station" data-stop="projects">
             <div className="copy">
               <p className="eyebrow">02 — Projects</p>
-              <h2 id="projects-h">Open source, upstream</h2>
-              <p>An agent platform I help maintain, and fixes sent to the tools I build on.</p>
+              <h2 id="projects-h">Selected work</h2>
+              <p>My work at Herodotus, an agent platform I help maintain, and contributions to the tools I build on.</p>
               <ol className="project-index">
                 {projects.map((p, i) => (
                   <li key={p.slug}>
@@ -274,10 +281,10 @@ export default function Home() {
 
         <section id="education" className="station" data-stop="education" aria-labelledby="education-h">
           <div className="copy">
-            <p className="eyebrow">05 — Education &amp; Awards</p>
+            <p className="eyebrow">05 — Education</p>
             <h2 id="education-h">Math first, then code.</h2>
-            <Timeline items={profile.education} />
-            <h3 className="eyebrow media-sub">Awards</h3>
+            <Timeline items={[...profile.education, ...profile.honors]} />
+            <h3 className="eyebrow media-sub">Hackathon awards</h3>
             <ul className="awards">
               {hackathons.map((h) => (
                 <li key={h.project}>
@@ -299,12 +306,6 @@ export default function Home() {
                       </div>
                     </div>
                   </details>
-                </li>
-              ))}
-              {profile.honors.map((item) => (
-                <li key={item.title} className="award-plain">
-                  <span className="timeline-period">{item.period}</span>
-                  <span className="award-title">{item.title}</span>
                 </li>
               ))}
             </ul>

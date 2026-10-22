@@ -42,6 +42,10 @@ export function ProjectArticle({
         />
       ) : null}
 
+      {project.gallery?.map((shot) => (
+        <Snapshot key={shot.src} src={shot.src} alt={shot.alt} href={shot.href ?? null} />
+      ))}
+
       <dl className="project-meta">
         <div>
           <dt>Role</dt>
