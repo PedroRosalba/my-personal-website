@@ -17,8 +17,9 @@ left alone for now; `vercel.json` declares Next.js, because the project was crea
 | Variable | Where | Value / effect |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Preview (this branch) and Production | set; canonical URLs, sitemap, Open Graph |
-| `NEXT_PUBLIC_BLOG_URL` | not set | turns on every Writing link once the blog is deployed |
-| `NEXT_PUBLIC_SHOW_DRAFTS` | never in production | `1` links unpublished posts (local, preview) |
+| `BLOG_ORIGIN` | Preview and Production | the blog deployment's own URL; `/blog/*` is rewritten there (`next.config.ts`) |
+| `NEXT_PUBLIC_BLOG_URL` | Preview and Production | `/blog`; turns on every Writing link |
+| `NEXT_PUBLIC_SHOW_DRAFTS` | local, preview; production while the blog ships drafts | `1` links unpublished posts |
 | `DEV_ORIGINS` | local only | extra hostnames for hot reload, e.g. a Tailscale name |
 
 Checks run on the last commit: `npm run typecheck` and `npm run build` pass (12 static pages). Headless Chrome at
@@ -68,6 +69,11 @@ whatever stop it was at, so closing showed a different card from the gateway jus
 the panel to that project's stop, and closing lands there (`components/html/ProjectPanel.tsx`).
 
 ## The blog (separate repo)
+
+Served at `/blog` on this domain (Next.js multi-zones): the blog has `basePath: "/blog"` and this app rewrites
+`/blog/*` to `BLOG_ORIGIN`. Same origin, so moving between the two is a cross-document view transition
+(`@view-transition` in both `globals.css`, mirrored): the name holds, the menus swap, the world goes out of focus.
+Links into the blog must stay plain `<a>`, never `<Link>`.
 
 `~/Projects/blog`, private GitHub repo `PedroRosalba/blog`, branch `feature/oss-posts` (3 commits). Eight posts
 ported from the Claude Docs drafts, grouped in two series, each dated by when its PRs merged or opened. Only

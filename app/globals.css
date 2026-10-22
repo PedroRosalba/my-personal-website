@@ -75,6 +75,28 @@ ol, ul { list-style: none; }
   background: linear-gradient(to right, rgba(5, 5, 7, 0.82) 0%, rgba(5, 5, 7, 0.5) 30%, rgba(5, 5, 7, 0) 52%);
 }
 
+/* ---------- crossing between portfolio and journal ---------- */
+/* Two apps on one origin: the browser animates the page swap. The header holds its place
+   while the world behind it goes out of focus. Mirrored in the other app's globals.css. */
+
+@view-transition { navigation: auto; }
+/* The name holds still and gains "/ journal"; the two menus differ, so one leaves before the other arrives. */
+.site-name { view-transition-name: site-name; }
+.site-header nav { view-transition-name: site-nav; }
+::view-transition-group(site-name), ::view-transition-group(site-nav) { animation-duration: 420ms; }
+::view-transition-old(site-name), ::view-transition-new(site-name) { width: auto; height: 100%; }
+::view-transition-old(site-nav), ::view-transition-new(site-nav) { width: auto; height: 100%; left: auto; right: 0; }
+::view-transition-old(site-nav) { animation: 160ms ease-out both vt-fade-out; }
+::view-transition-new(site-nav) { animation: 220ms ease-in 160ms both vt-arrive; }
+::view-transition-old(root) { animation: 420ms cubic-bezier(0.4, 0, 0.2, 1) both vt-defocus; }
+::view-transition-new(root) { animation: 420ms cubic-bezier(0.4, 0, 0.2, 1) 80ms both vt-arrive; }
+@keyframes vt-defocus { to { opacity: 0; filter: blur(14px); } }
+@keyframes vt-arrive { from { opacity: 0; } }
+@keyframes vt-fade-out { to { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+}
+
 /* ---------- header ---------- */
 
 .site-header {
