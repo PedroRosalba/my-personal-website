@@ -22,8 +22,25 @@ export function ProjectPanel({
 
   useEffect(() => {
     if (!open) return;
+    // Scroll and panel must agree: a gateway click or "Next" can open a project far from where the page is,
+    // so the page moves (hidden under the panel) to that project's station; closing then lands on its card.
+    document
+      .querySelector<HTMLElement>(`[data-stop="project-${slug}"]`)
+      ?.scrollIntoView({ block: "start", behavior: "instant" });
     useJourney.getState().set({ activeProject: slug });
-    return () => useJourney.getState().set({ activeProject: null });
+    return () => {
+      useJourney.getState().set({ activeProject: null });
+      // Back restores the scroll from before the panel opened; land on this project's card instead,
+      // unless another project has opened meanwhile ("Next").
+      const land = () => {
+        if (useJourney.getState().activeProject) return;
+        document
+          .querySelector<HTMLElement>(`[data-stop="project-${slug}"]`)
+          ?.scrollIntoView({ block: "start", behavior: "instant" });
+      };
+      requestAnimationFrame(() => requestAnimationFrame(land));
+      setTimeout(land, 120);
+    };
   }, [slug, open]);
 
   useEffect(() => {
