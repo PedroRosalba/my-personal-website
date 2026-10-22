@@ -1,6 +1,6 @@
 # Where the portfolio stands — 2026-10-21
 
-Branch to deploy: **`feature/real-experience`** (PR #6). It is stacked on `feature/traveller-walks-in` (PR #4) and
+Branch to deploy: **`feature/portfolio-release`**, the same tree as `feature/real-experience` (PR #6) with one commit per file. It is stacked on `feature/traveller-walks-in` (PR #4) and
 `feature/pillar-light-wave` (PR #3), so deploying it ships all three: the light swell, the traveller walking into
 gateways and everything below. `main` has none of this yet.
 
@@ -45,20 +45,17 @@ Rules the content follows: the site shows proof a visitor can click; numbers sta
 (`public/pedro-rosalba-cv.pdf`, built from `~/CV/CV.tex`); contributions describe what improved and why, not
 "fixed X"; nothing claims a review status.
 
-## What changed today, commit by commit
+## What changed today
 
-| Commit | What |
-|---|---|
-| `b2e3f1e` | Real content from the CV, open-source proof, CV PDF |
-| `63dfe06` | Talks, Cran prize placings, X; dead OnlyDust link removed |
-| `6496399` | `DEV_ORIGINS` for hot reload over Tailscale |
-| `2f1efc7` | Experience first, Cloudflare project, YouTube click-to-load component |
-| `01d0a4d` | Snapshots, focus chips linked to posts, Writing stop, no numbers on projects |
-| `7cd483b` | Herodotus leads, eNor de-emphasised, Hackathons and Community, simpler hero |
-| `4b934ec` | Turborepo and Cloudflare landmarks, awards dropdowns, **panel/scroll fix** |
-| `6018712` | Herodotus gateway (Ethereum + portal), Ravi robot, contribution wording |
+The branch history is one commit per changed file (36 files), in build order: tooling, assets, content, 3D scene,
+HTML components, page and styles, docs. `git log --oneline feature/traveller-walks-in..` reads as the change list.
 
-**Panel/scroll fix (`4b934ec`).** Opening a project from a gateway, the list or "Next" used to leave the page on
+In the order the work happened: real content from the CV and the CV PDF; talks, Cran placings, X; hot reload over
+Tailscale; experience first; snapshots and focus chips linked to posts; Herodotus leading, Hackathons and
+Community; Turborepo and Cloudflare landmarks, awards dropdowns and the panel/scroll fix; the Herodotus gateway,
+the Ravi robot and the contribution wording.
+
+**Panel/scroll fix (`c7f25ed`).** Opening a project from a gateway, the list or "Next" used to leave the page on
 whatever stop it was at, so closing showed a different card from the gateway just seen. The page now moves under
 the panel to that project's stop, and closing lands there (`components/html/ProjectPanel.tsx`).
 
