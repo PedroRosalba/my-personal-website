@@ -1,6 +1,6 @@
 // Single source of truth for personal content.
 // Only facts that are public or confirmed by Pedro belong here.
-// Fields left null / empty are hidden in the UI — see CONTENT_TODO.md.
+// The CV (public/pedro-rosalba-cv.pdf) carries the numbers; the site carries proof a visitor can click.
 
 export type LinkItem = { label: string; href: string };
 
@@ -9,31 +9,53 @@ export type TimelineItem = {
   place: string;
   period: string;
   detail?: string;
+  /** Proof a visitor can open: PRs, recordings, certificates. */
+  proof?: LinkItem[];
 };
+
+const cv = "/pedro-rosalba-cv.pdf";
 
 export const profile = {
   name: "Pedro Rosalba",
-  role: "Software · AI · Systems",
-  // DRAFT positioning sentence, derived from public repositories. Pedro to confirm.
-  positioning:
-    "I build software systems end to end — from low-level engines in Rust to AI tooling and on-chain applications.",
-  about: {
-    headline: "Systems thinking, applied across the stack.",
-    // DRAFT, derived from public repositories only. No biographical claims.
-    body: [
-      "I'm a software engineer who likes problems where correctness matters: payment engines, protocol integrations and the tooling around AI agents.",
-      "My public work ranges from a Rust transaction processor to privacy-preserving payments on Starknet and real-time collaborative apps — and this site itself, built with Three.js, React Three Fiber and WebGL.",
-    ],
-    photo: null as string | null, // e.g. "/pedro.jpg" — a real photo, shown small in About
-    facts: [] as { label: string; value: string }[], // e.g. { label: "Based in", value: "…" }
-  },
-  education: [] as TimelineItem[],
-  experience: [] as TimelineItem[],
+  role: "Software engineer",
+  positioning: "A native problem solver, across the stack.",
+  overview:
+    "Former mathlete, then cryptography and blockchain. Now building core software, for the web and beyond.",
+  education: [
+    {
+      title: "Mathematics and Computer Science",
+      place: "IMPA Tech",
+      period: "2024 – 2025",
+    },
+  ] as TimelineItem[],
+  honors: [
+    {
+      title: "Honorable mention, International Mathematics Competition (IMC)",
+      place: "Mathematics",
+      period: "2023",
+    },
+    {
+      title: "12th place, Brazil IMO team selection test",
+      place: "Mathematics",
+      period: "2023",
+    },
+    {
+      title: "Silver and bronze medals, Brazilian Math Olympiad (OBM)",
+      place: "Mathematics",
+      period: "2018 – 2023",
+    },
+  ] as TimelineItem[],
+  // Set NEXT_PUBLIC_BLOG_URL once the blog is deployed; every Writing link stays hidden until then.
+  writing: process.env.NEXT_PUBLIC_BLOG_URL ?? null,
   contact: {
-    line: "Open to conversations about software, AI and systems work.",
-    email: null as string | null, // public contact email — not set yet
-    links: [{ label: "GitHub", href: "https://github.com/PedroRosalba" }] as LinkItem[],
-    cv: null as string | null, // e.g. "/pedro-rosalba-cv.pdf"
+    line: "Open to conversations about Rust, payments, zero-knowledge and agent infrastructure.",
+    email: "pedro.dandrea.rpd@gmail.com" as string | null,
+    links: [
+      { label: "GitHub", href: "https://github.com/PedroRosalba" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/in/pedro-dandrea-rosalba-031b85291/" },
+      { label: "X", href: "https://x.com/0xrosalbito" },
+    ] as LinkItem[],
+    cv: cv as string | null,
   },
 };
 

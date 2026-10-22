@@ -10,6 +10,9 @@ import { FogSea } from "./FogSea";
 import { Causeway, Colonnade, Stele } from "./Structures";
 import { Gateway } from "./Gateway";
 import { EthDiamond } from "./EthDiamond";
+import { TurboMark } from "./TurboMark";
+import { CloudMark } from "./CloudMark";
+import { RobotMark } from "./RobotMark";
 import { LightWaveClock } from "./lightWave";
 
 export function World({ onOpen }: { onOpen: (slug: string) => void }) {
@@ -51,6 +54,7 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
           kind="project"
           index={i}
           slug={project.slug}
+          portal={project.portal ?? false}
           onOpen={onOpen}
           position={[GATE_X, 0, gateZ(i)]}
           width={14}
@@ -60,6 +64,9 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
           openHeight={9.6}
         >
           {project.landmark === "eth" ? <EthDiamond position={[0, 4.6, 1.2]} /> : null}
+          {project.landmark === "turbo" ? <TurboMark position={[0, 4.6, 1.2]} index={i} /> : null}
+          {project.landmark === "cloud" ? <CloudMark position={[0, 4.4, 1.2]} index={i} /> : null}
+          {project.landmark === "robot" ? <RobotMark position={[0, 3.9, 1.2]} index={i} /> : null}
         </Gateway>
       ))}
 

@@ -16,6 +16,8 @@ type Props = {
   openHeight: number;
   index?: number;
   slug?: string;
+  /** Project gateways only: false keeps the opening dark, so the landmark is all you see. */
+  portal?: boolean;
   onOpen?: (slug: string) => void;
   children?: React.ReactNode;
 };
@@ -130,6 +132,7 @@ export function Gateway({
   openHeight,
   index = -1,
   slug,
+  portal: hasPortal = true,
   onOpen,
   children,
 }: Props) {
@@ -186,7 +189,7 @@ export function Gateway({
       const hovered = s.hoverProject === slug ? 1 : 0;
       const active = frame.revealIndex === index ? frame.reveal : 0;
       target = Math.max(0.12 + near * 0.75, hovered, active);
-      open = active;
+      open = hasPortal ? active : 0;
     } else if (kind === "transit") {
       // faint at Arrival; it wakes as the traveller approaches
       const near = 1 - clamp01(Math.abs(frame.z - position[2]) / 70);
