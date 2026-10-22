@@ -9,7 +9,7 @@ gateways and everything below. `main` has none of this yet.
 **Development environment (what Pedro uses now).** Every push to `feature/portfolio-release` builds a Vercel
 preview, and this URL always points at the latest one:
 https://my-personal-website-git-feature-3c2886-pedro-rosalbas-projects.vercel.app
-Previews sit behind Vercel Authentication (log in to view); a shareable link comes from the deployment's Share button.
+Public: Vercel Authentication is off for this project's previews (turned off 2026-10-21), so the link works for anyone.
 
 **Production** tracks `main`, which has no app yet (its 404 on 2026-10-21 came from building `main`). Production is
 left alone for now; `vercel.json` declares Next.js, because the project was created with the "Other" preset.
