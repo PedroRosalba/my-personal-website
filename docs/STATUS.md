@@ -1,17 +1,25 @@
 # Where the portfolio stands — 2026-10-21
 
-Branch to deploy: **`feature/portfolio-release`**, the same tree as `feature/real-experience` (PR #6) with one commit per file. It is stacked on `feature/traveller-walks-in` (PR #4) and
+Branch to deploy: **`feature/portfolio-release`** (PR #7), the same tree as `feature/real-experience` (PR #6) with one commit per file. It is stacked on `feature/traveller-walks-in` (PR #4) and
 `feature/pillar-light-wave` (PR #3), so deploying it ships all three: the light swell, the traveller walking into
 gateways and everything below. `main` has none of this yet.
 
-## Deploying to production
+## Deploying
 
-| Variable | Value | Effect |
+**Development environment (what Pedro uses now).** Every push to `feature/portfolio-release` builds a Vercel
+preview, and this URL always points at the latest one:
+https://my-personal-website-git-feature-3c2886-pedro-rosalbas-projects.vercel.app
+Previews sit behind Vercel Authentication (log in to view); a shareable link comes from the deployment's Share button.
+
+**Production** tracks `main`, which has no app yet (its 404 on 2026-10-21 came from building `main`). Production is
+left alone for now; `vercel.json` declares Next.js, because the project was created with the "Other" preset.
+
+| Variable | Where | Value / effect |
 |---|---|---|
-| `NEXT_PUBLIC_SITE_URL` | the production URL, e.g. `https://pedrorosalba.com` | canonical URLs, sitemap, Open Graph |
-| `NEXT_PUBLIC_BLOG_URL` | the blog's URL, once it is deployed | turns on every Writing link: nav, Writing stop, focus chips, Contact. Unset, the Writing stop says posts are on their way |
-| `NEXT_PUBLIC_SHOW_DRAFTS` | **leave unset in production** | `1` links unpublished posts too (local and preview only) |
-| `DEV_ORIGINS` | not needed in production | dev only: extra hostnames for hot reload, e.g. a Tailscale name |
+| `NEXT_PUBLIC_SITE_URL` | Preview (this branch) and Production | set; canonical URLs, sitemap, Open Graph |
+| `NEXT_PUBLIC_BLOG_URL` | not set | turns on every Writing link once the blog is deployed |
+| `NEXT_PUBLIC_SHOW_DRAFTS` | never in production | `1` links unpublished posts (local, preview) |
+| `DEV_ORIGINS` | local only | extra hostnames for hot reload, e.g. a Tailscale name |
 
 Checks run on the last commit: `npm run typecheck` and `npm run build` pass (12 static pages). Headless Chrome at
 1440×900 and 390×844: every stop fits one screen, no horizontal scroll, no console errors.
