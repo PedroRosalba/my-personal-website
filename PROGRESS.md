@@ -1,6 +1,7 @@
 # Threshold — overnight build log
 
 Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.claude/skills/immersive-portfolio/`.
+Current work: `feature/real-experience` (PR #6). Status and deploy notes: `docs/STATUS.md`.
 
 ## Done
 - Docs: world identity (Eclipse, fog sea, colonnade, sky), Ethereum landmark, E1 reference.
@@ -72,8 +73,13 @@ Branch: `immersive-threshold-overnight` (never merged, never rebased). Docs: `.c
 - Fix: opening a project (gateway click, list link or "Next") scrolls the page under the panel to that project's
   station, and closing lands there too, so the card and the gateway always agree.
 
+## Iteration 8 — Herodotus gateway (2026-10-21)
+- Four gateways: Herodotus (Ethereum diamond, the only one with the portal's tunnel of light), Ravi (`RobotMark`),
+  Turborepo (`TurboMark`), Cloudflare (`CloudMark`). `Gateway portal={false}` keeps the opening dark.
+- Copy rule: contributions say what improved and why, never "fixed X"; no review status anywhere.
+
 ## Next (highest value first)
-1. Content from Pedro (see CONTENT_TODO.md): talk/podcast URLs, Ravi demos, photo, blog URL, domain.
+1. Content from Pedro (see CONTENT_TODO.md): podcast, Risklayer capture, blog URL, domain.
 2. Optional polish: fog sea billows near the camera at Arrival; Education/Experience 3D landmarks (post-MVP).
 3. Real-device check (touch scrolling on iOS/Android, low-power GPU).
 
