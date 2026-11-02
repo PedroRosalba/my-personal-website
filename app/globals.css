@@ -660,3 +660,49 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .stage:fullscreen .stage-caption { font-size: clamp(18px, 2.2vw, 30px); }
 @media (max-width: 900px) { .stage-caption { bottom: 88px; max-width: 92%; font-size: 13px; } }
 .side-head { position: sticky; top: -20px; z-index: 1; margin: -20px -20px 0; padding: 20px 20px 12px; background: #08080b; }
+
+/* ---------- event emblems (Community rows): the world's palette instead of a platform's share image ---------- */
+
+.em-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.em-line { fill: none; stroke: rgba(214, 205, 255, 0.78); stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round;
+  filter: drop-shadow(0 0 1.5px rgba(123, 97, 255, 0.85)); transition: stroke 300ms, filter 300ms; }
+.em-cable { stroke-dasharray: 1.2 1.6; stroke: rgba(214, 205, 255, 0.5); }
+.em-base { stroke: rgba(237, 235, 230, 0.22); stroke-width: 0.8; fill: none; }
+.card-row:hover .em-line { stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 2.5px rgba(123, 97, 255, 1)); }
+
+/* Rio: an Eclipse moon behind Sugarloaf, two tasks orbiting it at different speeds. */
+.em-moon {
+  position: absolute; left: 86px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: #030304;
+  box-shadow: 0 0 0 1px rgba(214, 205, 255, 0.5), 0 0 8px 1px rgba(123, 97, 255, 0.5), 0 0 22px 4px rgba(123, 97, 255, 0.15);
+  animation: to-breathe 4.8s ease-in-out infinite;
+}
+.em-orbit { position: absolute; left: 50%; top: 50%; width: 0; height: 0; animation: em-spin 5s linear infinite; }
+.em-orbit i { position: absolute; width: 2px; height: 2px; border-radius: 50%; background: #edebe6; box-shadow: 0 0 4px 1px rgba(160, 144, 255, 0.9); }
+.em-orbit-a i { left: 9px; top: -1px; }
+.em-orbit-b { animation-duration: 2.6s; animation-direction: reverse; }
+.em-orbit-b i { left: -14px; top: -1px; width: 1.5px; height: 1.5px; background: rgb(196, 184, 255); }
+.em-water {
+  position: absolute; left: 6px; right: 6px; top: 51px; height: 4px; opacity: 0.42;
+  background: linear-gradient(90deg, transparent 0%, rgba(123, 97, 255, 0.0) 30%, rgba(160, 144, 255, 0.55) 50%, rgba(123, 97, 255, 0) 70%, transparent 100%);
+  background-size: 220% 100%; animation: em-shimmer 7.5s ease-in-out infinite;
+  mask-image: linear-gradient(to bottom, #000, transparent); -webkit-mask-image: linear-gradient(to bottom, #000, transparent);
+}
+
+/* Invisible Garden: the light wave climbs the Obelisco; voxel petals rise from the garden. */
+.em-wave { transform-box: fill-box; animation: em-climb 4.2s cubic-bezier(0.45, 0, 0.3, 1) infinite; }
+.em-petal {
+  position: absolute; bottom: 10px; left: calc(30px + var(--i) * 10.5px); width: 2px; height: 2px;
+  background: rgb(160, 144, 255); box-shadow: 0 0 4px rgba(123, 97, 255, 0.9); opacity: 0;
+  animation: em-rise 6s ease-out infinite; animation-delay: calc(var(--i) * -1.07s);
+}
+.em-petal:nth-of-type(2n) { background: rgb(214, 205, 255); width: 1.5px; height: 1.5px; }
+
+@keyframes em-spin { to { transform: rotate(360deg); } }
+@keyframes em-shimmer { 0% { background-position: 110% 0; } 100% { background-position: -10% 0; } }
+@keyframes em-climb { 0% { transform: translateY(14px); } 70%, 100% { transform: translateY(-48px); } }
+@keyframes em-rise {
+  0% { transform: translate(0, 0); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: translate(calc((var(--i) - 2.5) * 2px), -38px) rotate(90deg); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .em-moon, .em-orbit, .em-water, .em-wave, .em-petal { animation: none; } .em-petal { opacity: 0.5; } }
