@@ -2,96 +2,106 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { AdditiveBlending, BufferGeometry, Float32BufferAttribute, Group, Points, PointsMaterial } from "three";
-import { gateZ } from "@/content/journey";
-import { clamp01, damp, frame } from "./state";
+import { Group, Matrix4, Points, Vector3 } from "three";
+import { frame } from "./state";
+import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHologram, type Cloud } from "./hologram";
 
-const COUNT = 1800;
+/*
+ * The Cloudflare landmark, as a hologram: the logo's cloud as a puffy 3D shape with a flat base, made of ~12k
+ * points in a containment tube (see hologram.tsx): squashed spheres cut flat at the floor. The small lobe on
+ * the right is lighter, as in the logo, and bobs a little on its own.
+ */
 
-/** Inside a Cloudflare-style cloud: a big lobe, a small one to its left, a flat base (unit ≈ 1 m). */
-function inCloud(x: number, y: number) {
-  if (y < -0.5) return false;
-  const lobe = (cx: number, cy: number, r: number) => (x - cx) ** 2 + (y - cy) ** 2 < r * r;
-  const base = y < -0.05 && x > -1.45 && x < 1.5;
-  return base || lobe(0.35, 0.2, 0.78) || lobe(-0.75, -0.08, 0.5) || lobe(1.18, -0.2, 0.32) || lobe(-1.3, -0.3, 0.2);
+const TUBE_R = 1.72;
+const TUBE_BOTTOM = 0.35;
+const TUBE_TOP = 6.55;
+const SPARK = new Vector3(0, TUBE_BOTTOM + 0.5, 0);
+
+const S = 1.05;
+const CY = 3.2; // the cloud's base line sits a little below this, metres above the gateway floor
+const MAIN = 0;
+const SMALL = 1;
+
+const FLOOR = -0.5; // the logo's flat bottom
+const SQUASH = 0.6; // lobes are flattened front to back
+const LOBES: { c: [number, number]; r: number; part: number }[] = [
+  { c: [0.35, 0.2], r: 0.78, part: MAIN },
+  { c: [-0.75, -0.08], r: 0.5, part: MAIN },
+  { c: [-1.22, -0.3], r: 0.28, part: MAIN },
+  // fillers along the bottom, cut flat by the floor
+  { c: [-0.3, -0.32], r: 0.5, part: MAIN },
+  { c: [0.7, -0.3], r: 0.5, part: MAIN },
+  { c: [1.18, -0.24], r: 0.34, part: SMALL },
+];
+
+const inLobe = (x: number, y: number, z: number, l: (typeof LOBES)[number]) =>
+  ((x - l.c[0]) / l.r) ** 2 + ((y - l.c[1]) / l.r) ** 2 + (z / (l.r * SQUASH)) ** 2 < 1;
+
+/** Inside the cloud, ignoring one lobe (so a surface point of that lobe is tested against the others). */
+function inside(x: number, y: number, z: number, skip: number) {
+  if (y < FLOOR) return true; // below the floor counts as solid: nothing shows under the flat bottom
+  return LOBES.some((l, i) => i !== skip && inLobe(x, y, z, l));
 }
 
-/** On the silhouette: inside, but a small step away is outside. */
-function onEdge(x: number, y: number) {
-  const d = 0.06;
-  return !inCloud(x + d, y) || !inCloud(x - d, y) || !inCloud(x, y + d) || !inCloud(x, y - d);
+function push(c: Cloud, x: number, y: number, z: number, n: Vector3, part: number, tone: number) {
+  const g = (Math.random() - 0.35) * 0.03;
+  c.pos.push((x + n.x * g) * S, (y + n.y * g) * S + CY, (z + n.z * g) * S);
+  c.nrm.push(n.x, n.y, n.z);
+  c.part.push(part);
+  c.tone.push(tone);
 }
 
 function makeCloud() {
-  const home: number[] = [];
-  const seed: number[] = [];
-  while (home.length < COUNT * 3) {
-    const x = (Math.random() * 2 - 1) * 1.6;
-    const y = Math.random() * 1.6 - 0.55;
-    if (!inCloud(x, y)) continue;
-    // half the sparks trace the outline so the silhouette reads from the causeway
-    const edge = onEdge(x, y);
-    if (!edge && home.length / 3 > COUNT * 0.5) continue;
-    home.push(x, y, (Math.random() * 2 - 1) * (edge ? 0.06 : 0.22));
-    seed.push(Math.random() * Math.PI * 2, 0.6 + Math.random() * 1.4, Math.random());
+  const c = emptyCloud();
+  const D = 1000;
+  // the lobes: points on each squashed sphere that no other piece covers
+  LOBES.forEach((l, i) => {
+    const tone = l.part === SMALL ? 1 : 0.84;
+    const target = Math.round(4 * Math.PI * l.r * l.r * 0.75 * D);
+    for (let k = 0; k < target * 3 && c.part.length < 40000; k++) {
+      const d = new Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5);
+      if (d.lengthSq() > 0.25 || d.lengthSq() < 1e-4) continue;
+      d.normalize();
+      const x = l.c[0] + d.x * l.r;
+      const y = l.c[1] + d.y * l.r;
+      const z = d.z * l.r * SQUASH;
+      if (inside(x, y, z, i)) continue;
+      push(c, x, y, z, new Vector3(d.x, d.y, d.z / SQUASH).normalize(), l.part, tone);
+    }
+  });
+  // the flat bottom: anywhere under the cloud's footprint
+  for (let k = 0; k < 3.1 * 0.95 * D; k++) {
+    const x = rand([-1.55, 1.5]);
+    const z = rand([-0.47, 0.47]);
+    const y = FLOOR + 0.001;
+    if (!LOBES.some((l) => inLobe(x, y, z, l))) continue;
+    push(c, x, FLOOR, z, new Vector3(0, -1, 0), MAIN, 0.6);
   }
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(home.slice(), 3));
-  return { geometry, home, seed };
+  return cloudGeometry(c);
 }
 
-/** The Cloudflare landmark: a cloud of orange sparks that drifts apart when idle and assembles near its gateway. */
-export function CloudMark({ position, index }: { position: [number, number, number]; index: number }) {
-  const bob = useRef<Group>(null!);
-  const points = useRef<Points>(null!);
-  const spread = useRef(1);
-  const { geometry, home, seed } = useMemo(makeCloud, []);
-  const material = useMemo(
-    () =>
-      new PointsMaterial({
-        color: "#f38020",
-        size: 0.06,
-        sizeAttenuation: true,
-        transparent: true,
-        opacity: 0.95,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        toneMapped: false,
-      }),
-    [],
-  );
+const rand = ([a, b]: number[]) => a + Math.random() * (b - a);
 
-  useFrame((_, rawDt) => {
-    const dt = Math.min(rawDt, 0.05);
-    const near = 1 - clamp01(Math.abs(frame.z - (gateZ(index) + 13)) / 45);
-    const open = frame.revealIndex === index ? frame.reveal : 0;
-    // far: a loose drift of sparks; near: the cloud assembles; open: it swirls
-    spread.current = damp(spread.current, 1 - near * 0.97 + open * 0.3, 2, dt);
+export function CloudMark({ position, index }: { position: [number, number, number]; index: number }) {
+  const spin = useRef<Group>(null!);
+  const points = useRef<Points>(null!);
+  const geometry = useMemo(makeCloud, []);
+  const parts = useMemo(() => Array.from({ length: 6 }, () => new Matrix4()), []);
+  const material = useMemo(() => createPointsMaterial(parts, SPARK, 0.04), [parts]);
+  const drive = useHologram({ index, material, points, spin, spinSpeed: 0.3, centerY: CY + 0.2 });
+
+  useFrame(() => {
     const t = frame.time;
-    const pos = geometry.getAttribute("position");
-    for (let i = 0; i < COUNT; i++) {
-      const [phase, speed, r] = [seed[i * 3], seed[i * 3 + 1], seed[i * 3 + 2]];
-      const a = phase + t * speed * (0.35 + open * 1.5);
-      const amp = spread.current * (0.25 + r * 0.9);
-      pos.setXYZ(
-        i,
-        home[i * 3] + Math.cos(a) * amp,
-        home[i * 3 + 1] + Math.sin(a * 1.3) * amp * 0.6,
-        home[i * 3 + 2] + Math.sin(a) * amp,
-      );
-    }
-    pos.needsUpdate = true;
-    material.opacity = 0.55 + near * 0.4;
-    bob.current.rotation.y = Math.sin(t * 0.25) * 0.4;
-    bob.current.position.y = Math.sin(t * 0.6) * 0.14;
+    parts[MAIN].makeTranslation(0, Math.sin(t * 0.7) * 0.03, 0);
+    parts[SMALL].makeTranslation(0, Math.sin(t * 1.3 + 1) * 0.06, Math.sin(t * 0.8) * 0.04);
   });
 
   return (
     <group position={position}>
-      <group ref={bob} scale={1.4}>
-        <points ref={points} geometry={geometry} material={material} />
+      <HologramTube drive={drive} radius={TUBE_R} bottom={TUBE_BOTTOM} top={TUBE_TOP} />
+      <group ref={spin}>
+        <points ref={points} geometry={geometry} material={material} renderOrder={4} />
       </group>
-      <pointLight position={[0, 0.3, 1.8]} color="#f38020" intensity={16} distance={9} decay={2} />
     </group>
   );
 }

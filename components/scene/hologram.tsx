@@ -4,7 +4,9 @@ import { useEffect, useMemo, useRef, type MutableRefObject, type RefObject } fro
 import { useFrame } from "@react-three/fiber";
 import {
   AdditiveBlending,
+  BufferGeometry,
   DoubleSide,
+  Float32BufferAttribute,
   Group,
   Matrix4,
   Mesh,
@@ -64,6 +66,38 @@ function usePointer() {
 }
 
 /* ---------- the points ---------- */
+
+/** A figure as raw point data: position, outward normal, moving-part index and tone (1 lit, <1 shaded, >1.5 emissive). */
+export type Cloud = { pos: number[]; nrm: number[]; part: number[]; tone: number[] };
+
+export const emptyCloud = (): Cloud => ({ pos: [], nrm: [], part: [], tone: [] });
+
+/** Packs a cloud into a geometry, with per-point seeds; the build order runs bottom to top with a ragged front. */
+export function cloudGeometry(c: Cloud) {
+  const count = c.part.length;
+  let minY = Infinity;
+  let maxY = -Infinity;
+  for (let i = 0; i < count; i++) {
+    minY = Math.min(minY, c.pos[i * 3 + 1]);
+    maxY = Math.max(maxY, c.pos[i * 3 + 1]);
+  }
+  const seed: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const h = (c.pos[i * 3 + 1] - minY) / (maxY - minY);
+    seed.push(Math.random(), h * 0.75 + Math.random() * 0.25, Math.random(), Math.random());
+  }
+  const geometry = new BufferGeometry();
+  geometry.setAttribute("position", new Float32BufferAttribute(c.pos, 3));
+  geometry.setAttribute("normal", new Float32BufferAttribute(c.nrm, 3));
+  geometry.setAttribute("aPart", new Float32BufferAttribute(c.part, 1));
+  geometry.setAttribute("aTone", new Float32BufferAttribute(c.tone, 1));
+  geometry.setAttribute("aSeed", new Float32BufferAttribute(seed, 4));
+  // the points move in the shader, so the CPU-side bounds are only a rough guess
+  geometry.computeBoundingSphere();
+  geometry.boundingSphere!.radius += 1.5;
+  return geometry;
+}
+
 
 const pointsVertex = /* glsl */ `
   attribute float aPart;

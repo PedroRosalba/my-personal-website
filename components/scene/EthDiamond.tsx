@@ -2,9 +2,9 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry, Float32BufferAttribute, Group, Matrix4, Points, Vector3 } from "three";
+import { Group, Matrix4, Points, Vector3 } from "three";
 import { frame } from "./state";
-import { HologramTube, createPointsMaterial, useHologram } from "./hologram";
+import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHologram, type Cloud } from "./hologram";
 
 /*
  * The Web3 landmark, as a hologram: the Ethereum diamond made of ~11k points in a containment tube (see
@@ -23,7 +23,6 @@ const ORIGIN_Y = 3.45; // the diamond's equator, metres above the gateway floor
 const UPPER = 0;
 const CHEVRON = 1;
 
-type Cloud = { pos: number[]; nrm: number[]; part: number[]; tone: number[] };
 type V = [number, number, number];
 
 const sub = (a: V, b: V): V => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -67,7 +66,7 @@ function facet(c: Cloud, part: number, a: V, b: V, cc: V, tone: number, outward:
 
 /** The Ethereum diamond: an upper bipyramid and a detached lower chevron, two-tone facets like the logo. */
 function makeDiamond() {
-  const c: Cloud = { pos: [], nrm: [], part: [], tone: [] };
+  const c = emptyCloud();
   const w = 0.92;
   const corners: V[] = [
     [w, 0, 0],
@@ -105,28 +104,7 @@ function makeDiamond() {
     }
   }
 
-  const count = c.part.length;
-  const seed: number[] = [];
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (let i = 0; i < count; i++) {
-    minY = Math.min(minY, c.pos[i * 3 + 1]);
-    maxY = Math.max(maxY, c.pos[i * 3 + 1]);
-  }
-  for (let i = 0; i < count; i++) {
-    const h = (c.pos[i * 3 + 1] - minY) / (maxY - minY);
-    seed.push(Math.random(), h * 0.75 + Math.random() * 0.25, Math.random(), Math.random());
-  }
-
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(c.pos, 3));
-  geometry.setAttribute("normal", new Float32BufferAttribute(c.nrm, 3));
-  geometry.setAttribute("aPart", new Float32BufferAttribute(c.part, 1));
-  geometry.setAttribute("aTone", new Float32BufferAttribute(c.tone, 1));
-  geometry.setAttribute("aSeed", new Float32BufferAttribute(seed, 4));
-  geometry.computeBoundingSphere();
-  geometry.boundingSphere!.radius += 1.5;
-  return geometry;
+  return cloudGeometry(c);
 }
 
 /** Appears exactly once: the landmark of the Web3 project gateway. */

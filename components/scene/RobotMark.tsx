@@ -2,9 +2,9 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { BufferGeometry, Float32BufferAttribute, Group, Matrix4, Points, Vector3 } from "three";
+import { Group, Matrix4, Points, Vector3 } from "three";
 import { frame } from "./state";
-import { HologramTube, createPointsMaterial, useHologram } from "./hologram";
+import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHologram, type Cloud } from "./hologram";
 
 /*
  * The Ravi landmark, as a hologram: a small walker robot made of ~14k points in a containment tube (see
@@ -30,13 +30,6 @@ const HIP_Y = 3.02;
 const KNEE_Y = 2.2;
 const HIP_X = 0.3;
 const NECK_Y = 4.05;
-
-type Cloud = {
-  pos: number[];
-  nrm: number[];
-  part: number[];
-  tone: number[];
-};
 
 /** Points on the surface of a box, spread by face area, pushed slightly along the normal for a grainy, voxel feel. */
 function box(
@@ -101,7 +94,7 @@ function antenna(c: Cloud, part: number, a: Vector3, b: Vector3) {
 
 /** A Ravi-ish walker: wide boxy head with a visor and two round eyes, two antennas, a torso, two jointed legs. */
 function makeRobot() {
-  const c: Cloud = { pos: [], nrm: [], part: [], tone: [] };
+  const c = emptyCloud();
   const D = 640; // points per m² of surface
 
   // head, with a recessed dark visor and two bright round eyes on the front face
@@ -151,31 +144,7 @@ function makeRobot() {
     box(c, shin, [x * 1.06, 1.27, 0.1], [0.52, 0.2, 0.78], D);
   }
 
-  const count = c.part.length;
-  const seed: number[] = [];
-  let minY = Infinity;
-  let maxY = -Infinity;
-  for (let i = 0; i < count; i++) {
-    const y = c.pos[i * 3 + 1];
-    minY = Math.min(minY, y);
-    maxY = Math.max(maxY, y);
-  }
-  for (let i = 0; i < count; i++) {
-    // build order: bottom first, with some randomness so the front is ragged
-    const h = (c.pos[i * 3 + 1] - minY) / (maxY - minY);
-    seed.push(Math.random(), h * 0.75 + Math.random() * 0.25, Math.random(), Math.random());
-  }
-
-  const geometry = new BufferGeometry();
-  geometry.setAttribute("position", new Float32BufferAttribute(c.pos, 3));
-  geometry.setAttribute("normal", new Float32BufferAttribute(c.nrm, 3));
-  geometry.setAttribute("aPart", new Float32BufferAttribute(c.part, 1));
-  geometry.setAttribute("aTone", new Float32BufferAttribute(c.tone, 1));
-  geometry.setAttribute("aSeed", new Float32BufferAttribute(seed, 4));
-  // the points move in the shader, so the CPU-side bounds are only a rough guess
-  geometry.computeBoundingSphere();
-  geometry.boundingSphere!.radius += 1.5;
-  return geometry;
+  return cloudGeometry(c);
 }
 
 const pivot = (m: Matrix4, x: number, y: number, z: number, rx: number, ry = 0) =>
