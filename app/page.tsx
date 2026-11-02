@@ -9,7 +9,7 @@ import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
-import { YouTubeClip } from "@/components/html/YouTubeClip";
+import { CommunityCard } from "@/components/html/CommunityCard";
 import { Snapshot } from "@/components/html/Snapshot";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
@@ -253,26 +253,11 @@ export default function Home() {
             <h2 id="community-h">Teaching, talks and meetups.</h2>
             <ul className="cards cards-wide">
               {community.map((item) => (
-                <li key={item.title} className={item.image ? "card-row" : "card-row card-row-plain"}>
-                  {item.youtube ? (
-                    <YouTubeClip clip={item.youtube} title={item.title} language={item.language} />
-                  ) : item.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img className="card-thumb" src={item.image} alt="" loading="lazy" />
-                  ) : null}
-                  <div>
-                    <p className="timeline-period">{item.period}</p>
-                    <h3 className="card-row-title">
-                      {item.href ? (
-                        <a href={item.href} target="_blank" rel="noreferrer">
-                          {item.title}
-                        </a>
-                      ) : (
-                        item.title
-                      )}
-                    </h3>
-                    <p className="card-row-text">{item.where}</p>
-                  </div>
+                <li
+                  key={item.title}
+                  className={item.emblem || item.video || item.image || item.youtube ? "card-row" : "card-row card-row-plain"}
+                >
+                  <CommunityCard item={item} />
                 </li>
               ))}
             </ul>
