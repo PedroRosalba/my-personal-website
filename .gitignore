@@ -8,3 +8,6 @@ next-env.d.ts
 .claude/scheduled_tasks.lock
 .vercel
 .env*
+
+# local video encodes (served from R2 in production)
+public/media/
