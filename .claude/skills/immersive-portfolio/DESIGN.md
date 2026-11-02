@@ -218,6 +218,8 @@ Bad:
 
 `prefers-reduced-motion`: tunnel and dash become short crossfades; camera cuts instead of flies.
 
+Prototyped motion ideas for UI moments (openings, progress, ambient touches) live in `MOTION_LIBRARY.md`.
+
 ## Architecture rules
 
 Portfolio content is **real semantic HTML**. Nothing essential exists only inside WebGL.
