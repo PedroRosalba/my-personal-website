@@ -689,9 +689,23 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 @keyframes hd-run { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
 @keyframes hd-ghost { 0%, 100% { opacity: 0.35; } 10% { opacity: 1; } 30% { opacity: 0.35; } }
 
+/* hdp-cairo: a leaf lights, the proof path climbs to the root, each sibling pulses as the path passes it. */
+.hdp-path { stroke-dasharray: 1; stroke-dashoffset: 1; animation: hdp-path 6s ease-in-out infinite; }
+.hdp-leaf { fill: rgb(214, 205, 255); opacity: 0; animation: hdp-leaf 6s ease-out infinite; filter: drop-shadow(0 0 calc(2px * var(--k)) rgb(123, 97, 255)); }
+.hdp-root { fill: rgb(237, 235, 255); opacity: 0; animation: hdp-root 6s ease-out infinite; filter: drop-shadow(0 0 calc(3px * var(--k)) rgb(123, 97, 255)); }
+.hdp-sib { fill: none; stroke: rgb(214, 205, 255); stroke-width: 0.6; opacity: 0; transform-box: fill-box; transform-origin: center;
+  animation: hdp-sib 6s ease-out infinite; animation-delay: 0.9s; }
+.hdp-sib-b { animation-delay: 2.4s; }
+@keyframes hdp-path { 0%, 8% { stroke-dashoffset: 1; opacity: 1; } 58%, 85% { stroke-dashoffset: 0; opacity: 1; } 95%, 100% { stroke-dashoffset: 0; opacity: 0; } }
+@keyframes hdp-leaf { 0% { opacity: 0; } 6%, 85% { opacity: 1; } 95%, 100% { opacity: 0; } }
+@keyframes hdp-root { 0%, 56% { opacity: 0; } 62%, 85% { opacity: 1; } 95%, 100% { opacity: 0; } }
+@keyframes hdp-sib { 0% { opacity: 0; transform: scale(0.6); } 4% { opacity: 1; } 22%, 100% { opacity: 0; transform: scale(1.8); } }
+
 @media (prefers-reduced-motion: reduce) {
-  .hd-run, .hd-ghost { animation: none; }
+  .hd-run, .hd-ghost, .hdp-path, .hdp-leaf, .hdp-root, .hdp-sib { animation: none; }
   .hd-run { stroke-dashoffset: 0.3; }
+  .hdp-path { stroke-dashoffset: 0; }
+  .hdp-leaf, .hdp-root { opacity: 1; }
 }
 
 /* Rio: an Eclipse moon behind Sugarloaf, two tasks orbiting it at different speeds. */

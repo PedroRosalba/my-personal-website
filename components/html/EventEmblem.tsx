@@ -14,6 +14,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   obelisk: () => <Obelisk />,
   herodotus: (id) => <Herodotus id={id} />,
   daloc: (id) => <Daloc id={id} />,
+  hdp: () => <Hdp />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -189,6 +190,46 @@ function Daloc({ id }: { id: string }) {
           <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.88;1" dur="10s" begin={`${-i * 2}s`} repeatCount="indefinite" />
         </g>
       ))}
+    </Art>
+  );
+}
+
+/** hdp-cairo: a Merkle tree over chain state. One leaf lights, its path climbs to the root while the sibling it
+ * needs at each level pulses, and the root flashes: a value read from state, proven against the root. */
+function Hdp() {
+  const root = [56, 9];
+  const mid = [
+    [42, 23],
+    [70, 23],
+  ];
+  const leaves = [35, 49, 63, 77];
+  return (
+    <Art>
+      {/* the tree */}
+      <path
+        className="em-dim"
+        d={`M${root[0]} ${root[1]} L${mid[0][0]} ${mid[0][1]} M${root[0]} ${root[1]} L${mid[1][0]} ${mid[1][1]} ${leaves
+          .map((x, i) => `M${mid[i < 2 ? 0 : 1][0]} ${mid[0][1]} L${x} 37`)
+          .join(" ")}`}
+      />
+      {/* the proof path: leaf → parent → root */}
+      <path className="em-hot hdp-path" pathLength={1} d={`M63 37 L${mid[1][0]} ${mid[1][1]} L${root[0]} ${root[1]}`} />
+      {/* nodes */}
+      <circle className="em-line em-void" cx={root[0]} cy={root[1]} r="2.6" />
+      <circle className="hdp-root" cx={root[0]} cy={root[1]} r="1.5" />
+      {mid.map(([x, y]) => (
+        <circle key={x} className="em-line em-void" cx={x} cy={y} r="2.2" />
+      ))}
+      {leaves.map((x) => (
+        <rect key={x} className="em-line em-void" x={x - 2.2} y="34.8" width="4.4" height="4.4" rx="0.6" />
+      ))}
+      <rect className="hdp-leaf" x="61.4" y="35.4" width="3.2" height="3.2" rx="0.4" />
+      {/* the siblings the proof carries: b2 beside the leaf, then the left subtree beside the parent */}
+      <circle className="hdp-sib" cx="77" cy="37" r="3.4" />
+      <circle className="hdp-sib hdp-sib-b" cx={mid[0][0]} cy={mid[0][1]} r="3.4" />
+      {/* chain state below the leaves */}
+      <path className="em-dim" d="M35 39.2 V44 M49 39.2 V44 M63 39.2 V44 M77 39.2 V44" />
+      <path className="em-base" d="M24 46 H88" />
     </Art>
   );
 }
