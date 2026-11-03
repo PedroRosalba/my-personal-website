@@ -8,7 +8,8 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 
 /*
  * The Turborepo landmark, as a hologram: the mark's inner ring and four outer arcs made of ~12k points in a
- * containment tube (see hologram.tsx). The leading tip of each arc burns bright.
+ * containment tube (see hologram.tsx). The arcs spin in their own plane, faster as the traveller arrives and at
+ * full "turbo" once the project opens; their leading tips burn bright.
  */
 
 const TUBE_R = 1.72;
@@ -85,6 +86,19 @@ export function TurboMark({ position, index }: { position: [number, number, numb
   const parts = useMemo(() => Array.from({ length: 6 }, () => new Matrix4()), []);
   const material = useMemo(() => createPointsMaterial(parts, SPARK, 0.04), [parts]);
   const drive = useHologram({ index, material, points, spin, spinSpeed: 0.22, centerY: CY });
+  const arcs = useRef({ angle: 0, speed: 0.35 });
+
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05);
+    const { awake, open } = drive.current;
+    const a = arcs.current;
+    // idle drift → faster as the traveller arrives → full "turbo" when the project opens
+    a.speed = damp(a.speed, 0.35 + awake * 1.6 + open * 5, 2.5, dt);
+    if (!frame.reduced) a.angle -= a.speed * dt;
+    about(parts[OUTER], "z", a.angle);
+    about(parts[INNER], "y", frame.time * 0.4);
+  });
+
   return (
     <group position={position}>
       <HologramTube drive={drive} radius={TUBE_R} bottom={TUBE_BOTTOM} top={TUBE_TOP} />
