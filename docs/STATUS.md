@@ -37,7 +37,7 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
    as rows with covers. Covers are `EventEmblem` kinds (`components/html/EventEmblem.tsx`); Risklayer is gone (the
    site is down).
 3. **Selected work** — four gateways, each with a card (one-line tagline, living cover, "Focused on" chips that link to
-   the matching blog post when it is public) and a panel that opens the same way for all four: the card's cover, the
+   the matching blog post when it is public) and a panel that opens the same way for all four (no cover: the card already showed it): the
    live product as a window tinted violet (true colours on hover, links to the site), then **Receipts**, two or three
    real PRs as cards (status, repo and number, size, what it fixed, date). Then meta, focus, highlights, links. Data:
    `product` and `receipts` in `content/projects.ts`; components `ProductWindow.tsx` and `Receipts.tsx`.
