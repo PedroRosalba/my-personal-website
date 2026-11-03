@@ -94,6 +94,7 @@ export const projects: Project[] = [
       href: "https://ravi.bot",
     },
     video: null,
+    emblem: "ravi",
     landmark: "robot",
   },
   {
@@ -124,6 +125,7 @@ export const projects: Project[] = [
     ],
     image: { src: "/shots/turborepo-site.jpg", alt: "turborepo.dev: your codebase, faster.", href: "https://turborepo.dev" },
     video: null,
+    emblem: "turborepo",
     landmark: "turbo",
   },
   {
