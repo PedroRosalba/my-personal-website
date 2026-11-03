@@ -63,10 +63,10 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
           openWidth={4.8}
           openHeight={9.6}
         >
-          {project.landmark === "eth" ? <EthDiamond position={[0, 4.6, 1.2]} /> : null}
-          {project.landmark === "turbo" ? <TurboMark position={[0, 4.6, 1.2]} index={i} /> : null}
-          {project.landmark === "cloud" ? <CloudMark position={[0, 4.4, 1.2]} index={i} /> : null}
-          {project.landmark === "robot" ? <RobotMark position={[0, 3.9, 1.2]} index={i} /> : null}
+          {project.landmark === "eth" ? <EthDiamond position={[0, 0, 1.2]} index={i} /> : null}
+          {project.landmark === "turbo" ? <TurboMark position={[0, 0, 1.2]} index={i} /> : null}
+          {project.landmark === "cloud" ? <CloudMark position={[0, 0, 1.2]} index={i} /> : null}
+          {project.landmark === "robot" ? <RobotMark position={[0, 0, 1.2]} index={i} /> : null}
         </Gateway>
       ))}
 
