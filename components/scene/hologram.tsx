@@ -293,9 +293,59 @@ const tubeFragment = /* glsl */ `
   }
 `;
 
+/** A flat ring in the XZ plane: a hot core line with a soft halo (our stand-in for bloom), cut into rotating arcs. */
+const ringVertex = /* glsl */ `
+  varying vec2 vP;
+  void main() {
+    vP = position.xy;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const ringFragment = /* glsl */ `
+  uniform float uRadius;
+  uniform float uRot;
+  uniform float uSegments;
+  uniform float uGap;
+  uniform float uIntensity;
+  uniform vec3 uCore;
+  uniform vec3 uColor;
+  varying vec2 vP;
+  void main() {
+    float r = length(vP);
+    float d = abs(r - uRadius);
+    float ang = atan(vP.y, vP.x) / 6.28318 + 0.5;
+    float seg = fract(ang * uSegments + uRot);
+    // soft ends on each arc
+    float arc = smoothstep(0.0, 0.02, seg - uGap) * smoothstep(1.0, 0.98, seg);
+    float core = exp(-pow(d / 0.045, 2.0));
+    float halo = exp(-d / 0.12) * 0.6 + exp(-d / 0.45) * 0.18;
+    vec3 col = uCore * core * arc * 1.6 + uColor * (halo * mix(0.35, 1.0, arc));
+    gl_FragColor = vec4(col * uIntensity, 1.0);
+  }
+`;
+
 const additive = { transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false } as const;
 
-/** The tube and a violet light on the stone, all driven by a figure's `drive`. */
+function ringMaterial(radius: number, segments: number, gap: number) {
+  return new ShaderMaterial({
+    vertexShader: ringVertex,
+    fragmentShader: ringFragment,
+    uniforms: {
+      uRadius: { value: radius },
+      uRot: { value: 0 },
+      uSegments: { value: segments },
+      uGap: { value: gap },
+      uIntensity: { value: 1 },
+      uCore: { value: new Vector3(0.93, 0.9, 1.0) },
+      uColor: { value: GLOW.clone() },
+    },
+    side: DoubleSide,
+    ...additive,
+  });
+}
+
+/** The tube, its rings and a violet light on the stone, all driven by a figure's `drive`. */
 export function HologramTube({
   drive,
   radius,
@@ -319,21 +369,49 @@ export function HologramTube({
       }),
     [],
   );
+  const rings = useMemo(
+    () => ({
+      top: ringMaterial(radius, 2, 0.06),
+      bottom: ringMaterial(radius, 2, 0.03),
+      outer: ringMaterial(radius + 0.35, 3, 0.22),
+    }),
+    [radius],
+  );
+
   useFrame(({ camera }) => {
     const t = frame.time;
     const s = drive.current;
     const glow = 0.35 + s.awake * 0.65;
     tube.uniforms.uTime.value = t;
     tube.uniforms.uIntensity.value = glow;
+
+    rings.top.uniforms.uRot.value = t * 0.06;
+    rings.bottom.uniforms.uRot.value = -t * 0.09;
+    rings.outer.uniforms.uRot.value = t * 0.04;
+    // the bottom ring flares while it feeds the build
+    const feeding = s.build > 0.001 && s.build < 0.999 ? 0.6 : 0;
+    rings.top.uniforms.uIntensity.value = glow * 0.8;
+    rings.bottom.uniforms.uIntensity.value = glow * (1 + feeding);
+    rings.outer.uniforms.uIntensity.value = glow * 0.55;
     light.current.intensity = 6 + s.awake * 16;
   });
 
+  const ringGeo = (r: number) => <ringGeometry args={[Math.max(0.01, r - 0.9), r + 0.9, 128, 1]} />;
   const height = top - bottom;
 
   return (
     <>
       <mesh position={[0, bottom + height / 2, 0]} material={tube} renderOrder={2}>
         <cylinderGeometry args={[radius, radius, height, 96, 1, true]} />
+      </mesh>
+      <mesh position={[0, top, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.top} renderOrder={3}>
+        {ringGeo(radius)}
+      </mesh>
+      <mesh position={[0, bottom, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.bottom} renderOrder={3}>
+        {ringGeo(radius)}
+      </mesh>
+      <mesh position={[0, bottom - 0.25, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.outer} renderOrder={3}>
+        {ringGeo(radius + 0.35)}
       </mesh>
       <pointLight ref={light} position={[0, 2.5, 2.2]} color="#8f66ff" intensity={10} distance={12} decay={2} />
     </>
