@@ -26,12 +26,15 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
  * drawing lives, so it can sit right beside text; anything wider (Daloc's orbit, the floor lines) fades at the edge. */
 const VIEW_FRAMED = "0 0 112 63";
 const VIEW_BARE = "24 0 64 63";
+/** A bare project cover keeps more width than an icon (Daloc's orbit, the floor lines) but still crops the empty
+ * sides, so narrow drawings such as Ravi's robot and the Turborepo gauge read at a useful size on a phone. */
+const VIEW_BARE_LARGE = "16 0 80 63";
 const ViewBox = createContext(VIEW_FRAMED);
 
 /**
  * `large` fills its container's width (a project card cover) and scales the glow with it.
- * `bare` drops the dark star frame: just the drawing. Beside a row's text it is cropped to the drawing; as a large
- * cover it keeps the whole width, fading at the sides.
+ * `bare` drops the dark star frame: just the drawing, cropped closer to it (tightly beside a row's text, a little
+ * wider as a large cover), fading at the sides.
  */
 export function EventEmblem({ kind, large = false, bare = false }: { kind: EmblemKind; large?: boolean; bare?: boolean }) {
   // Gradient and clip ids must be unique: the same emblem can be on the page twice (home row and project panel).
@@ -57,7 +60,7 @@ export function EventEmblem({ kind, large = false, bare = false }: { kind: Emble
       className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}${bare ? " emblem-bare" : ""}`}
       aria-hidden="true"
     >
-      <ViewBox.Provider value={bare && !large ? VIEW_BARE : VIEW_FRAMED}>{DRAW[kind](id)}</ViewBox.Provider>
+      <ViewBox.Provider value={bare ? (large ? VIEW_BARE_LARGE : VIEW_BARE) : VIEW_FRAMED}>{DRAW[kind](id)}</ViewBox.Provider>
     </span>
   );
 }
