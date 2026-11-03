@@ -65,7 +65,7 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
         >
           {project.landmark === "eth" ? <EthDiamond position={[0, 0, 1.2]} index={i} /> : null}
           {project.landmark === "turbo" ? <TurboMark position={[0, 0, 1.2]} index={i} /> : null}
-          {project.landmark === "cloud" ? <CloudMark position={[0, 4.4, 1.2]} index={i} /> : null}
+          {project.landmark === "cloud" ? <CloudMark position={[0, 0, 1.2]} index={i} /> : null}
           {project.landmark === "robot" ? <RobotMark position={[0, 0, 1.2]} index={i} /> : null}
         </Gateway>
       ))}
