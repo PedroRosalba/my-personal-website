@@ -32,7 +32,7 @@ export type EmblemKind =
   | "obelisk"
   | "herodotus"
   | "daloc"
-  | "daloc-docs"
+  | "hdp"
   | "ravi"
   | "turborepo"
   | "enor"

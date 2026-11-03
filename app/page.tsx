@@ -94,9 +94,11 @@ function BuildRow({ build }: { build: Build }) {
         </h4>
         <p className="card-row-text">{build.summary}</p>
         <p className="cc-actions">
-          <a className="cc-link" href={build.href} target="_blank" rel="noreferrer" aria-label={`${build.title}: ${host(build.href)}`}>
-            {host(build.href)} <span aria-hidden="true">↗</span>
-          </a>
+          {build.links.map((link) => (
+            <a key={link.href} className="cc-link" href={link.href} target="_blank" rel="noreferrer" aria-label={`${build.title}: ${link.label}`}>
+              {link.label} <span aria-hidden="true">↗</span>
+            </a>
+          ))}
         </p>
       </div>
     </li>
@@ -149,7 +151,7 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         {role.slug === "herodotus" ? (
           <p className="section-more">
             <Link className="next-link" href="/projects/herodotus" scroll={false}>
-              See the work: Daloc, its docs and hdp-cairo <span aria-hidden="true">→</span>
+              See the work: Daloc and hdp-cairo <span aria-hidden="true">→</span>
             </Link>
           </p>
         ) : null}

@@ -8,9 +8,12 @@ export type Build = {
   title: string;
   /** What it is, in a few words: the row's eyebrow. */
   kind: string;
+  /** Where the title and the cover go. */
   href: string;
   summary: string;
   emblem: EmblemKind;
+  /** Every place to open it, in the row's action line. */
+  links: LinkItem[];
 };
 
 export type Role = {
@@ -47,13 +50,7 @@ export const featuredRoles: Role[] = [
       "Risk tooling: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on.",
     ],
     stack: ["Cairo", "Rust", "TypeScript", "Python"],
-    proof: [
-      {
-        label: "hdp-cairo PRs",
-        href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
-      },
-      { label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" },
-    ],
+    proof: [{ label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" }],
     emblem: "herodotus",
     builds: [
       {
@@ -63,13 +60,25 @@ export const featuredRoles: Role[] = [
         summary:
           "One account across chains: pledge collateral and trade on credit. I built the real-time order-book pipelines and RFQ quoting behind it.",
         emblem: "daloc",
+        links: [
+          { label: "daloc.xyz", href: "https://daloc.xyz" },
+          { label: "Docs", href: "https://docs.daloc.xyz" },
+        ],
       },
       {
-        title: "Daloc Docs",
-        kind: "Documentation",
-        href: "https://docs.daloc.xyz",
-        summary: "How the platform works: Prime Trade, Borrow, Earn and Strategy Vaults, down to the margin account on Hyperliquid.",
-        emblem: "daloc-docs",
+        title: "hdp-cairo",
+        kind: "Open source · ZK co-processor",
+        href: "https://github.com/HerodotusDev/hdp-cairo",
+        summary:
+          "The Herodotus Data Processor: runs programs over multi-chain data and proves what they read. I took it from EVM storage proofs to plain Merkle and Patricia-trie proofs.",
+        emblem: "hdp",
+        links: [
+          { label: "GitHub", href: "https://github.com/HerodotusDev/hdp-cairo" },
+          {
+            label: "My PRs",
+            href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
+          },
+        ],
       },
     ],
   },

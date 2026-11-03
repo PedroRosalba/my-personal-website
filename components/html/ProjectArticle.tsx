@@ -4,6 +4,7 @@ import { postHref } from "@/content/writing";
 import { YouTubeClip } from "./YouTubeClip";
 import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
+import { EventEmblem } from "./EventEmblem";
 
 /** The one project presentation, shared by the panel and the standalone page. */
 export function ProjectArticle({
@@ -40,6 +41,8 @@ export function ProjectArticle({
           alt={project.image.alt}
           href={project.image.post ? postHref(project.image.post) : (project.image.href ?? null)}
         />
+      ) : project.emblem ? (
+        <EventEmblem kind={project.emblem} large />
       ) : null}
 
       {project.gallery?.map((shot) => (

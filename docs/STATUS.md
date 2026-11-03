@@ -32,13 +32,13 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
 1. **Hero** — "A native problem solver, across the stack." Former mathlete, then cryptography and blockchain, now
    core software. CV button.
 2. **Experience** — Herodotus first, with its H as a living cover (what Pedro did, hdp-cairo PRs, the Invisible
-   Garden session, a link into the Herodotus gateway). Under it, "Builds I worked on": Daloc and Daloc Docs as rows,
-   each with its own cover. Then **Also**: eNor (one line, closed source, scope on the CV) and Mediolano (PR links),
+   Garden session, a link into the Herodotus gateway). Under it, "Builds I worked on": Daloc (app and docs) and
+   hdp-cairo (repo and PRs) as rows, each with its own cover. Then **Also**: eNor (one line, closed source, scope on the CV) and Mediolano (PR links),
    as rows with covers. Covers are `EventEmblem` kinds (`components/html/EventEmblem.tsx`); Risklayer is gone (the
    site is down).
 3. **Selected work** — four gateways, each with a card (one-line tagline, snapshot, "Focused on" chips that link to
    the matching blog post when it is public) and a panel (outcome, snapshot, focus, highlights, links):
-   - **Herodotus** — Ethereum diamond, the only gateway that keeps the portal's tunnel of light. Daloc snapshot.
+   - **Herodotus** — Ethereum diamond. Card and panel use the Daloc cover (no screenshot).
    - **Ravi** — a floating robot that wakes as you arrive. The card's cover is the same robot as a living emblem;
      the panel keeps the ravi.bot snapshot. Links to ravi.bot, the fork and the upstream PRs.
    - **Turborepo** — a ring of blue-to-pink arcs that spins up near the gateway and on open. The card's cover is

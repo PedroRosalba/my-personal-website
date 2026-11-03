@@ -14,7 +14,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   obelisk: () => <Obelisk />,
   herodotus: (id) => <Herodotus id={id} />,
   daloc: (id) => <Daloc id={id} />,
-  "daloc-docs": (id) => <DalocDocs id={id} />,
+  hdp: () => <Hdp />,
   ravi: (id) => <Ravi id={id} />,
   turborepo: (id) => <Turborepo id={id} />,
   enor: (id) => <Enor id={id} />,
@@ -221,41 +221,42 @@ function Daloc({ id }: { id: string }) {
   );
 }
 
-/** Daloc Docs: a docs page (sidebar with the four-leaf mark, heading, prose, a code block) that the light wave
- * reads from top to bottom. */
-function DalocDocs({ id }: { id: string }) {
-  const text: [number, number][] = [
-    [19, 77],
-    [23, 73],
-    [27, 76],
-    [31, 68],
+/** hdp-cairo: a Merkle tree over chain state. One leaf lights, its path climbs to the root while the sibling it
+ * needs at each level pulses, and the root flashes: a value read from state, proven against the root. */
+function Hdp() {
+  const root = [56, 9];
+  const mid = [
+    [42, 23],
+    [70, 23],
   ];
+  const leaves = [35, 49, 63, 77];
   return (
     <Art>
-      <defs>
-        <clipPath id={`${id}-page`}>
-          <rect x="30" y="7" width="52" height="44" rx="2" />
-        </clipPath>
-        <linearGradient id={`${id}-wave`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="rgb(123,97,255)" stopOpacity="0" />
-          <stop offset="0.5" stopColor="rgb(214,205,255)" stopOpacity="0.5" />
-          <stop offset="1" stopColor="rgb(123,97,255)" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect x="30" y="7" width="52" height="44" rx="2" fill="rgba(123,97,255,.05)" />
-      <g clipPath={`url(#${id}-page)`}>
-        <rect className="dc-scan" x="30" y="0" width="52" height="10" fill={`url(#${id}-wave)`} />
-      </g>
-      <rect className="em-line" x="30" y="7" width="52" height="44" rx="2" />
-      <path className="em-dim" d="M44 7 V51" />
-      <Clover x={33.2} y={9.4} s={0.3} />
-      <path className="em-line em-thin" d="M33.5 19 H40.5" />
-      <path className="em-dim" d="M33.5 23 H39.5 M33.5 27 H41 M33.5 31 H38.5 M33.5 35 H40" />
-      <path className="em-line" style={{ strokeWidth: 1.5 }} d="M48 13 H66" />
-      <path className="em-dim" d={text.map(([y, x2]) => `M48 ${y} H${x2}`).join(" ")} />
-      <rect x="48" y="35" width="29" height="11" rx="1" fill="rgba(3,3,4,.7)" stroke="rgba(237,235,230,.22)" strokeWidth="0.5" />
-      <path className="em-line em-thin" d="M51 39 H60 M51 42.5 H67" />
-      <path className="em-base" d="M18 54 H94" />
+      {/* the tree */}
+      <path
+        className="em-dim"
+        d={`M${root[0]} ${root[1]} L${mid[0][0]} ${mid[0][1]} M${root[0]} ${root[1]} L${mid[1][0]} ${mid[1][1]} ${leaves
+          .map((x, i) => `M${mid[i < 2 ? 0 : 1][0]} ${mid[0][1]} L${x} 37`)
+          .join(" ")}`}
+      />
+      {/* the proof path: leaf → parent → root */}
+      <path className="em-hot hdp-path" pathLength={1} d={`M63 37 L${mid[1][0]} ${mid[1][1]} L${root[0]} ${root[1]}`} />
+      {/* nodes */}
+      <circle className="em-line em-void" cx={root[0]} cy={root[1]} r="2.6" />
+      <circle className="hdp-root" cx={root[0]} cy={root[1]} r="1.5" />
+      {mid.map(([x, y]) => (
+        <circle key={x} className="em-line em-void" cx={x} cy={y} r="2.2" />
+      ))}
+      {leaves.map((x) => (
+        <rect key={x} className="em-line em-void" x={x - 2.2} y="34.8" width="4.4" height="4.4" rx="0.6" />
+      ))}
+      <rect className="hdp-leaf" x="61.4" y="35.4" width="3.2" height="3.2" rx="0.4" />
+      {/* the siblings the proof carries: b2 beside the leaf, then the left subtree beside the parent */}
+      <circle className="hdp-sib" cx="77" cy="37" r="3.4" />
+      <circle className="hdp-sib hdp-sib-b" cx={mid[0][0]} cy={mid[0][1]} r="3.4" />
+      {/* chain state below the leaves */}
+      <path className="em-dim" d="M35 39.2 V44 M49 39.2 V44 M63 39.2 V44 M77 39.2 V44" />
+      <path className="em-base" d="M24 46 H88" />
     </Art>
   );
 }
