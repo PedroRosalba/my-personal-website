@@ -475,6 +475,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 
 /* The card object: the Eclipse over the Domus, with voice ripples. Same slot as a .card-thumb in .cards-wide. */
 .talk-object, .emblem {
+  --k: 1;
   position: relative; display: block; width: 112px; height: 63px; padding: 0; overflow: hidden; cursor: pointer;
   border: 1px solid var(--line); border-radius: 2px;
   background:
@@ -661,14 +662,25 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 @media (max-width: 900px) { .stage-caption { bottom: 88px; max-width: 92%; font-size: 13px; } }
 .side-head { position: sticky; top: -20px; z-index: 1; margin: -20px -20px 0; padding: 20px 20px 12px; background: #08080b; }
 
-/* ---------- event emblems (Community rows): the world's palette instead of a platform's share image ---------- */
+/* ---------- emblems (Community rows, roles, builds, project cards): the world's palette instead of a share image ---------- */
+
+/* A project card's cover: the same emblem at the card's width; --k scales every glow with it. */
+.emblem.emblem-lg { --k: 3; width: 100%; height: auto; aspect-ratio: 16 / 9; cursor: default; }
+.project-card:hover .emblem, .cover:focus-visible .emblem { border-color: rgba(123, 97, 255, 0.55); }
 
 .em-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .em-line { fill: none; stroke: rgba(214, 205, 255, 0.78); stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round;
-  filter: drop-shadow(0 0 1.5px rgba(123, 97, 255, 0.85)); transition: stroke 300ms, filter 300ms; }
+  filter: drop-shadow(0 0 calc(1.5px * var(--k)) rgba(123, 97, 255, 0.85)); transition: stroke 300ms, filter 300ms; }
+.em-thin { stroke-width: 0.6; }
+.em-dim { fill: none; stroke: rgba(237, 235, 230, 0.24); stroke-width: 0.6; stroke-linecap: round; }
+.em-dash { stroke-dasharray: 1.2 1.8; }
+.em-hot { fill: none; stroke: rgb(237, 235, 255); stroke-width: 1; stroke-linecap: round; filter: drop-shadow(0 0 calc(2px * var(--k)) rgb(123, 97, 255)); }
+.em-void { fill: #030304; }
 .em-cable { stroke-dasharray: 1.2 1.6; stroke: rgba(214, 205, 255, 0.5); }
 .em-base { stroke: rgba(237, 235, 230, 0.22); stroke-width: 0.8; fill: none; }
-.card-row:hover .em-line { stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 2.5px rgba(123, 97, 255, 1)); }
+.card-row:hover .em-line, .project-card:hover .em-line {
+  stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 calc(2.5px * var(--k)) rgba(123, 97, 255, 1));
+}
 
 /* Rio: an Eclipse moon behind Sugarloaf, two tasks orbiting it at different speeds. */
 .em-moon {

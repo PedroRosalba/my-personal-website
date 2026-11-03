@@ -1,14 +1,55 @@
-// Small living emblems for Community rows, in the world's palette instead of an event platform's share image.
-// Same family as the talk card's Domus object (TalkPlayer): a dark star frame, one landmark drawn in light,
-// and one quiet motion that means something. Pure CSS/SVG, so this needs no client JavaScript.
+"use client";
 
+// Small living emblems, in the world's palette instead of a platform's share image or a screenshot of someone
+// else's design. Same family as the talk card's Domus object (TalkPlayer): a dark star frame, one landmark from the
+// item's own imagery drawn in light, and one quiet motion that means something. Used by Community rows, roles, the
+// builds under a role and the project cards. The drawing is pure SVG/CSS; the only script pauses the SVG (SMIL)
+// animations for visitors who ask for reduced motion, since CSS cannot stop those.
+
+import { useEffect, useId, useRef, type CSSProperties } from "react";
 import type { EmblemKind } from "@/content/media";
 
-export function EventEmblem({ kind }: { kind: EmblemKind }) {
+const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
+  rio: () => <Rio />,
+  obelisk: () => <Obelisk />,
+};
+
+/** `large` fills its container's width (a project card cover) and scales the glow with it. */
+export function EventEmblem({ kind, large = false }: { kind: EmblemKind; large?: boolean }) {
+  // Gradient and clip ids must be unique: the same emblem can be on the page twice (home row and project panel).
+  const id = `em${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
+  const ref = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // Freeze each SVG on a representative frame instead of its first one (which can be empty).
+    ref.current?.querySelectorAll("svg").forEach((svg) => {
+      try {
+        svg.setCurrentTime(2.2);
+        svg.pauseAnimations();
+      } catch {
+        /* an SVG without animations */
+      }
+    });
+  }, []);
+
   return (
-    <span className={`emblem emblem-${kind}`} aria-hidden="true">
-      {kind === "rio" ? <Rio /> : <Obelisk />}
+    <span ref={ref} className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}`} aria-hidden="true">
+      {DRAW[kind](id)}
     </span>
+  );
+}
+
+/** A drop-shadow glow whose radius grows with the emblem (`--k` is 1 in a row, 3 on a card). */
+const glow = (px: number, color = "rgb(123,97,255)"): CSSProperties => ({
+  filter: `drop-shadow(0 0 calc(${px}px * var(--k)) ${color})`,
+});
+
+function Art({ children }: { children: React.ReactNode }) {
+  return (
+    <svg className="em-art" viewBox="0 0 112 63" focusable="false">
+      {children}
+    </svg>
   );
 }
 
