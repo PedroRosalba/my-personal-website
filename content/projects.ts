@@ -30,7 +30,7 @@ export type Project = {
   gallery?: { src: string; alt: string; href?: string }[];
   /** 3D hint only: which landmark the gateway carries. */
   landmark: "portal" | "eth" | "turbo" | "cloud" | "robot";
-  /** The portal's tunnel of light. Only the Herodotus (Ethereum) gateway keeps it; the rest show their mark alone. */
+  /** The portal's tunnel of light behind the mark. Off everywhere now: the holograms carry the gateways. */
   portal?: boolean;
 };
 
@@ -59,7 +59,6 @@ export const projects: Project[] = [
     image: { src: "/shots/daloc.jpg", alt: "Daloc: one account, every chain. Onchain prime brokerage.", href: "https://daloc.xyz" },
     video: null,
     landmark: "eth",
-    portal: true,
   },
   {
     slug: "ravi",
