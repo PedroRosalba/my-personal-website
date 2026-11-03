@@ -151,6 +151,7 @@ export const projects: Project[] = [
     ],
     image: null,
     video: null,
+    emblem: "cloudflare",
     landmark: "cloud",
   },
 ];
