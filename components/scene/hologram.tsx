@@ -242,3 +242,100 @@ export function useHologram({
 
   return drive;
 }
+
+/* ---------- the containment tube ---------- */
+
+/** A faint lit wall with a triangle-lattice texture, brighter at the silhouette and near the floor. */
+const tubeVertex = /* glsl */ `
+  varying vec2 vUv;
+  varying vec3 vN;
+  varying vec3 vV;
+  void main() {
+    vUv = uv;
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vN = normalize(normalMatrix * normal);
+    vV = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const tubeFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  uniform float uTime;
+  varying vec2 vUv;
+  varying vec3 vN;
+  varying vec3 vV;
+
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+  // distance to the nearest edge of a triangle lattice
+  float lattice(vec2 p) {
+    float da = abs(fract(p.y) - 0.5);
+    float db = abs(fract(p.x * 0.5 + p.y * 0.866) - 0.5);
+    float dc = abs(fract(p.x * 0.5 - p.y * 0.866) - 0.5);
+    return 0.5 - max(da, max(db, dc));
+  }
+
+  void main() {
+    float edge = 1.0 - abs(dot(normalize(vN), normalize(vV)));
+    float sil = pow(edge, 2.2);
+    vec2 p = vec2(vUv.x * 64.0, vUv.y * 30.0);
+    // jitter the lattice per cell so it reads like a fine irregular mesh, not graph paper
+    vec2 cell = floor(p);
+    p += (vec2(hash(cell), hash(cell + 7.1)) - 0.5) * 0.35;
+    float line = 1.0 - smoothstep(0.0, 0.06, lattice(p));
+    float sparkle = step(0.82, hash(cell + floor(uTime * 2.0))) * 0.6 + 0.4;
+    float floorGlow = exp(-vUv.y * 3.2);
+    float fade = smoothstep(1.0, 0.75, vUv.y) * smoothstep(0.0, 0.03, vUv.y);
+    float a = (0.035 + sil * 0.55 + floorGlow * 0.3) + line * sparkle * (0.05 + sil * 0.7);
+    gl_FragColor = vec4(uColor * a * fade * uIntensity, 1.0);
+  }
+`;
+
+const additive = { transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false } as const;
+
+/** The tube and a violet light on the stone, all driven by a figure's `drive`. */
+export function HologramTube({
+  drive,
+  radius,
+  bottom,
+  top,
+}: {
+  drive: MutableRefObject<Drive>;
+  radius: number;
+  bottom: number;
+  top: number;
+}) {
+  const light = useRef<PointLight>(null!);
+  const tube = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: tubeVertex,
+        fragmentShader: tubeFragment,
+        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 }, uTime: { value: 0 } },
+        side: DoubleSide,
+        ...additive,
+      }),
+    [],
+  );
+  useFrame(({ camera }) => {
+    const t = frame.time;
+    const s = drive.current;
+    const glow = 0.35 + s.awake * 0.65;
+    tube.uniforms.uTime.value = t;
+    tube.uniforms.uIntensity.value = glow;
+    light.current.intensity = 6 + s.awake * 16;
+  });
+
+  const height = top - bottom;
+
+  return (
+    <>
+      <mesh position={[0, bottom + height / 2, 0]} material={tube} renderOrder={2}>
+        <cylinderGeometry args={[radius, radius, height, 96, 1, true]} />
+      </mesh>
+      <pointLight ref={light} position={[0, 2.5, 2.2]} color="#8f66ff" intensity={10} distance={12} decay={2} />
+    </>
+  );
+}
