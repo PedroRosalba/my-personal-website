@@ -429,8 +429,8 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .series-blurb { display: none; }
   .card-row { grid-template-columns: 56px minmax(0, 1fr); gap: 12px; padding: 10px 0; }
   .card-thumb { width: 56px; height: 56px; }
-  .cards-wide .card-row { grid-template-columns: 88px minmax(0, 1fr); }
-  .cards-wide .card-thumb { width: 88px; height: 50px; }
+  /* the talk object and event emblems are drawn at 112 × 63, so their column keeps that width on phones too */
+  .cards-wide .card-row { grid-template-columns: 112px minmax(0, 1fr); }
   .cards .card-row.card-row-plain { grid-template-columns: 1fr; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
