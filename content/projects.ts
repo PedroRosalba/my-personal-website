@@ -3,7 +3,7 @@
 // and the 3D gateways (order = gateway order along the causeway).
 // No counts here: the PR links carry the numbers. Every fact can be checked from the linked repositories.
 
-import type { YouTubeClip } from "./media";
+import type { EmblemKind, YouTubeClip } from "./media";
 import { postHref } from "./writing";
 
 export type Focus = { label: string; post?: string };
@@ -21,6 +21,9 @@ export type Project = {
   focus: Focus[];
   highlights: string[];
   links: { label: string; href: string }[];
+  /** A living cover drawn in the world's palette. The card shows it instead of `image`; the panel shows it when
+   * there is no video, clip or image. */
+  emblem?: EmblemKind;
   /** A snapshot of the work, linking to the post it comes from when there is one. */
   image: { src: string; alt: string; post?: string; href?: string } | null;
   video: string | null;
