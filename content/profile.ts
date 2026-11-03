@@ -48,7 +48,6 @@ export const profile = {
   // Set NEXT_PUBLIC_BLOG_URL once the blog is deployed; every Writing link stays hidden until then.
   writing: process.env.NEXT_PUBLIC_BLOG_URL ?? null,
   contact: {
-    line: "Open to conversations about Rust, payments, zero-knowledge and agent infrastructure.",
     email: "pedro.dandrea.rpd@gmail.com" as string | null,
     links: [
       { label: "GitHub", href: "https://github.com/PedroRosalba" },
