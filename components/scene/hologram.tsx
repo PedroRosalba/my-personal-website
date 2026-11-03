@@ -325,6 +325,28 @@ const ringFragment = /* glsl */ `
   }
 `;
 
+/** A camera-facing soft column of light behind and around the tube: fakes the volume glow of a bloom pass. */
+const hazeVertex = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const hazeFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  varying vec2 vUv;
+  void main() {
+    vec2 c = vUv - 0.5;
+    float x = exp(-pow(abs(c.x) / 0.26, 3.0));
+    float y = smoothstep(0.5, 0.25, abs(c.y + 0.03));
+    float floorPool = exp(-pow((vUv.y - 0.12) / 0.07, 2.0)) * exp(-pow(c.x / 0.3, 2.0));
+    gl_FragColor = vec4(uColor * (x * y * 0.22 + floorPool * 0.35) * uIntensity, 1.0);
+  }
+`;
+
 const additive = { transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false } as const;
 
 function ringMaterial(radius: number, segments: number, gap: number) {
@@ -345,7 +367,7 @@ function ringMaterial(radius: number, segments: number, gap: number) {
   });
 }
 
-/** The tube, its rings and a violet light on the stone, all driven by a figure's `drive`. */
+/** The tube, its rings, the haze around it and a violet light on the stone, all driven by a figure's `drive`. */
 export function HologramTube({
   drive,
   radius,
@@ -357,6 +379,7 @@ export function HologramTube({
   bottom: number;
   top: number;
 }) {
+  const haze = useRef<Mesh>(null!);
   const light = useRef<PointLight>(null!);
   const tube = useMemo(
     () =>
@@ -365,6 +388,16 @@ export function HologramTube({
         fragmentShader: tubeFragment,
         uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 }, uTime: { value: 0 } },
         side: DoubleSide,
+        ...additive,
+      }),
+    [],
+  );
+  const hazeMaterial = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: hazeVertex,
+        fragmentShader: hazeFragment,
+        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 } },
         ...additive,
       }),
     [],
@@ -384,6 +417,8 @@ export function HologramTube({
     const glow = 0.35 + s.awake * 0.65;
     tube.uniforms.uTime.value = t;
     tube.uniforms.uIntensity.value = glow;
+    hazeMaterial.uniforms.uIntensity.value = glow * (0.6 + s.build * 0.4);
+    haze.current.quaternion.copy(camera.quaternion);
 
     rings.top.uniforms.uRot.value = t * 0.06;
     rings.bottom.uniforms.uRot.value = -t * 0.09;
@@ -401,6 +436,9 @@ export function HologramTube({
 
   return (
     <>
+      <mesh ref={haze} position={[0, bottom + height / 2, 0]} material={hazeMaterial} renderOrder={1}>
+        <planeGeometry args={[radius * 4.2, height * 1.25]} />
+      </mesh>
       <mesh position={[0, bottom + height / 2, 0]} material={tube} renderOrder={2}>
         <cylinderGeometry args={[radius, radius, height, 96, 1, true]} />
       </mesh>
