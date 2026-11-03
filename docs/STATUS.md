@@ -31,8 +31,8 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
 
 1. **Hero** — "A native problem solver, across the stack." Former mathlete, then cryptography and blockchain, now
    core software. CV button.
-2. **Experience** — Herodotus first, with its H as a living cover (what Pedro did, hdp-cairo PRs, the Invisible
-   Garden session, a link into the Herodotus gateway). Under it, "Builds I worked on": Daloc (app and docs) and
+2. **Experience** — Herodotus first, with its H as a living cover (what Pedro did, and a link into the
+   Herodotus gateway; the Invisible Garden session lives in Community). Under it, "Builds I worked on": Daloc (app and docs) and
    hdp-cairo (repo and PRs) as rows, each with its own cover. Then **Also**: eNor (one line, closed source, scope on the CV) and Mediolano (PR links),
    as rows with covers. Covers are `EventEmblem` kinds (`components/html/EventEmblem.tsx`); Risklayer is gone (the
    site is down).
