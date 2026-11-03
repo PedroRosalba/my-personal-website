@@ -4,7 +4,6 @@ import { postHref } from "@/content/writing";
 import { YouTubeClip } from "./YouTubeClip";
 import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
-import { EventEmblem } from "./EventEmblem";
 import { ProductWindow } from "./ProductWindow";
 import { Receipts } from "./Receipts";
 
@@ -33,13 +32,6 @@ export function ProjectArticle({
       </Heading>
       <p className="project-outcome">{project.outcome}</p>
 
-      {/* 1 · the card's cover, so the click reads as opening the card itself */}
-      {project.emblem ? (
-        <div className="project-cover">
-          <EventEmblem kind={project.emblem} large bare />
-        </div>
-      ) : null}
-
       {project.video ? (
         <video className="project-video" src={project.video} controls preload="metadata" playsInline />
       ) : project.youtube ? (
@@ -52,14 +44,14 @@ export function ProjectArticle({
         />
       ) : null}
 
-      {/* 2 · the live product, in our light */}
+      {/* the live product, in our light: the card already showed the cover */}
       {project.product ? <ProductWindow product={project.product} /> : null}
 
       {project.gallery?.map((shot) => (
         <Snapshot key={shot.src} src={shot.src} alt={shot.alt} href={shot.href ?? null} />
       ))}
 
-      {/* 3 · receipts */}
+      {/* receipts */}
       {project.receipts?.length ? (
         <>
           <h3 className="eyebrow">Receipts</h3>
