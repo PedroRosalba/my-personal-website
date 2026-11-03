@@ -59,8 +59,9 @@ export const projects: Project[] = [
       { label: "Daloc Docs", href: "https://docs.daloc.xyz" },
       { label: "hdp-cairo PRs", href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged" },
     ],
-    image: { src: "/shots/daloc.jpg", alt: "Daloc: one account, every chain. Onchain prime brokerage.", href: "https://daloc.xyz" },
+    image: null,
     video: null,
+    emblem: "daloc",
     landmark: "eth",
   },
   {
