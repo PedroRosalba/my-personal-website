@@ -8,7 +8,7 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 
 /*
  * The Ravi landmark, as a hologram: a small walker robot made of ~14k points in a containment tube (see
- * hologram.tsx). It streams up out of a spark when the traveller comes near, turns slowly,
+ * hologram.tsx). It streams up out of a spark when the traveller comes near, turns slowly, walks in place,
  * and frays and snaps back every few seconds.
  */
 
@@ -161,6 +161,31 @@ export function RobotMark({ position, index }: { position: [number, number, numb
   const parts = useMemo(() => Array.from({ length: 6 }, () => new Matrix4()), []);
   const material = useMemo(() => createPointsMaterial(parts, SPARK), [parts]);
   const drive = useHologram({ index, material, points, spin });
+  const gait = useRef(0);
+
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05);
+    const t = frame.time;
+    const { awake, open } = drive.current;
+
+    // walk in place. The robot faces +z; a negative x rotation swings a leg forward. Each knee folds back
+    // in early swing, as its thigh starts forward, and is straight by the time the foot reaches out.
+    if (!frame.reduced) gait.current += dt * (1.6 + awake * 1.2);
+    const g = gait.current;
+    const swing = 0.42;
+    pivot(parts[THIGH_L], -HIP_X, HIP_Y, 0, -Math.sin(g) * swing);
+    pivot(parts[THIGH_R], HIP_X, HIP_Y, 0, Math.sin(g) * swing);
+    const kneeL = Math.max(0, Math.cos(g + 0.6)) * 0.85;
+    const kneeR = Math.max(0, Math.cos(g + Math.PI + 0.6)) * 0.85;
+    parts[SHIN_L].copy(parts[THIGH_L]).multiply(pivot(new Matrix4(), -HIP_X, KNEE_Y, 0, kneeL));
+    parts[SHIN_R].copy(parts[THIGH_R]).multiply(pivot(new Matrix4(), HIP_X, KNEE_Y, 0, kneeR));
+    const bob = Math.abs(Math.cos(g)) * 0.05;
+    parts[BODY].makeTranslation(0, bob, 0);
+    parts[HEAD]
+      .makeTranslation(0, bob, 0)
+      .multiply(pivot(new Matrix4(), 0, NECK_Y, 0, Math.sin(t * 3) * 0.06 * open, Math.sin(t * 0.5) * 0.35 * (1 - open)));
+  });
+
   return (
     <group position={position}>
       <HologramTube drive={drive} radius={TUBE_R} bottom={TUBE_BOTTOM} top={TUBE_TOP} />
