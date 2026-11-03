@@ -16,6 +16,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   daloc: (id) => <Daloc id={id} />,
   hdp: () => <Hdp />,
   ravi: (id) => <Ravi id={id} />,
+  turborepo: (id) => <Turborepo id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -298,6 +299,58 @@ function Ravi({ id }: { id: string }) {
           <animate attributeName="opacity" values=".5;.5;1;1;.5" keyTimes="0;.36;.4;.85;1" {...loop} />
         </rect>
       </g>
+    </Art>
+  );
+}
+
+/** Turborepo: the speedometer from turborepo.dev. The needle crawls, then snaps to the top with a flash: a cache
+ * hit skips the work. */
+function Turborepo({ id }: { id: string }) {
+  const cx = 56,
+    cy = 44,
+    r = 25,
+    a0 = 160,
+    a1 = 380;
+  const pt = (a: number, rr: number) =>
+    [cx + rr * Math.cos((a * Math.PI) / 180), cy + rr * Math.sin((a * Math.PI) / 180)].map((v) => v.toFixed(2));
+  const [sx, sy] = pt(a0, r);
+  const [ex, ey] = pt(a1, r);
+  const arc = `M${sx} ${sy} A${r} ${r} 0 1 1 ${ex} ${ey}`;
+  let ticks = "";
+  for (let i = 0; i <= 22; i++) {
+    const a = a0 + (i * (a1 - a0)) / 22;
+    const [x1, y1] = pt(a, 23);
+    const [x2, y2] = pt(a, i % 5 === 0 ? 19.5 : 21.5);
+    ticks += `M${x1} ${y1} L${x2} ${y2} `;
+  }
+  const rot = (deg: number) => `${deg} ${cx} ${cy}`;
+  return (
+    <Art>
+      <defs>
+        <linearGradient id={`${id}-band`} x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="rgb(123,97,255)" stopOpacity="0.35" />
+          <stop offset="0.6" stopColor="rgb(160,144,255)" stopOpacity="0.8" />
+          <stop offset="1" stopColor="rgb(237,235,255)" />
+        </linearGradient>
+      </defs>
+      <path d={arc} fill="none" stroke={`url(#${id}-band)`} strokeWidth="2.2" strokeLinecap="round" style={glow(2, "rgba(123,97,255,.9)")} />
+      <path d={arc} className="em-hot" strokeWidth="2.6" opacity="0">
+        <animate attributeName="opacity" values="0;0;1;.3;0" keyTimes="0;.58;.62;.8;1" dur="6s" repeatCount="indefinite" />
+      </path>
+      <path className="em-dim" d={ticks} />
+      <g>
+        <path d={`M${cx - 3} ${cy} L${cx + 19} ${cy - 0.5} L${cx + 19} ${cy + 0.5} Z`} fill="rgb(237,235,255)" style={glow(1.5)} />
+        <animateTransform
+          attributeName="transform"
+          type="rotate"
+          dur="6s"
+          repeatCount="indefinite"
+          values={[165, 228, 228, 372, 372, 165].map(rot).join(";")}
+          keyTimes="0;.55;.58;.61;.85;1"
+        />
+      </g>
+      <circle cx={cx} cy={cy} r="2.6" className="em-void" stroke="rgba(214,205,255,.8)" strokeWidth="0.7" />
+      <path className="em-base" d="M20 56 H92" />
     </Art>
   );
 }

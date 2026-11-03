@@ -33,7 +33,8 @@ export type EmblemKind =
   | "herodotus"
   | "daloc"
   | "hdp"
-  | "ravi";
+  | "ravi"
+  | "turborepo";
 
 export type CommunityItem = {
   title: string;
