@@ -8,8 +8,9 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 
 /*
  * The Web3 landmark, as a hologram: the Ethereum diamond made of ~11k points in a containment tube (see
- * hologram.tsx). It streams up out of a spark when the traveller comes near, spins slowly, frays every few
- * seconds, and lights up where the cursor passes.
+ * hologram.tsx). It streams up out of a spark when the traveller comes near, spins slowly, breathes (the
+ * lower chevron drifts away from the upper body and back), frays every few seconds, and lights up where
+ * the cursor passes.
  */
 
 const TUBE_R = 1.72;
@@ -114,6 +115,14 @@ export function EthDiamond({ position, index }: { position: [number, number, num
   const parts = useMemo(() => Array.from({ length: 6 }, () => new Matrix4()), []);
   const material = useMemo(() => createPointsMaterial(parts, SPARK, 0.04), [parts]);
   const drive = useHologram({ index, material, points, spin, spinSpeed: 0.3 });
+
+  useFrame(() => {
+    // breathe: the chevron drifts away from the upper body and back; opening the project closes the gap
+    const t = frame.time;
+    const gap = (Math.sin(t * 0.9) * 0.5 + 0.5) * 0.22 * (1 - drive.current.open);
+    parts[UPPER].makeTranslation(0, gap * 0.4, 0);
+    parts[CHEVRON].makeTranslation(0, -gap * 0.6, 0);
+  });
 
   return (
     <group position={position}>
