@@ -67,7 +67,7 @@ export const projects: Project[] = [
   {
     slug: "ravi",
     title: "Ravi",
-    tagline: "Open-source agents on machines you control. I help maintain it.",
+    tagline: "Open-source agents on machines you control.",
     outcome:
       "An open-source platform for running AI agents on machines you control, reached from WhatsApp, Slack and the CLI. I help maintain it and work on who may act, where the agent runs and how it is contained.",
     role: "Maintainer — permissions, security, sandboxes",
