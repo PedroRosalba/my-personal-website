@@ -50,7 +50,7 @@ export const featuredRoles: Role[] = [
       "Risk tooling: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on.",
     ],
     stack: ["Cairo", "Rust", "TypeScript", "Python"],
-    proof: [{ label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" }],
+    proof: [],
     emblem: "herodotus",
     builds: [
       {
