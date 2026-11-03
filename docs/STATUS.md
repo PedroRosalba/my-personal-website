@@ -43,7 +43,8 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
      the panel keeps the ravi.bot snapshot. Links to ravi.bot, the fork and the upstream PRs.
    - **Turborepo** — a ring of blue-to-pink arcs that spins up near the gateway and on open. The card's cover is
      a speedometer emblem; the panel keeps the turborepo.dev snapshot.
-   - **Cloudflare Workers** — orange sparks that assemble into a cloud near the gateway. No snapshot yet.
+   - **Cloudflare Workers** — orange sparks that assemble into a cloud near the gateway. The card's
+     cover is that cloud in light: Rust in the big cloud, a JS tile in the small one, a map entry crossing the cut.
 4. **Writing** — the blog's two series (Turborepo upstream, Agents on machines you control), linking only
    published posts in production.
 5. **Community** — Devin Meetup Rio talk (2026), Invisible Garden mentor session (2025), Blockchain League founder,
@@ -91,7 +92,7 @@ When a post is published on the blog, set its `live: true` in `content/writing.t
 ## Open items
 
 - [ ] Podcast link(s) → `community` in `content/media.ts` (a YouTube link becomes a click-to-play clip)
-- [ ] Cloudflare snapshot and a Cloudflare write-up (then add `post` to its focus chips)
+- [ ] A Cloudflare write-up (then add `post` to its focus chips)
 - [ ] Deploy the blog, then set `NEXT_PUBLIC_BLOG_URL` here
 - [ ] Review and publish the seven draft posts (two need edits first: an unsourced Ollama paragraph in "Where does
       the agent live?", and the Ravi sandboxes post had its security-findings table removed)

@@ -36,7 +36,8 @@ export type EmblemKind =
   | "ravi"
   | "turborepo"
   | "enor"
-  | "mediolano";
+  | "mediolano"
+  | "cloudflare";
 
 export type CommunityItem = {
   title: string;

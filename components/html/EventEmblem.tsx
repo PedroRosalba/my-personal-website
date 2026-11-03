@@ -19,6 +19,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   turborepo: (id) => <Turborepo id={id} />,
   enor: (id) => <Enor id={id} />,
   mediolano: (id) => <Mediolano id={id} />,
+  cloudflare: () => <Cloudflare />,
 };
 
 /** The drawings are made for a 112 × 63 frame. A small bare icon (no frame) shows only the middle 64 units, where every
@@ -53,13 +54,16 @@ export function EventEmblem({ kind, large = false, bare = false }: { kind: Emble
     });
   }, []);
 
+  const draw = DRAW[kind];
+  if (!draw) return null; // an emblem kind the content names but this file does not draw yet
+
   return (
     <span
       ref={ref}
       className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}${bare ? " emblem-bare" : ""}`}
       aria-hidden="true"
     >
-      <ViewBox.Provider value={bare ? (large ? VIEW_BARE_LARGE : VIEW_BARE) : VIEW_FRAMED}>{DRAW[kind](id)}</ViewBox.Provider>
+      <ViewBox.Provider value={bare ? (large ? VIEW_BARE_LARGE : VIEW_BARE) : VIEW_FRAMED}>{draw(id)}</ViewBox.Provider>
     </span>
   );
 }
@@ -464,6 +468,70 @@ function Mediolano({ id }: { id: string }) {
         <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;.1;.14;.68;.73;1" {...loop} />
       </circle>
       <path className="em-base" d="M22 52 H90" />
+    </Art>
+  );
+}
+
+// The Rust logo, from rust-lang.org/logos (CC BY 4.0, the Rust Foundation): the 32-tooth gear ring, and the disc with
+// the R and its five rivets. Logo units, centred on (71.05, 70.95), about 52 to the tooth tips.
+const RUST_GEAR = "m115.68 70.95a44.63 44.63 0 0 1 -44.63 44.63 44.63 44.63 0 0 1 -44.63-44.63 44.63 44.63 0 0 1 44.63-44.63 44.63 44.63 0 0 1 44.63 44.63zm-.84-4.31 6.96 4.31-6.96 4.31 5.98 5.59-7.66 2.87 4.78 6.65-8.09 1.32 3.4 7.46-8.19-.29 1.88 7.98-7.98-1.88.29 8.19-7.46-3.4-1.32 8.09-6.65-4.78-2.87 7.66-5.59-5.98-4.31 6.96-4.31-6.96-5.59 5.98-2.87-7.66-6.65 4.78-1.32-8.09-7.46 3.4.29-8.19-7.98 1.88 1.88-7.98-8.19.29 3.4-7.46-8.09-1.32 4.78-6.65-7.66-2.87 5.98-5.59-6.96-4.31 6.96-4.31-5.98-5.59 7.66-2.87-4.78-6.65 8.09-1.32-3.4-7.46 8.19.29-1.88-7.98 7.98 1.88-.29-8.19 7.46 3.4 1.32-8.09 6.65 4.78 2.87-7.66 5.59 5.98 4.31-6.96 4.31 6.96 5.59-5.98 2.87 7.66 6.65-4.78 1.32 8.09 7.46-3.4-.29 8.19 7.98-1.88-1.88 7.98 8.19-.29-3.4 7.46 8.09 1.32-4.78 6.65 7.66 2.87z";
+const RUST_INNER = "m71.05 23.68c-26.06 0-47.27 21.22-47.27 47.27s21.22 47.27 47.27 47.27 47.27-21.22 47.27-47.27-21.22-47.27-47.27-47.27zm-.07 4.2a3.1 3.11 0 0 1 3.02 3.11 3.11 3.11 0 0 1 -6.22 0 3.11 3.11 0 0 1 3.2-3.11zm7.12 5.12a38.27 38.27 0 0 1 26.2 18.66l-3.67 8.28c-.63 1.43.02 3.11 1.44 3.75l7.06 3.13a38.27 38.27 0 0 1 .08 6.64h-3.93c-.39 0-.55.26-.55.64v1.8c0 4.24-2.39 5.17-4.49 5.4-2 .23-4.21-.84-4.49-2.06-1.18-6.63-3.14-8.04-6.24-10.49 3.85-2.44 7.85-6.05 7.85-10.87 0-5.21-3.57-8.49-6-10.1-3.42-2.25-7.2-2.7-8.22-2.7h-40.6a38.27 38.27 0 0 1 21.41-12.08l4.79 5.02c1.08 1.13 2.87 1.18 4 .09zm-44.2 23.02a3.11 3.11 0 0 1 3.02 3.11 3.11 3.11 0 0 1 -6.22 0 3.11 3.11 0 0 1 3.2-3.11zm74.15.14a3.11 3.11 0 0 1 3.02 3.11 3.11 3.11 0 0 1 -6.22 0 3.11 3.11 0 0 1 3.2-3.11zm-68.29.5h5.42v24.44h-10.94a38.27 38.27 0 0 1 -1.24-14.61l6.7-2.98c1.43-.64 2.08-2.31 1.44-3.74zm22.62.26h12.91c.67 0 4.71.77 4.71 3.8 0 2.51-3.1 3.41-5.65 3.41h-11.98zm0 17.56h9.89c.9 0 4.83.26 6.08 5.28.39 1.54 1.26 6.56 1.85 8.17.59 1.8 2.98 5.4 5.53 5.4h16.14a38.27 38.27 0 0 1 -3.54 4.1l-6.57-1.41c-1.53-.33-3.04.65-3.37 2.18l-1.56 7.28a38.27 38.27 0 0 1 -31.91-.15l-1.56-7.28c-.33-1.53-1.83-2.51-3.36-2.18l-6.43 1.38a38.27 38.27 0 0 1 -3.32-3.92h31.27c.35 0 .59-.06.59-.39v-11.06c0-.32-.24-.39-.59-.39h-9.15zm-14.43 25.33a3.11 3.11 0 0 1 3.02 3.11 3.11 3.11 0 0 1 -6.22 0 3.11 3.11 0 0 1 3.2-3.11zm46.05.14a3.11 3.11 0 0 1 3.02 3.11 3.11 3.11 0 0 1 -6.22 0 3.11 3.11 0 0 1 3.2-3.11z";
+
+/** The Rust logo drawn in light at (cx, cy), `r` to the tooth tips. Only the gear ring turns, so the R stays legible. */
+function RustLogo({ cx, cy, r, spin }: { cx: number; cy: number; r: number; spin: string }) {
+  const s = r / 52;
+  const g = glow(1.2 / s);
+  return (
+    <g transform={`translate(${cx} ${cy}) scale(${s.toFixed(4)}) translate(-71.05 -70.95)`}>
+      <g>
+        <animateTransform attributeName="transform" type="rotate" values="0 71.05 70.95;360 71.05 70.95" dur={spin} repeatCount="indefinite" />
+        <path d={RUST_GEAR} fill="rgb(214,205,255)" fillRule="evenodd" stroke="rgb(214,205,255)" strokeWidth="3" strokeLinejoin="round" style={g} />
+      </g>
+      <path d={RUST_INNER} fill="rgb(214,205,255)" opacity="0.9" style={g} />
+    </g>
+  );
+}
+
+/** Cloudflare Workers: the cloud from the Cloudflare gateway (components/scene/CloudMark). The big cloud holds Rust,
+ * the small one past the logo's curved cut holds JavaScript; the cut is the boundary and the dash the lane. A map
+ * entry drops out of Rust, runs along the dash, crosses the cut (the star flashes) and lands in JS, which lights:
+ * Rust data reaching JavaScript intact, which is what the workers-rs fixes are about. */
+function Cloudflare() {
+  const loop = { dur: "6s", repeatCount: "indefinite" } as const;
+  const star = "M0 -2.6 Q.4 -.4 2.6 0 Q.4 .4 0 2.6 Q-.4 .4 -2.6 0 Q-.4 -.4 0 -2.6Z";
+  const big = "M27 47 Q26 36 36 35 Q39 19 55 18 Q69 18 71 31 Q67 39 67 47 Z";
+  const small = "M71 47 Q70 37 76 33 Q85 29 89 37 Q91 42 90 47 Z";
+  return (
+    <Art>
+      <path d={big} fill="rgba(123,97,255,.1)" />
+      <path className="em-line" d={big} />
+      <path d={small} fill="rgba(123,97,255,.16)" />
+      <path className="em-line" d={small} />
+      <RustLogo cx={50} cy={29.5} r={7.6} spin="12s" />
+      {/* the JS tile, lit when the entry lands */}
+      <rect className="em-line em-thin" x="76.5" y="34.6" width="8" height="8" rx="1" />
+      <rect x="76.5" y="34.6" width="8" height="8" rx="1" fill="rgba(123,97,255,.55)" opacity="0" style={glow(3)}>
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;.62;.66;.86;.94;1" {...loop} />
+      </rect>
+      <text className="em-glyph" x="84" y="41.6" textAnchor="end" fontSize="3.6">
+        JS
+      </text>
+      {/* the dash, and the star where it crosses the cut */}
+      <path className="em-dim" d="M40 44 H87" />
+      <g transform="translate(68.8 44)">
+        <path d={star} fill="rgb(237,235,255)" style={glow(2)}>
+          <animateTransform attributeName="transform" type="scale" values="1;1;1.9;1;1" keyTimes="0;.36;.42;.5;1" {...loop} />
+        </path>
+      </g>
+      {/* the map entry: a key linked to its value */}
+      <g opacity="0">
+        <rect x="-3.4" y="-1.2" width="2.4" height="2.4" rx="0.4" fill="#030304" stroke="rgb(237,235,255)" strokeWidth="0.6" />
+        <path d="M-1 0 H1" stroke="rgb(214,205,255)" strokeWidth="0.5" />
+        <circle cx="2.2" cy="0" r="1.3" fill="rgb(237,235,255)" style={glow(1.5)} />
+        <animateMotion path="M50 38 L50 44 L80.5 44 L80.5 38.6" keyPoints="0;0;1;1" keyTimes="0;.08;.62;1" calcMode="linear" {...loop} />
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;.06;.1;.62;.66;1" {...loop} />
+      </g>
+      <path className="em-base" d="M19 51 H93" />
     </Art>
   );
 }
