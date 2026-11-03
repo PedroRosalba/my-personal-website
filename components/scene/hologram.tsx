@@ -66,3 +66,116 @@ export function cloudGeometry(c: Cloud) {
   geometry.boundingSphere!.radius += 1.5;
   return geometry;
 }
+
+const pointsVertex = /* glsl */ `
+  attribute float aPart;
+  attribute float aTone;
+  attribute vec4 aSeed;
+  uniform mat4 uParts[6];
+  uniform float uTime;
+  uniform float uBuild;
+  uniform float uScatter;
+  uniform float uSize;
+  uniform float uViewH;
+  uniform vec3 uSpark;
+  varying vec3 vN;
+  varying float vTone;
+  varying float vAlpha;
+  varying float vGlow;
+
+  vec3 drift(vec3 p, float s, float t) {
+    return vec3(
+      sin(p.y * 3.1 + t * 1.7 + s * 6.0) + sin(p.z * 5.3 - t * 2.3),
+      sin(p.z * 2.7 + t * 1.3 + s * 4.0) + 0.6,
+      sin(p.x * 3.3 + t * 1.9 + s * 5.0) + sin(p.y * 4.7 + t * 1.1)
+    ) * 0.5;
+  }
+
+  void main() {
+    mat4 M = uParts[int(aPart + 0.5)];
+    vec3 p = (M * vec4(position, 1.0)).xyz;
+    vec3 n = normalize(mat3(M) * normal);
+
+    // fray: a share of the points lift off the surface and drift, more of them at the extremities
+    float reach = uScatter * (0.06 + aSeed.z * aSeed.z * aSeed.z * 0.75);
+    p += (n * 0.12 + drift(p, aSeed.w, uTime) * 0.16) * reach;
+
+    // build: each point streams up from the spark along a short spiral, bottom of the figure first
+    float k = clamp((uBuild * 1.3 - aSeed.y) / 0.3, 0.0, 1.0);
+    k = k * k * (3.0 - 2.0 * k);
+    vec3 from = uSpark + (aSeed.zwx - 0.5) * 0.22;
+    vec3 q = mix(from, p, k);
+    float a = (1.0 - k) * (2.5 + aSeed.w * 3.0);
+    q.xz = mat2(cos(a), -sin(a), sin(a), cos(a)) * q.xz;
+
+    // before launch, only a few points show, gathered as a spark on the ring
+    float launched = step(0.0001, k);
+    float spark = step(aSeed.x, 0.07) * step(0.002, uBuild) * (1.0 - smoothstep(0.6, 1.0, uBuild));
+    vAlpha = max(launched, spark);
+
+    vec4 mv = modelViewMatrix * vec4(q, 1.0);
+    gl_Position = projectionMatrix * mv;
+    float size = uSize * mix(0.7, 1.0, k) * (1.0 + reach * 0.3);
+    gl_PointSize = vAlpha * size * projectionMatrix[1][1] * uViewH * 0.5 / -mv.z;
+
+    vN = normalize(normalMatrix * n);
+    vTone = aTone;
+    vGlow = (1.0 - k) * 0.9 + reach * 0.5;
+  }
+`;
+
+const pointsFragment = /* glsl */ `
+  uniform vec3 uShadow;
+  uniform vec3 uLit;
+  uniform vec3 uRim;
+  uniform vec3 uGlow;
+  uniform vec3 uEmissive;
+  uniform float uOpacity;
+  varying vec3 vN;
+  varying float vTone;
+  varying float vAlpha;
+  varying float vGlow;
+
+  void main() {
+    vec2 c = gl_PointCoord - 0.5;
+    float d = length(c);
+    if (d > 0.5 || vAlpha < 0.01) discard;
+    // light from up-front-left in view space, a cool rim from behind
+    float lam = max(dot(vN, normalize(vec3(-0.35, 0.8, 0.5))), 0.0);
+    float rim = pow(1.0 - abs(vN.z), 2.0);
+    vec3 col = mix(uShadow, uLit, 0.18 + lam * 0.82) + uRim * rim * 0.25;
+    col *= min(vTone, 1.0);
+    col = mix(col, uEmissive * 1.5, step(1.5, vTone));
+    col += uGlow * vGlow;
+    // a tiny highlight in each point gives the cloud its beaded look
+    col += uRim * 0.18 * (1.0 - smoothstep(0.0, 0.32, length(c + vec2(0.12, -0.12))));
+    float alpha = smoothstep(0.5, 0.36, d) * uOpacity;
+    gl_FragColor = vec4(col, alpha);
+  }
+`;
+
+/** The point material. `parts` are per-part transforms (up to 6) for figures with moving limbs; pass identities otherwise. */
+export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.042) {
+  return new ShaderMaterial({
+    vertexShader: pointsVertex,
+    fragmentShader: pointsFragment,
+    uniforms: {
+      uParts: { value: parts },
+      uTime: { value: 0 },
+      uBuild: { value: 0 },
+      uScatter: { value: 0 },
+      uSize: { value: size },
+      uViewH: { value: 900 },
+      uSpark: { value: spark },
+      uShadow: { value: SHADOW },
+      uLit: { value: LIT },
+      uRim: { value: RIM },
+      uGlow: { value: GLOW },
+      uEmissive: { value: EMISSIVE },
+      uOpacity: { value: 1 },
+    },
+    transparent: true,
+    depthWrite: true,
+    toneMapped: false,
+  });
+}
