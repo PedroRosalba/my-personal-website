@@ -146,7 +146,10 @@ export const projects: Project[] = [
       "Rust SDK: KV, Queues, R2 and Durable Object bindings in workers-rs carry Rust data to JavaScript faithfully, and workerd's TypeScript types match what the runtime returns.",
     ],
     links: [
-      { label: "workers-rs PRs", href: "https://github.com/cloudflare/workers-rs/pulls?q=is%3Apr+author%3APedroRosalba" },
+      { label: "Emscripten", href: "https://github.com/emscripten-core/emscripten/issues?q=involves%3APedroRosalba" },
+      { label: "wasm-bindgen #5415", href: "https://github.com/wasm-bindgen/wasm-bindgen/pull/5415" },
+      { label: "Tokio", href: "https://github.com/tokio-rs/tokio/issues?q=involves%3APedroRosalba" },
+      { label: "workers-rs", href: "https://github.com/cloudflare/workers-rs/issues?q=involves%3APedroRosalba" },
       { label: "workerd PRs", href: "https://github.com/cloudflare/workerd/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
     image: null,
