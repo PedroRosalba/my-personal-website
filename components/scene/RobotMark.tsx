@@ -9,7 +9,7 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 /*
  * The Ravi landmark, as a hologram: a small walker robot made of ~14k points in a containment tube (see
  * hologram.tsx). It streams up out of a spark when the traveller comes near, turns slowly, walks in place,
- * and frays and snaps back every few seconds.
+ * frays and snaps back every few seconds, and lights up where the cursor passes.
  */
 
 // Layout, in metres from the gateway floor (the tube stands inside the 4.8 m arch).

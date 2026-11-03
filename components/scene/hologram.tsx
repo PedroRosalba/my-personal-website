@@ -24,15 +24,46 @@ import { clamp01, damp, frame } from "./state";
 /*
  * Shared pieces of the hologram landmarks: a figure made of points standing in a containment tube between
  * glowing rings. The points stream up out of a spark when the traveller comes near, fray and snap back every
- * few seconds. Everything is in the site's violet.
+ * few seconds, and light up and get swept aside where the cursor passes. Everything is in the site's violet.
  */
 
-// Violet palette: shadow → lit → rim, the glow of points in flight and the emissive bits.
+// Violet palette: shadow → lit → rim, the glow of points in flight, the emissive bits, and the cursor's light.
 const SHADOW = new Vector3(0.15, 0.12, 0.27);
 const LIT = new Vector3(0.74, 0.68, 0.98);
 const RIM = new Vector3(0.78, 0.72, 1.0);
 export const GLOW = new Vector3(0.48, 0.38, 1.0);
 const EMISSIVE = new Vector3(0.86, 0.8, 1.0);
+const HOVER = new Vector3(1.15, 1.0, 1.7);
+
+/* ---------- the cursor, shared by every hologram (canvas sits under the HTML, so listen on window) ---------- */
+
+const pointer = { ndc: new Vector2(), active: false };
+let listeners = 0;
+const onMove = (e: PointerEvent) => {
+  pointer.ndc.set((e.clientX / window.innerWidth) * 2 - 1, -(e.clientY / window.innerHeight) * 2 + 1);
+  pointer.active = true;
+};
+const onOut = (e: PointerEvent) => {
+  if (!e.relatedTarget) pointer.active = false;
+};
+const onBlur = () => (pointer.active = false);
+
+function usePointer() {
+  useEffect(() => {
+    if (listeners++ === 0) {
+      window.addEventListener("pointermove", onMove, { passive: true });
+      document.addEventListener("pointerout", onOut);
+      window.addEventListener("blur", onBlur);
+    }
+    return () => {
+      if (--listeners === 0) {
+        window.removeEventListener("pointermove", onMove);
+        document.removeEventListener("pointerout", onOut);
+        window.removeEventListener("blur", onBlur);
+      }
+    };
+  }, []);
+}
 
 /* ---------- the points ---------- */
 
@@ -78,10 +109,16 @@ const pointsVertex = /* glsl */ `
   uniform float uSize;
   uniform float uViewH;
   uniform vec3 uSpark;
+  uniform vec3 uMouse;
+  uniform vec3 uMouseVel;
+  uniform float uMouseEnergy;
+  uniform float uMouseRadius;
+  uniform float uMouseStrength;
   varying vec3 vN;
   varying float vTone;
   varying float vAlpha;
   varying float vGlow;
+  varying float vHover;
 
   vec3 drift(vec3 p, float s, float t) {
     return vec3(
@@ -100,6 +137,15 @@ const pointsVertex = /* glsl */ `
     float reach = uScatter * (0.06 + aSeed.z * aSeed.z * aSeed.z * 0.75);
     p += (n * 0.12 + drift(p, aSeed.w, uTime) * 0.16) * reach;
 
+    // the cursor: points near it light up, and get swept along its motion with a little random spread
+    float mf = clamp(1.0 - length(p - uMouse) / uMouseRadius, 0.0, 1.0);
+    float speed = length(uMouseVel);
+    vec3 dir = uMouseVel / max(speed, 1e-4);
+    vec3 rnd = normalize(vec3(sin(aSeed.x * 127.1), cos(aSeed.w * 311.7), sin(aSeed.z * 74.3 + 1.0)));
+    vec3 side = normalize(rnd - dir * dot(rnd, dir) + vec3(0.0, 1e-4, 0.0));
+    p += (dir + side) * speed * uMouseStrength * mf * mf;
+    vHover = pow(mf, 1.6) * (0.9 + uMouseEnergy * 2.0);
+
     // build: each point streams up from the spark along a short spiral, bottom of the figure first
     float k = clamp((uBuild * 1.3 - aSeed.y) / 0.3, 0.0, 1.0);
     k = k * k * (3.0 - 2.0 * k);
@@ -115,7 +161,7 @@ const pointsVertex = /* glsl */ `
 
     vec4 mv = modelViewMatrix * vec4(q, 1.0);
     gl_Position = projectionMatrix * mv;
-    float size = uSize * mix(0.7, 1.0, k) * (1.0 + reach * 0.3);
+    float size = uSize * mix(0.7, 1.0, k) * (1.0 + reach * 0.3 + min(vHover, 1.0) * 0.6);
     gl_PointSize = vAlpha * size * projectionMatrix[1][1] * uViewH * 0.5 / -mv.z;
 
     vN = normalize(normalMatrix * n);
@@ -130,11 +176,13 @@ const pointsFragment = /* glsl */ `
   uniform vec3 uRim;
   uniform vec3 uGlow;
   uniform vec3 uEmissive;
+  uniform vec3 uHover;
   uniform float uOpacity;
   varying vec3 vN;
   varying float vTone;
   varying float vAlpha;
   varying float vGlow;
+  varying float vHover;
 
   void main() {
     vec2 c = gl_PointCoord - 0.5;
@@ -149,6 +197,7 @@ const pointsFragment = /* glsl */ `
     col += uGlow * vGlow;
     // a tiny highlight in each point gives the cloud its beaded look
     col += uRim * 0.18 * (1.0 - smoothstep(0.0, 0.32, length(c + vec2(0.12, -0.12))));
+    col = mix(col, uHover, clamp(vHover, 0.0, 1.0)) + uHover * max(vHover - 1.0, 0.0) * 0.35;
     float alpha = smoothstep(0.5, 0.36, d) * uOpacity;
     gl_FragColor = vec4(col, alpha);
   }
@@ -167,11 +216,17 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
       uSize: { value: size },
       uViewH: { value: 900 },
       uSpark: { value: spark },
+      uMouse: { value: new Vector3(1e4, 1e4, 1e4) },
+      uMouseVel: { value: new Vector3() },
+      uMouseEnergy: { value: 0 },
+      uMouseRadius: { value: 1.5 },
+      uMouseStrength: { value: 0.14 },
       uShadow: { value: SHADOW },
       uLit: { value: LIT },
       uRim: { value: RIM },
       uGlow: { value: GLOW },
       uEmissive: { value: EMISSIVE },
+      uHover: { value: HOVER },
       uOpacity: { value: 1 },
     },
     transparent: true,
@@ -180,13 +235,15 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
   });
 }
 
-/* ---------- the drive: proximity, build, fray, turntable ---------- */
+/* ---------- the drive: proximity, build, fray, turntable, cursor ---------- */
 
-export type Drive = { awake: number; build: number; open: number; yaw: number };
+export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number };
+
+const FAR = new Vector3(1e4, 1e4, 1e4);
 
 /**
  * Runs a hologram figure: assembles it near its gateway, frays it every `period` seconds, spins `spin` slowly
- * (turning it to face the visitor when the project opens), and keeps `material` in step.
+ * (turning it to face the visitor when the project opens), and feeds the cursor into `material`.
  */
 export function useHologram({
   index,
@@ -195,6 +252,7 @@ export function useHologram({
   spin,
   period = 7,
   spinSpeed = 0.35,
+  centerY = 3.4,
 }: {
   index: number;
   material: ShaderMaterial;
@@ -202,9 +260,28 @@ export function useHologram({
   spin: RefObject<Group | null>;
   period?: number;
   spinSpeed?: number;
+  /** height of the figure's middle above its origin: the cursor is cast onto a plane through it */
+  centerY?: number;
 }): MutableRefObject<Drive> {
-  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0 });
-  useFrame(({ gl }, rawDt) => {
+  usePointer();
+  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0 });
+  const tmp = useMemo(
+    () => ({
+      ray: new Raycaster(),
+      plane: new Plane(),
+      center: new Vector3(),
+      normal: new Vector3(),
+      hit: new Vector3(),
+      prev: new Vector3(),
+      hasPrev: false,
+      vel: new Vector3(),
+      raw: new Vector3(),
+      inv: new Matrix4(),
+    }),
+    [],
+  );
+
+  useFrame(({ camera, gl }, rawDt) => {
     const dt = Math.min(rawDt, 0.05);
     const t = frame.time;
     const s = drive.current;
@@ -232,12 +309,44 @@ export function useHologram({
       spin.current.position.y = Math.sin(t * 1.1) * 0.08;
     }
 
+    // the cursor: cast it onto a plane through the figure, facing the camera, then into the figure's own space
     const u = material.uniforms;
+    const obj = points.current;
+    if (obj && pointer.active && s.build > 0.5) {
+      obj.getWorldPosition(tmp.center);
+      tmp.center.y += centerY;
+      camera.getWorldDirection(tmp.normal);
+      tmp.plane.setFromNormalAndCoplanarPoint(tmp.normal, tmp.center);
+      tmp.ray.setFromCamera(pointer.ndc, camera);
+      if (tmp.ray.ray.intersectPlane(tmp.plane, tmp.hit)) {
+        if (tmp.hasPrev && dt > 0) tmp.raw.copy(tmp.hit).sub(tmp.prev).divideScalar(dt);
+        else tmp.raw.set(0, 0, 0);
+        tmp.prev.copy(tmp.hit);
+        tmp.hasPrev = true;
+        if (tmp.raw.length() > 8) tmp.raw.setLength(8);
+        tmp.vel.lerp(tmp.raw, 1 - Math.exp(-10 * dt));
+        // motion charges the glow; it bleeds off in about a third of a second
+        s.energy = Math.min(1, s.energy * Math.exp(-dt * 3) + (tmp.raw.length() / 8) * dt * 9);
+
+        tmp.inv.copy(obj.matrixWorld).invert();
+        u.uMouse.value.copy(tmp.hit).applyMatrix4(tmp.inv);
+        const speed = tmp.vel.length();
+        u.uMouseVel.value.copy(tmp.vel).transformDirection(tmp.inv).multiplyScalar(frame.reduced ? 0 : speed);
+      }
+    } else {
+      tmp.hasPrev = false;
+      tmp.vel.multiplyScalar(Math.exp(-6 * dt));
+      s.energy *= Math.exp(-dt * 3);
+      u.uMouse.value.copy(FAR);
+      u.uMouseVel.value.set(0, 0, 0);
+    }
+
     u.uTime.value = t;
     u.uBuild.value = s.build;
     u.uScatter.value = scatter;
     u.uViewH.value = gl.domElement.height;
     u.uOpacity.value = 0.55 + s.awake * 0.45;
+    u.uMouseEnergy.value = s.energy;
   });
 
   return drive;
@@ -428,7 +537,7 @@ export function HologramTube({
     rings.top.uniforms.uIntensity.value = glow * 0.8;
     rings.bottom.uniforms.uIntensity.value = glow * (1 + feeding);
     rings.outer.uniforms.uIntensity.value = glow * 0.55;
-    light.current.intensity = 6 + s.awake * 16;
+    light.current.intensity = 6 + s.awake * 16 + s.energy * 10;
   });
 
   const ringGeo = (r: number) => <ringGeometry args={[Math.max(0.01, r - 0.9), r + 0.9, 128, 1]} />;
