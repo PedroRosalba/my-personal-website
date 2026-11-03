@@ -5,6 +5,8 @@ import { YouTubeClip } from "./YouTubeClip";
 import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
 import { EventEmblem } from "./EventEmblem";
+import { ProductWindow } from "./ProductWindow";
+import { Receipts } from "./Receipts";
 
 /** The one project presentation, shared by the panel and the standalone page. */
 export function ProjectArticle({
@@ -31,6 +33,13 @@ export function ProjectArticle({
       </Heading>
       <p className="project-outcome">{project.outcome}</p>
 
+      {/* 1 · the card's cover, so the click reads as opening the card itself */}
+      {project.emblem ? (
+        <div className="project-cover">
+          <EventEmblem kind={project.emblem} large bare />
+        </div>
+      ) : null}
+
       {project.video ? (
         <video className="project-video" src={project.video} controls preload="metadata" playsInline />
       ) : project.youtube ? (
@@ -41,13 +50,22 @@ export function ProjectArticle({
           alt={project.image.alt}
           href={project.image.post ? postHref(project.image.post) : (project.image.href ?? null)}
         />
-      ) : project.emblem ? (
-        <EventEmblem kind={project.emblem} large bare />
       ) : null}
+
+      {/* 2 · the live product, in our light */}
+      {project.product ? <ProductWindow product={project.product} /> : null}
 
       {project.gallery?.map((shot) => (
         <Snapshot key={shot.src} src={shot.src} alt={shot.alt} href={shot.href ?? null} />
       ))}
+
+      {/* 3 · receipts */}
+      {project.receipts?.length ? (
+        <>
+          <h3 className="eyebrow">Receipts</h3>
+          <Receipts receipts={project.receipts} />
+        </>
+      ) : null}
 
       <dl className="project-meta">
         <div>
