@@ -140,10 +140,10 @@ export const projects: Project[] = [
     stack: ["Rust", "Tokio", "Emscripten", "wasm-bindgen", "workerd"],
     focus: [{ label: "Tokio on the V8 event loop" }, { label: "Emscripten" }, { label: "wasm-bindgen" }, { label: "Rust SDK" }],
     highlights: [
-      "Storage bindings: KV, Queues and R2 in workers-rs carry Rust data to JavaScript faithfully, maps and partial metadata included.",
-      "Durable Objects: alarm and storage options reach the runtime as it expects, with the read options JavaScript already had.",
-      "Runtime types: workerd's TypeScript definitions match the runtime for byte inputs, RPC exports and bulk KV reads.",
-      "Build tooling: worker-build reads wasm-bindgen's package metadata and keeps the project's pinned version.",
+      "Tokio on the V8 event loop: tested the experimental runtime with axum, sqlx and reqwest and reported the gaps, such as four sockets leaked per cancelled request and bytes lost when a request ends. The teardown fix went into Tokio's integration PR.",
+      "Emscripten: pipe buffers that grow on demand as a ring (in review), and an epoll listener that could exhaust workerd's 10,000-timer cap, now fixed upstream.",
+      "wasm-bindgen: private classes stay in Emscripten output, so Rust streams reach JavaScript under the Emscripten build (merged).",
+      "Rust SDK: KV, Queues, R2 and Durable Object bindings in workers-rs carry Rust data to JavaScript faithfully, and workerd's TypeScript types match what the runtime returns.",
     ],
     links: [
       { label: "workers-rs PRs", href: "https://github.com/cloudflare/workers-rs/pulls?q=is%3Apr+author%3APedroRosalba" },
