@@ -9,7 +9,8 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 /*
  * The Cloudflare landmark, as a hologram: the logo's cloud as a puffy 3D shape with a flat base, made of ~12k
  * points in a containment tube (see hologram.tsx): squashed spheres cut flat at the floor. The small lobe on
- * the right is lighter, as in the logo, and bobs a little on its own.
+ * the right is lighter, as in the logo, and bobs a little on its own; the logo's horizontal dash is a glowing
+ * groove around the lower body.
  */
 
 const TUBE_R = 1.72;
@@ -33,6 +34,10 @@ const LOBES: { c: [number, number]; r: number; part: number }[] = [
   { c: [0.7, -0.3], r: 0.5, part: MAIN },
   { c: [1.18, -0.24], r: 0.34, part: SMALL },
 ];
+
+// the logo's horizontal dash: a groove around the lower body with a line of light in it
+const DASH = { y: -0.31, x: [-1.05, 1.0], gap: 0.05 };
+const inDashGap = (x: number, y: number) => x > DASH.x[0] && x < DASH.x[1] && Math.abs(y - DASH.y) < DASH.gap;
 
 const inLobe = (x: number, y: number, z: number, l: (typeof LOBES)[number]) =>
   ((x - l.c[0]) / l.r) ** 2 + ((y - l.c[1]) / l.r) ** 2 + (z / (l.r * SQUASH)) ** 2 < 1;
@@ -65,8 +70,22 @@ function makeCloud() {
       const x = l.c[0] + d.x * l.r;
       const y = l.c[1] + d.y * l.r;
       const z = d.z * l.r * SQUASH;
-      if (inside(x, y, z, i)) continue;
+      if (inside(x, y, z, i) || inDashGap(x, y)) continue;
       push(c, x, y, z, new Vector3(d.x, d.y, d.z / SQUASH).normalize(), l.part, tone);
+    }
+  });
+  // the dash's line of light: where the groove's plane cuts each lobe, pulled a little into the groove
+  LOBES.forEach((l, i) => {
+    const dy = (DASH.y - l.c[1]) / l.r;
+    if (Math.abs(dy) >= 1) return;
+    const rx = l.r * Math.sqrt(1 - dy * dy);
+    for (let k = 0; k < rx * 900; k++) {
+      const a = Math.random() * Math.PI * 2;
+      const x = l.c[0] + Math.cos(a) * rx;
+      const z = Math.sin(a) * rx * SQUASH;
+      if (x < DASH.x[0] || x > DASH.x[1] || inside(x, DASH.y, z, i)) continue;
+      const n = new Vector3(Math.cos(a), 0, Math.sin(a) / SQUASH).normalize();
+      push(c, x - n.x * 0.03, DASH.y + (Math.random() - 0.5) * 0.02, z - n.z * 0.03, n, l.part, 2.3);
     }
   });
   // the flat bottom: anywhere under the cloud's footprint
