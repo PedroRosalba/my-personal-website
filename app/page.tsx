@@ -81,9 +81,9 @@ function Cover({ href, children }: { href: string; children: React.ReactNode }) 
 /** A build under a role, in the Community-row shape: cover, what it is, name, one line, where it lives. */
 function BuildRow({ build }: { build: Build }) {
   return (
-    <li className="card-row">
+    <li className="card-row card-row-icon">
       <Cover href={build.href}>
-        <EventEmblem kind={build.emblem} />
+        <EventEmblem kind={build.emblem} bare />
       </Cover>
       <div>
         <p className="timeline-period">{build.kind}</p>
@@ -117,7 +117,7 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         <div className={role.emblem ? "role-head-cover" : undefined}>
           {role.emblem ? (
             <Cover href={role.href}>
-              <EventEmblem kind={role.emblem} />
+              <EventEmblem kind={role.emblem} bare />
             </Cover>
           ) : null}
           <div className="role-head">
@@ -204,10 +204,10 @@ export default function Home() {
               <p className="eyebrow">Also</p>
               <ul className="cards cards-wide also-roles">
                 {earlierRoles.map((role) => (
-                  <li key={role.slug} className={role.emblem ? "card-row" : "card-row card-row-plain"}>
+                  <li key={role.slug} className={role.emblem ? "card-row card-row-icon" : "card-row card-row-plain"}>
                     {role.emblem ? (
                       <Cover href={role.href}>
-                        <EventEmblem kind={role.emblem} />
+                        <EventEmblem kind={role.emblem} bare />
                       </Cover>
                     ) : null}
                     <div>
