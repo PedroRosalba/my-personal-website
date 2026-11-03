@@ -430,6 +430,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .cards .card-row.card-row-plain { grid-template-columns: 1fr; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
+  .emblem.emblem-bare:not(.emblem-lg) { --k: 1.1; width: 72px; height: 71px; }
   .hero-overview { font-size: 15px; }
   .award summary, .award-plain { grid-template-columns: 76px minmax(0, 1fr) 14px; gap: 10px; padding: 9px 0; }
   .award-title { font-size: 14px; }
@@ -667,6 +668,12 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 /* A project card's cover: the same emblem at the card's width; --k scales every glow with it. */
 .emblem.emblem-lg { --k: 3; width: 100%; height: auto; aspect-ratio: 16 / 9; cursor: default; }
 .project-card:hover .emblem, .cover:focus-visible .emblem { border-color: rgba(123, 97, 255, 0.55); }
+/* A bare icon: only the drawing, no frame or starfield; whatever runs past the crop fades out at the sides. */
+.emblem.emblem-bare { --k: 1.5; width: 96px; height: 94.5px; border: 0; background: none; overflow: visible; cursor: inherit; }
+.emblem-bare .em-art {
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+}
 
 .em-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .em-line { fill: none; stroke: rgba(214, 205, 255, 0.78); stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round;

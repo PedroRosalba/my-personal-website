@@ -6,7 +6,7 @@
 // builds under a role and the project cards. The drawing is pure SVG/CSS; the only script pauses the SVG (SMIL)
 // animations for visitors who ask for reduced motion, since CSS cannot stop those.
 
-import { useEffect, useId, useRef, type CSSProperties } from "react";
+import { createContext, useContext, useEffect, useId, useRef, type CSSProperties } from "react";
 import type { EmblemKind } from "@/content/media";
 
 const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
@@ -22,8 +22,18 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   cloudflare: () => <Cloudflare />,
 };
 
-/** `large` fills its container's width (a project card cover) and scales the glow with it. */
-export function EventEmblem({ kind, large = false }: { kind: EmblemKind; large?: boolean }) {
+/** The drawings are made for a 112 × 63 frame. A small bare icon (no frame) shows only the middle 64 units, where every
+ * drawing lives, so it can sit right beside text; anything wider (Daloc's orbit, the floor lines) fades at the edge. */
+const VIEW_FRAMED = "0 0 112 63";
+const VIEW_BARE = "24 0 64 63";
+const ViewBox = createContext(VIEW_FRAMED);
+
+/**
+ * `large` fills its container's width (a project card cover) and scales the glow with it.
+ * `bare` drops the dark star frame: just the drawing. Beside a row's text it is cropped to the drawing; as a large
+ * cover it keeps the whole width, fading at the sides.
+ */
+export function EventEmblem({ kind, large = false, bare = false }: { kind: EmblemKind; large?: boolean; bare?: boolean }) {
   // Gradient and clip ids must be unique: the same emblem can be on the page twice (home row and project panel).
   const id = `em${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
   const ref = useRef<HTMLSpanElement>(null);
@@ -42,8 +52,12 @@ export function EventEmblem({ kind, large = false }: { kind: EmblemKind; large?:
   }, []);
 
   return (
-    <span ref={ref} className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}`} aria-hidden="true">
-      {DRAW[kind](id)}
+    <span
+      ref={ref}
+      className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}${bare ? " emblem-bare" : ""}`}
+      aria-hidden="true"
+    >
+      <ViewBox.Provider value={bare && !large ? VIEW_BARE : VIEW_FRAMED}>{DRAW[kind](id)}</ViewBox.Provider>
     </span>
   );
 }
@@ -77,7 +91,7 @@ function Clover({ x, y, s }: { x: number; y: number; s: number }) {
 
 function Art({ children }: { children: React.ReactNode }) {
   return (
-    <svg className="em-art" viewBox="0 0 112 63" focusable="false">
+    <svg className="em-art" viewBox={useContext(ViewBox)} focusable="false">
       {children}
     </svg>
   );
