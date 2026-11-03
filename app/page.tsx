@@ -373,7 +373,6 @@ export default function Home() {
             <h2 id="contact-h" className="contact-title">
               Get in touch
             </h2>
-            <p className="lead">{contact.line}</p>
             {contact.email ? (
               <a className="contact-email" href={`mailto:${contact.email}`}>
                 {contact.email}
