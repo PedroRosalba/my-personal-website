@@ -54,13 +54,16 @@ export function EventEmblem({ kind, large = false, bare = false }: { kind: Emble
     });
   }, []);
 
+  const draw = DRAW[kind];
+  if (!draw) return null; // an emblem kind the content names but this file does not draw yet
+
   return (
     <span
       ref={ref}
       className={`emblem emblem-${kind}${large ? " emblem-lg" : ""}${bare ? " emblem-bare" : ""}`}
       aria-hidden="true"
     >
-      <ViewBox.Provider value={bare ? (large ? VIEW_BARE_LARGE : VIEW_BARE) : VIEW_FRAMED}>{DRAW[kind](id)}</ViewBox.Provider>
+      <ViewBox.Provider value={bare ? (large ? VIEW_BARE_LARGE : VIEW_BARE) : VIEW_FRAMED}>{draw(id)}</ViewBox.Provider>
     </span>
   );
 }
