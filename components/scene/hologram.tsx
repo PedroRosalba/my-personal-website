@@ -179,3 +179,66 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
     toneMapped: false,
   });
 }
+
+/* ---------- the drive: proximity, build, fray, turntable ---------- */
+
+export type Drive = { awake: number; build: number; open: number; yaw: number };
+
+/**
+ * Runs a hologram figure: assembles it near its gateway, frays it every `period` seconds, spins `spin` slowly
+ * (turning it to face the visitor when the project opens), and keeps `material` in step.
+ */
+export function useHologram({
+  index,
+  material,
+  points,
+  spin,
+  period = 7,
+  spinSpeed = 0.35,
+}: {
+  index: number;
+  material: ShaderMaterial;
+  points: RefObject<Points | null>;
+  spin: RefObject<Group | null>;
+  period?: number;
+  spinSpeed?: number;
+}): MutableRefObject<Drive> {
+  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0 });
+  useFrame(({ gl }, rawDt) => {
+    const dt = Math.min(rawDt, 0.05);
+    const t = frame.time;
+    const s = drive.current;
+
+    const near = 1 - clamp01(Math.abs(frame.z - (gateZ(index) + 13)) / 45);
+    s.open = frame.revealIndex === index ? frame.reveal : 0;
+    s.awake = damp(s.awake, Math.max(near, s.open), 3, dt);
+
+    // assemble when the traveller gets close, fall back into the spark when they leave
+    const target = s.awake > 0.2 ? 1 : 0;
+    s.build = frame.reduced
+      ? target
+      : s.build + Math.sign(target - s.build) * Math.min(Math.abs(target - s.build), dt / 2.6);
+
+    // fray and reassemble every `period` s; nearly still once the project is open
+    const cyc = (t % period) / period;
+    const pulse = cyc > 0.6 ? Math.sin(((cyc - 0.6) / 0.4) * Math.PI) ** 2 : 0;
+    const scatter = frame.reduced ? 0 : pulse * (1 - s.open * 0.8) + (1 - s.build) * 0.4;
+
+    // a slow turntable; when the project opens it turns to face the visitor
+    if (s.open > 0.05) s.yaw = damp(s.yaw, Math.round(s.yaw / (Math.PI * 2)) * Math.PI * 2, 2.5, dt);
+    else if (!frame.reduced) s.yaw += dt * spinSpeed;
+    if (spin.current) {
+      spin.current.rotation.y = s.yaw;
+      spin.current.position.y = Math.sin(t * 1.1) * 0.08;
+    }
+
+    const u = material.uniforms;
+    u.uTime.value = t;
+    u.uBuild.value = s.build;
+    u.uScatter.value = scatter;
+    u.uViewH.value = gl.domElement.height;
+    u.uOpacity.value = 0.55 + s.awake * 0.45;
+  });
+
+  return drive;
+}
