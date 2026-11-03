@@ -676,6 +676,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .em-dash { stroke-dasharray: 1.2 1.8; }
 .em-hot { fill: none; stroke: rgb(237, 235, 255); stroke-width: 1; stroke-linecap: round; filter: drop-shadow(0 0 calc(2px * var(--k)) rgb(123, 97, 255)); }
 .em-void { fill: #030304; }
+.em-glyph { font-family: var(--font-sans), system-ui, sans-serif; font-weight: 500; fill: rgba(214, 205, 255, 0.85); }
 .em-cable { stroke-dasharray: 1.2 1.6; stroke: rgba(214, 205, 255, 0.5); }
 .em-base { stroke: rgba(237, 235, 230, 0.22); stroke-width: 0.8; fill: none; }
 .card-row:hover .em-line, .project-card:hover .em-line {
