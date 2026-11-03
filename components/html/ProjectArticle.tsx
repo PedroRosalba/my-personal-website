@@ -42,7 +42,7 @@ export function ProjectArticle({
           href={project.image.post ? postHref(project.image.post) : (project.image.href ?? null)}
         />
       ) : project.emblem ? (
-        <EventEmblem kind={project.emblem} large />
+        <EventEmblem kind={project.emblem} large bare />
       ) : null}
 
       {project.gallery?.map((shot) => (

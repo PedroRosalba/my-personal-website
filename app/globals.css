@@ -278,8 +278,8 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .project-card .focus-label { margin-top: 18px; }
 /* A role with its company's cover, and the builds under it: the Community-row shape. */
 /* Their covers are bare icons (no frame), centred on the text beside them. */
-.role-head-cover { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: center; }
-.cards-wide .card-row.card-row-icon { grid-template-columns: 64px minmax(0, 1fr); align-items: center; }
+.role-head-cover { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; }
+.cards-wide .card-row.card-row-icon { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; }
 .builds .focus-label { margin-bottom: 4px; }
 .builds .card-row-title { font-weight: 500; font-size: 16px; }
 .role .snapshot { aspect-ratio: 16 / 6; }
@@ -434,9 +434,9 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .cards .card-row.card-row-plain { grid-template-columns: 1fr; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
-  .role-head-cover { grid-template-columns: 52px minmax(0, 1fr); gap: 12px; }
-  .cards-wide .card-row.card-row-icon { grid-template-columns: 52px minmax(0, 1fr); }
-  .emblem.emblem-bare { width: 52px; height: 51px; }
+  .role-head-cover { grid-template-columns: 72px minmax(0, 1fr); gap: 14px; }
+  .cards-wide .card-row.card-row-icon { grid-template-columns: 72px minmax(0, 1fr); gap: 14px; }
+  .emblem.emblem-bare:not(.emblem-lg) { --k: 1.1; width: 72px; height: 71px; }
   .hero-overview { font-size: 15px; }
   .award summary, .award-plain { grid-template-columns: 76px minmax(0, 1fr) 14px; gap: 10px; padding: 9px 0; }
   .award-title { font-size: 14px; }
@@ -676,10 +676,12 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .project-card:hover .emblem, .cover:focus-visible .emblem { border-color: rgba(123, 97, 255, 0.55); }
 .cover { display: block; border-radius: 2px; text-decoration: none; }
 /* A bare icon: only the drawing, no frame or starfield; whatever runs past the crop fades out at the sides. */
-.emblem.emblem-bare { width: 64px; height: 63px; border: 0; background: none; overflow: visible; }
+.emblem.emblem-bare { --k: 1.5; width: 96px; height: 94.5px; border: 0; background: none; overflow: visible; cursor: inherit; }
+/* A bare project cover: the whole drawing, no frame, sized so it reads as an object rather than a banner. */
+.emblem.emblem-bare.emblem-lg { --k: 2.6; width: min(100%, 340px); height: auto; aspect-ratio: 112 / 63; }
 .emblem-bare .em-art {
-  mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent);
 }
 .cover:focus-visible { outline-offset: 2px; }
 

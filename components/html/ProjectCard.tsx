@@ -22,7 +22,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       </h3>
       <p className="card-outcome">{project.tagline}</p>
       {project.emblem ? (
-        <EventEmblem kind={project.emblem} large />
+        <EventEmblem kind={project.emblem} large bare />
       ) : image ? (
         <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : (image.href ?? null)} />
       ) : null}
