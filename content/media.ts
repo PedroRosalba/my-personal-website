@@ -30,7 +30,8 @@ export type TalkVideo = {
 export type EmblemKind =
   | "rio"
   | "obelisk"
-  | "herodotus";
+  | "herodotus"
+  | "daloc";
 
 export type CommunityItem = {
   title: string;

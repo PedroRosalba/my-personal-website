@@ -13,6 +13,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   rio: () => <Rio />,
   obelisk: () => <Obelisk />,
   herodotus: (id) => <Herodotus id={id} />,
+  daloc: (id) => <Daloc id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -45,6 +46,18 @@ export function EventEmblem({ kind, large = false }: { kind: EmblemKind; large?:
 const glow = (px: number, color = "rgb(123,97,255)"): CSSProperties => ({
   filter: `drop-shadow(0 0 calc(${px}px * var(--k)) ${color})`,
 });
+
+/** The Daloc four-leaf mark, from daloc-logo.svg (15 × 17 units). */
+function Clover({ x, y, s }: { x: number; y: number; s: number }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`} fill="rgb(196,184,255)">
+      <path d="M0 5.5C0 3.29 1.79 1.5 4 1.5C6.21 1.5 8 3.29 8 5.5V9.5H4C1.79 9.5 0 7.71 0 5.5Z" />
+      <path d="M9 6.5C9 4.84 10.34 3.5 12 3.5C13.66 3.5 15 4.84 15 6.5C15 8.16 13.66 9.5 12 9.5H9V6.5Z" />
+      <path d="M0 14.5C0 12.29 1.79 10.5 4 10.5H8V14.5C8 16.71 6.21 18.5 4 18.5C1.79 18.5 0 16.71 0 14.5Z" />
+      <path d="M9 10.5H12C13.66 10.5 15 11.84 15 13.5C15 15.16 13.66 16.5 12 16.5C10.34 16.5 9 15.16 9 13.5V10.5Z" />
+    </g>
+  );
+}
 
 function Art({ children }: { children: React.ReactNode }) {
   return (
@@ -143,6 +156,39 @@ function Herodotus({ id }: { id: string }) {
         <path className="em-hot hd-run" style={{ strokeWidth: 2.2 }} pathLength={1} d={H} />
       </g>
       <path className="em-base" d="M22 56 H90" />
+    </Art>
+  );
+}
+
+/** Daloc: the arc of collateral over a planet from daloc.xyz's hero, the four-leaf mark on the account, and
+ * collateral orbs gliding along the arc: collateral that never sits still. */
+function Daloc({ id }: { id: string }) {
+  return (
+    <Art>
+      <defs>
+        <radialGradient id={`${id}-dome`} cx="56" cy="64" r="32" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(160,144,255)" stopOpacity="0.6" />
+          <stop offset="0.55" stopColor="rgb(123,97,255)" stopOpacity="0.18" />
+          <stop offset="1" stopColor="rgb(123,97,255)" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <path d="M24 63 Q56 37 88 63Z" fill={`url(#${id}-dome)`} />
+      <path className="em-line" d="M24 63 Q56 37 88 63" />
+      <path className="em-dim em-dash" id={`${id}-orbit`} d="M6 55 Q56 11 106 55" />
+      <path className="em-line em-thin" d="M56 13.5 V50" />
+      <rect x="47" y="5" width="18" height="8.5" rx="4.25" className="em-void" stroke="rgba(214,205,255,.6)" strokeWidth="0.6" />
+      <Clover x={49.6} y={5.6} s={0.4} />
+      <path className="em-dim" d="M57.6 9.25 H62.4" />
+      {[0, 1, 2, 3, 4].map((i) => (
+        <g key={i}>
+          <circle r="2" className="em-void" stroke="rgba(214,205,255,.75)" strokeWidth="0.6" />
+          <circle r="0.7" fill="rgb(214,205,255)" />
+          <animateMotion dur="10s" begin={`${-i * 2}s`} repeatCount="indefinite">
+            <mpath href={`#${id}-orbit`} />
+          </animateMotion>
+          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.12;.88;1" dur="10s" begin={`${-i * 2}s`} repeatCount="indefinite" />
+        </g>
+      ))}
     </Art>
   );
 }
