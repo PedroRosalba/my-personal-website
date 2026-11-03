@@ -132,13 +132,13 @@ export const projects: Project[] = [
   {
     slug: "cloudflare",
     title: "Cloudflare Workers",
-    tagline: "Contributor to the Workers Rust SDK and the runtime's TypeScript types.",
+    tagline: "Async Rust on Cloudflare Workers: Tokio on V8's event loop, through Emscripten and wasm-bindgen.",
     outcome:
-      "I contribute to Cloudflare's Workers platform from Rust and TypeScript: bringing the Rust SDK's bindings in line with their JavaScript counterparts, and making the runtime's types describe what it really returns.",
+      "In a Worker the thread belongs to V8's event loop, so Tokio cannot block and sockets are JavaScript streams. Cloudflare's experimental runtime compiles Rust to Emscripten and lets the JavaScript loop drive Tokio. I run real Rust apps on it, find what breaks at each layer, and fix it upstream in wasm-bindgen, Emscripten, Tokio and workers-rs.",
     role: "Open-source contributor",
     year: "2026",
-    stack: ["Rust", "wasm-bindgen", "TypeScript", "workerd"],
-    focus: [{ label: "Rust SDK parity" }, { label: "Runtime types" }, { label: "Build tooling" }],
+    stack: ["Rust", "Tokio", "Emscripten", "wasm-bindgen", "workerd"],
+    focus: [{ label: "Tokio on the V8 event loop" }, { label: "Emscripten" }, { label: "wasm-bindgen" }, { label: "Rust SDK" }],
     highlights: [
       "Storage bindings: KV, Queues and R2 in workers-rs carry Rust data to JavaScript faithfully, maps and partial metadata included.",
       "Durable Objects: alarm and storage options reach the runtime as it expects, with the read options JavaScript already had.",
