@@ -32,6 +32,8 @@ export type Role = {
   /** Products shipped there that a visitor can open. */
   builds?: Build[];
   image?: { src: string; alt: string; href: string };
+  /** The company's mark as a living cover, beside the role. */
+  emblem?: EmblemKind;
 };
 
 export const featuredRoles: Role[] = [
@@ -49,6 +51,7 @@ export const featuredRoles: Role[] = [
     ],
     stack: ["Cairo", "Rust", "TypeScript", "Python"],
     proof: [{ label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" }],
+    emblem: "herodotus",
     builds: [
       {
         title: "Daloc",

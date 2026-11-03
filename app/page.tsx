@@ -107,12 +107,19 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
             <h2 id="experience-h">Experience</h2>
           </>
         ) : null}
-        <div className="role-head">
-          <p className="timeline-period">{role.period}</p>
-          <h3 className="role-title">
-            {role.role} · <Company role={role} />
-          </h3>
-          <p className="role-summary">{role.summary}</p>
+        <div className={role.emblem ? "role-head-cover" : undefined}>
+          {role.emblem ? (
+            <Cover href={role.href}>
+              <EventEmblem kind={role.emblem} bare />
+            </Cover>
+          ) : null}
+          <div className="role-head">
+            <p className="timeline-period">{role.period}</p>
+            <h3 className="role-title">
+              {role.role} · <Company role={role} />
+            </h3>
+            <p className="role-summary">{role.summary}</p>
+          </div>
         </div>
         {role.image ? <Snapshot src={role.image.src} alt={role.image.alt} href={role.image.href} /> : null}
         {role.builds?.length ? (

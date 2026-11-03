@@ -278,6 +278,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .project-card .focus-label { margin-top: 18px; }
 /* A role with its company's cover, and the builds under it: the Community-row shape. */
 /* Their covers are bare icons (no frame), centred on the text beside them. */
+.role-head-cover { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; }
 .cards-wide .card-row.card-row-icon { grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; }
 .builds .focus-label { margin-bottom: 4px; }
 .builds .card-row-title { font-weight: 500; font-size: 16px; }
@@ -433,6 +434,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .cards .card-row.card-row-plain { grid-template-columns: 1fr; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
+  .role-head-cover { grid-template-columns: 72px minmax(0, 1fr); gap: 14px; }
   .cards-wide .card-row.card-row-icon { grid-template-columns: 72px minmax(0, 1fr); gap: 14px; }
   .emblem.emblem-bare:not(.emblem-lg) { --k: 1.1; width: 72px; height: 71px; }
   .emblem.emblem-bare.emblem-lg { width: min(100%, 320px); }
