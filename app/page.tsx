@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
-import { featuredRoles, earlierRoles, type Role } from "@/content/experience";
+import { featuredRoles, earlierRoles, type Build, type Role } from "@/content/experience";
 import { community } from "@/content/media";
 import { hackathons } from "@/content/hackathons";
 import { writingBySeries } from "@/content/writing";
@@ -11,6 +11,7 @@ import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
 import { CommunityCard } from "@/components/html/CommunityCard";
 import { Snapshot } from "@/components/html/Snapshot";
+import { EventEmblem } from "@/components/html/EventEmblem";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
 
@@ -58,6 +59,43 @@ function Company({ role }: { role: Role }) {
   );
 }
 
+/** A living cover that opens the same place as the title next to it. Decorative for assistive tech: the title link
+ * already names the destination. */
+function Cover({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a className="cover" href={href} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden="true">
+      {children}
+    </a>
+  );
+}
+
+/** A build under a role, in the Community-row shape: cover, what it is, name, one line, where it lives. */
+function BuildRow({ build }: { build: Build }) {
+  return (
+    <li className="card-row card-row-icon">
+      <Cover href={build.href}>
+        <EventEmblem kind={build.emblem} bare />
+      </Cover>
+      <div>
+        <p className="timeline-period">{build.kind}</p>
+        <h4 className="card-row-title">
+          <a href={build.href} target="_blank" rel="noreferrer">
+            {build.title}
+          </a>
+        </h4>
+        <p className="card-row-text">{build.summary}</p>
+        <p className="cc-actions">
+          {build.links.map((link) => (
+            <a key={link.href} className="cc-link" href={link.href} target="_blank" rel="noreferrer" aria-label={`${build.title}: ${link.label}`}>
+              {link.label} <span aria-hidden="true">↗</span>
+            </a>
+          ))}
+        </p>
+      </div>
+    </li>
+  );
+}
+
 function RoleStation({ role, index }: { role: Role; index: number }) {
   const cv = profile.contact.cv;
   return (
@@ -80,7 +118,11 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         {role.builds?.length ? (
           <div className="builds">
             <p className="eyebrow focus-label">Builds I worked on</p>
-            <ProofLinks links={role.builds} />
+            <ul className="cards cards-wide">
+              {role.builds.map((b) => (
+                <BuildRow build={b} key={b.href} />
+              ))}
+            </ul>
           </div>
         ) : null}
         <ul className="project-highlights role-bullets">
