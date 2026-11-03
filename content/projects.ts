@@ -40,7 +40,7 @@ export const projects: Project[] = [
     title: "Herodotus",
     tagline: "Zero-knowledge state proofs for Ethereum, then DeFi infrastructure.",
     outcome:
-      "At Herodotus I worked on storage proofs and the Herodotus Data Processor, then on infrastructure for DeFi lending. Builds I worked on: Daloc, an onchain prime brokerage, and Risklayer, a DeFi risk terminal.",
+      "At Herodotus I worked on storage proofs and the Herodotus Data Processor, then on infrastructure for DeFi lending. Builds I worked on: Daloc, an onchain prime brokerage, and its documentation.",
     role: "Software Engineer",
     year: "2024 – 2026",
     stack: ["Cairo", "Rust", "TypeScript", "Python"],
@@ -48,12 +48,12 @@ export const projects: Project[] = [
     highlights: [
       "State proofs: extended hdp-cairo from EVM storage proofs to plain Merkle and Patricia-trie proofs, so off-chain systems such as matching engines and oracles can prove the state they read.",
       "Prime brokerage: real-time order-book pipelines and RFQ quoting behind Daloc, for trading on credit across chains.",
-      "Risk: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on, behind Risklayer.",
+      "Risk: on-chain credit pricing, and an AI risk analysis of DeFi protocols mapped onto the infrastructure they depend on.",
       "Community: mentored a Herodotus Data Processor session at Invisible Garden, Buenos Aires 2025.",
     ],
     links: [
       { label: "Daloc", href: "https://daloc.xyz" },
-      { label: "Risklayer", href: "https://risklayer.online" },
+      { label: "Daloc Docs", href: "https://docs.daloc.xyz" },
       { label: "hdp-cairo PRs", href: "https://github.com/HerodotusDev/hdp-cairo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged" },
     ],
     image: { src: "/shots/daloc.jpg", alt: "Daloc: one account, every chain. Onchain prime brokerage.", href: "https://daloc.xyz" },

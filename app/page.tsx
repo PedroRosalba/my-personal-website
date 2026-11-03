@@ -93,7 +93,7 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         {role.slug === "herodotus" ? (
           <p className="section-more">
             <Link className="next-link" href="/projects/herodotus" scroll={false}>
-              See the work: Daloc, Risklayer, hdp-cairo <span aria-hidden="true">→</span>
+              See the work: Daloc and hdp-cairo <span aria-hidden="true">→</span>
             </Link>
           </p>
         ) : null}

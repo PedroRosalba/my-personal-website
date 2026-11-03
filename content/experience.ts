@@ -43,7 +43,6 @@ export const featuredRoles: Role[] = [
     ],
     builds: [
       { label: "Daloc", href: "https://daloc.xyz" },
-      { label: "Risklayer", href: "https://risklayer.online" },
     ],
   },
 ];

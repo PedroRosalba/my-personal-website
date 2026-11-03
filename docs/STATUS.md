@@ -88,8 +88,6 @@ When a post is published on the blog, set its `live: true` in `content/writing.t
 ## Open items
 
 - [ ] Podcast link(s) → `community` in `content/media.ts` (a YouTube link becomes a click-to-play clip)
-- [ ] Risklayer snapshot or screen recording: risklayer.online refuses connections from here (2026-10-21).
-      Pedro's idea: a muted loop playing inside the Herodotus arch
 - [ ] Cloudflare snapshot and a Cloudflare write-up (then add `post` to its focus chips)
 - [ ] Deploy the blog, then set `NEXT_PUBLIC_BLOG_URL` here
 - [ ] Review and publish the seven draft posts (two need edits first: an unsourced Ollama paragraph in "Where does
