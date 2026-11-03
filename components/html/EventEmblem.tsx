@@ -15,6 +15,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   herodotus: (id) => <Herodotus id={id} />,
   daloc: (id) => <Daloc id={id} />,
   hdp: () => <Hdp />,
+  ravi: (id) => <Ravi id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -47,6 +48,16 @@ export function EventEmblem({ kind, large = false }: { kind: EmblemKind; large?:
 const glow = (px: number, color = "rgb(123,97,255)"): CSSProperties => ({
   filter: `drop-shadow(0 0 calc(${px}px * var(--k)) ${color})`,
 });
+
+/** Light falling on a solid: lavender at the top, fading to the floor. */
+function Lit({ id }: { id: string }) {
+  return (
+    <linearGradient id={`${id}-lit`} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stopColor="rgb(196,184,255)" stopOpacity="0.75" />
+      <stop offset="1" stopColor="rgb(237,235,230)" stopOpacity="0.1" />
+    </linearGradient>
+  );
+}
 
 /** The Daloc four-leaf mark, from daloc-logo.svg (15 × 17 units). */
 function Clover({ x, y, s }: { x: number; y: number; s: number }) {
@@ -230,6 +241,63 @@ function Hdp() {
       {/* chain state below the leaves */}
       <path className="em-dim" d="M35 39.2 V44 M49 39.2 V44 M63 39.2 V44 M77 39.2 V44" />
       <path className="em-base" d="M24 46 H88" />
+    </Art>
+  );
+}
+
+/** Ravi: the robot that floats beside the Ravi gateway (components/scene/RobotMark), front view. It looks around
+ * until a message reaches its antenna, then its eyes light and it faces you: an agent you reach from anywhere. */
+function Ravi({ id }: { id: string }) {
+  const loop = { dur: "6s", repeatCount: "indefinite" } as const;
+  const at = (b: number, t: number) => (t + b / 6).toFixed(3);
+  return (
+    <Art>
+      <defs>
+        <Lit id={id} />
+      </defs>
+      <ellipse cx="56" cy="56.5" rx="11" ry="1.4" fill="rgba(123,97,255,.35)">
+        <animate attributeName="rx" values="11;9;11" dur="3s" repeatCount="indefinite" />
+      </ellipse>
+      <path className="em-base" d="M22 56.5 H90" />
+      {/* the message arriving: rings closing in on the antenna */}
+      {[0, 0.3, 0.6].map((b) => (
+        <circle key={b} cx="56" cy="6.5" r="14" fill="none" stroke="rgb(214,205,255)" strokeWidth="0.6" opacity="0">
+          <animate attributeName="r" values="14;14;1.8;1.8" keyTimes={`0;${at(b, 0.02)};${at(b, 0.2)};1`} {...loop} />
+          <animate attributeName="opacity" values="0;0;.8;0;0" keyTimes={`0;${at(b, 0.02)};${at(b, 0.08)};${at(b, 0.2)};1`} {...loop} />
+        </circle>
+      ))}
+      <g>
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.4;0 0" dur="3s" repeatCount="indefinite" />
+        <g>
+          <animateTransform attributeName="transform" type="rotate" values="-6 56 15;6 56 15;-6 56 15" dur="1.6s" repeatCount="indefinite" />
+          <path className="em-line em-thin" d="M56 15 V8.4" />
+          <circle cx="56" cy="6.5" r="1.7" fill="rgb(214,205,255)" style={glow(2)} opacity="0.5">
+            <animate attributeName="opacity" values=".5;.5;1;1;.5" keyTimes="0;.3;.34;.75;1" {...loop} />
+          </circle>
+        </g>
+        <rect x="39.2" y="21" width="3" height="7" rx="1.2" fill={`url(#${id}-lit)`} />
+        <rect x="69.8" y="21" width="3" height="7" rx="1.2" fill={`url(#${id}-lit)`} />
+        <rect className="em-line" x="42.5" y="15" width="27" height="19" rx="3" fill="rgba(123,97,255,.08)" />
+        <rect x="45.5" y="19" width="21" height="11" rx="2" className="em-void" stroke="rgba(237,235,230,.22)" strokeWidth="0.5" />
+        <g style={glow(2)}>
+          <animateTransform
+            attributeName="transform"
+            type="translate"
+            values="-2 0;2 0;-2 0;-2 0;0 0;0 0;-2 0"
+            keyTimes="0;.12;.24;.3;.34;.85;1"
+            {...loop}
+          />
+          <g fill="rgb(214,205,255)" opacity="0.45">
+            <animate attributeName="opacity" values=".45;.45;1;1;.45" keyTimes="0;.32;.36;.85;1" {...loop} />
+            <circle cx="51.5" cy="24.5" r="2" />
+            <circle cx="60.5" cy="24.5" r="2" />
+          </g>
+        </g>
+        <rect className="em-line" x="46.5" y="37" width="19" height="13.5" rx="2" fill="rgba(123,97,255,.06)" />
+        <rect x="52.3" y="41" width="7.4" height="1.4" rx="0.7" fill="rgb(214,205,255)" style={glow(2)} opacity="0.5">
+          <animate attributeName="opacity" values=".5;.5;1;1;.5" keyTimes="0;.36;.4;.85;1" {...loop} />
+        </rect>
+      </g>
     </Art>
   );
 }

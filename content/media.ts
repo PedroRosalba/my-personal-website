@@ -32,7 +32,8 @@ export type EmblemKind =
   | "obelisk"
   | "herodotus"
   | "daloc"
-  | "hdp";
+  | "hdp"
+  | "ravi";
 
 export type CommunityItem = {
   title: string;
