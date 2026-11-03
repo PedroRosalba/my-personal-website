@@ -8,6 +8,26 @@ import { postHref } from "./writing";
 
 export type Focus = { label: string; post?: string };
 
+/** The live product, shown in the panel as a window tinted into the world's violet; true colours on hover. */
+export type ProductWindow = { src: string; alt: string; href: string; /** The address shown in the window's bar. */ label: string };
+
+/** One pull request (or a reported issue) in the panel: what it is, how big, and what it changed for users. */
+export type Receipt = {
+  state: "merged" | "review" | "reported";
+  repo: string;
+  number: number;
+  /** For a reported issue: the PR that fixed it. */
+  fixedIn?: number;
+  added?: number;
+  removed?: number;
+  title: string;
+  /** One line on what it fixed, in plain words. */
+  what: string;
+  /** ISO date: merged, opened (in review) or reported. */
+  date: string;
+  href: string;
+};
+
 export type Project = {
   slug: string;
   title: string;
@@ -31,6 +51,10 @@ export type Project = {
   youtube?: YouTubeClip & { language?: string };
   /** More snapshots for the panel, shown after `image`. */
   gallery?: { src: string; alt: string; href?: string }[];
+  /** The live product, under the cover in the panel. */
+  product?: ProductWindow;
+  /** Two or three real PRs, under the product in the panel. */
+  receipts?: Receipt[];
   /** 3D hint only: which landmark the gateway carries. */
   landmark: "portal" | "eth" | "turbo" | "cloud" | "robot";
   /** The portal's tunnel of light behind the mark. Off everywhere now: the holograms carry the gateways. */
