@@ -35,7 +35,8 @@ export type EmblemKind =
   | "hdp"
   | "ravi"
   | "turborepo"
-  | "enor";
+  | "enor"
+  | "mediolano";
 
 export type CommunityItem = {
   title: string;

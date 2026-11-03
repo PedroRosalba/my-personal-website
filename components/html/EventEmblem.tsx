@@ -18,6 +18,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   ravi: (id) => <Ravi id={id} />,
   turborepo: (id) => <Turborepo id={id} />,
   enor: (id) => <Enor id={id} />,
+  mediolano: (id) => <Mediolano id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -402,6 +403,49 @@ function Enor({ id }: { id: string }) {
       </g>
       <path className="em-line" d={`M${poly([T, UR, LR, B, LL, UL])} Z`} />
       <path className="em-line" d={`M${poly([LL, C, LR])}`} />
+      <path className="em-base" d="M22 52 H90" />
+    </Art>
+  );
+}
+
+/** Mediolano: Medialane's two lanes, sparkle and dot. A spark leaves the sparkle, runs down the lane and lights the
+ * dot: a work, minted, then licensed. */
+function Mediolano({ id }: { id: string }) {
+  const star = "M0 -4 Q.6 -.6 4 0 Q.6 .6 0 4 Q-.6 .6 -4 0 Q-.6 -.6 0 -4Z";
+  const loop = { dur: "6s", repeatCount: "indefinite" } as const;
+  return (
+    <Art>
+      <defs>
+        <Lit id={id} />
+        <clipPath id={`${id}-sq`}>
+          <rect x="37" y="7" width="38" height="38" rx="10" />
+        </clipPath>
+      </defs>
+      <rect x="37" y="7" width="38" height="38" rx="10" fill="rgba(123,97,255,.1)" />
+      <g clipPath={`url(#${id}-sq)`} fill={`url(#${id}-lit)`}>
+        <rect x="53" y="7" width="2.6" height="38" />
+        <rect x="59" y="7" width="2.6" height="38" />
+      </g>
+      <rect className="em-line" x="37" y="7" width="38" height="38" rx="10" />
+      <g transform="translate(44.5 15.5)">
+        <path d={star} fill="rgb(214,205,255)" style={glow(2)}>
+          <animateTransform attributeName="transform" type="scale" values="1;1.35;.9;1;1" keyTimes="0;.06;.14;.22;1" {...loop} />
+        </path>
+      </g>
+      <circle cx="68.5" cy="38.5" r="2.5" fill="none" stroke="rgba(214,205,255,.7)" strokeWidth="0.7" />
+      <circle cx="68.5" cy="38.5" r="2.5" fill="rgb(214,205,255)" opacity="0.15" style={glow(3)}>
+        <animate attributeName="opacity" values=".15;.15;1;1;.15" keyTimes="0;.7;.74;.9;1" {...loop} />
+      </circle>
+      <circle r="1.1" fill="rgb(237,235,255)" opacity="0" style={glow(2)}>
+        <animateMotion
+          path="M44.5 15.5 Q57.3 9 57.3 18 L57.3 37 Q57.3 40.5 66 38.5"
+          keyPoints="0;0;1;1"
+          keyTimes="0;.1;.72;1"
+          calcMode="linear"
+          {...loop}
+        />
+        <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;.1;.14;.68;.73;1" {...loop} />
+      </circle>
       <path className="em-base" d="M22 52 H90" />
     </Art>
   );
