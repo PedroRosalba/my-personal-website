@@ -17,6 +17,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   hdp: () => <Hdp />,
   ravi: (id) => <Ravi id={id} />,
   turborepo: (id) => <Turborepo id={id} />,
+  enor: (id) => <Enor id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -351,6 +352,57 @@ function Turborepo({ id }: { id: string }) {
       </g>
       <circle cx={cx} cy={cy} r="2.6" className="em-void" stroke="rgba(214,205,255,.8)" strokeWidth="0.7" />
       <path className="em-base" d="M20 56 H92" />
+    </Art>
+  );
+}
+
+/** eNor: the cube, its upper faces in halftone and the bottom face open. Rows of the halftone light from the open
+ * face upward: settlement rising into custody. */
+function Enor({ id }: { id: string }) {
+  const h = 14.72;
+  const T = [56, 12],
+    UR = [56 + h, 20.5],
+    LR = [56 + h, 37.5],
+    B = [56, 46],
+    LL = [56 - h, 37.5],
+    UL = [56 - h, 20.5],
+    C = [56, 29];
+  const poly = (pts: number[][]) => pts.map((p) => p.join(" ")).join(" L");
+  const dots: { x: number; y: number; r: number; d: number }[] = [];
+  for (let row = 0, y = 13.4; y < 38; row++, y += 2.25) {
+    for (let x = 41.6 + (row % 2) * 1.15; x < 71; x += 2.3) {
+      dots.push({
+        x,
+        y,
+        r: 0.32 + 0.62 * Math.max(0, 1 - Math.hypot(x - 56, y - 15) / 22),
+        d: -((38 - y) / 26) * 1.7,
+      });
+    }
+  }
+  const upper = `M${poly([T, UR, LR, C, LL, UL])} Z`;
+  return (
+    <Art>
+      <defs>
+        <clipPath id={`${id}-upper`}>
+          <path d={upper} />
+        </clipPath>
+      </defs>
+      <path d={upper} fill="rgba(123,97,255,.12)" />
+      <g clipPath={`url(#${id}-upper)`}>
+        {dots.map((p) => (
+          <circle
+            key={`${p.x.toFixed(2)}-${p.y.toFixed(2)}`}
+            className="en-dot"
+            cx={p.x.toFixed(2)}
+            cy={p.y.toFixed(2)}
+            r={p.r.toFixed(2)}
+            style={{ ["--d" as string]: `${p.d.toFixed(2)}s` }}
+          />
+        ))}
+      </g>
+      <path className="em-line" d={`M${poly([T, UR, LR, B, LL, UL])} Z`} />
+      <path className="em-line" d={`M${poly([LL, C, LR])}`} />
+      <path className="em-base" d="M22 52 H90" />
     </Art>
   );
 }

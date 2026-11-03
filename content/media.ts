@@ -34,7 +34,8 @@ export type EmblemKind =
   | "daloc"
   | "hdp"
   | "ravi"
-  | "turborepo";
+  | "turborepo"
+  | "enor";
 
 export type CommunityItem = {
   title: string;
