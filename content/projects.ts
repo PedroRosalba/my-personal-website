@@ -132,23 +132,20 @@ export const projects: Project[] = [
   {
     slug: "cloudflare",
     title: "Cloudflare Workers",
-    tagline: "Async Rust on Cloudflare Workers: Tokio on V8's event loop, through Emscripten and wasm-bindgen.",
+    tagline: "Async Rust on Cloudflare Workers: Rust on V8's event loop, through Emscripten.",
     outcome:
-      "In a Worker the thread belongs to V8's event loop, so Tokio cannot block and sockets are JavaScript streams. Cloudflare's experimental runtime compiles Rust to Emscripten and lets the JavaScript loop drive Tokio. I run real Rust apps on it, find what breaks at each layer, and fix it upstream in wasm-bindgen, Emscripten, Tokio and workers-rs.",
+      "In a Worker the thread belongs to V8's event loop, so an async Rust runtime cannot block and sockets are JavaScript streams. Cloudflare's experimental runtime compiles Rust to Emscripten and lets the JavaScript loop drive it. I run real Rust apps on it, find what breaks at each layer, and fix it upstream in Emscripten and workers-rs.",
     role: "Open-source contributor",
     year: "2026",
-    stack: ["Rust", "Tokio", "Emscripten", "wasm-bindgen", "workerd"],
-    focus: [{ label: "Tokio on the V8 event loop" }, { label: "Emscripten" }, { label: "wasm-bindgen" }, { label: "Rust SDK" }],
+    stack: ["Rust", "Emscripten", "WebAssembly", "workerd"],
+    focus: [{ label: "Async Rust on the V8 event loop" }, { label: "Emscripten" }, { label: "Rust SDK" }],
     highlights: [
-      "Tokio on the V8 event loop: tested the experimental runtime with axum, sqlx and reqwest and reported the gaps, such as four sockets leaked per cancelled request and bytes lost when a request ends. The teardown fix went into Tokio's integration PR.",
+      "Async Rust on the V8 event loop: tested the experimental runtime with axum, sqlx and reqwest and reported the gaps, such as four sockets leaked per cancelled request and bytes lost when a request ends.",
       "Emscripten: pipe buffers that grow on demand as a ring (in review), and an epoll listener that could exhaust workerd's 10,000-timer cap, now fixed upstream.",
-      "wasm-bindgen: private classes stay in Emscripten output, so Rust streams reach JavaScript under the Emscripten build (merged).",
       "Rust SDK: KV, Queues, R2 and Durable Object bindings in workers-rs carry Rust data to JavaScript faithfully, and workerd's TypeScript types match what the runtime returns.",
     ],
     links: [
       { label: "Emscripten", href: "https://github.com/emscripten-core/emscripten/issues?q=involves%3APedroRosalba" },
-      { label: "wasm-bindgen #5415", href: "https://github.com/wasm-bindgen/wasm-bindgen/pull/5415" },
-      { label: "Tokio", href: "https://github.com/tokio-rs/tokio/issues?q=involves%3APedroRosalba" },
       { label: "workers-rs", href: "https://github.com/cloudflare/workers-rs/issues?q=involves%3APedroRosalba" },
       { label: "workerd PRs", href: "https://github.com/cloudflare/workerd/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
