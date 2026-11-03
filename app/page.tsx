@@ -59,6 +59,15 @@ function Company({ role }: { role: Role }) {
   );
 }
 
+/** "daloc.xyz" for a link line: where the link goes, without the scheme. */
+function host(href: string) {
+  try {
+    return new URL(href).hostname.replace(/^www\./, "");
+  } catch {
+    return href;
+  }
+}
+
 /** A living cover that opens the same place as the title next to it. Decorative for assistive tech: the title link
  * already names the destination. */
 function Cover({ href, children }: { href: string; children: React.ReactNode }) {
@@ -195,24 +204,35 @@ export default function Home() {
           <div className="station" data-stop="experience-earlier">
             <div className="copy">
               <p className="eyebrow">Also</p>
-              <ol className="timeline">
+              <ul className="cards cards-wide also-roles">
                 {earlierRoles.map((role) => (
-                  <li key={role.slug}>
-                    <p className="timeline-period">{role.period}</p>
+                  <li key={role.slug} className={role.emblem ? "card-row card-row-icon" : "card-row card-row-plain"}>
+                    {role.emblem ? (
+                      <Cover href={role.href}>
+                        <EventEmblem kind={role.emblem} bare />
+                      </Cover>
+                    ) : null}
                     <div>
-                      <h3 className="timeline-title">
+                      <p className="timeline-period">{role.period}</p>
+                      <h3 className="card-row-title">
                         {role.role}
                         <span className="timeline-place">
                           {" "}
                           · <Company role={role} />
                         </span>
                       </h3>
-                      {role.summary ? <p className="timeline-detail">{role.summary}</p> : null}
-                      {role.proof.length ? <ProofLinks links={role.proof} /> : null}
+                      {role.summary ? <p className="card-row-text">{role.summary}</p> : null}
+                      <p className="cc-actions">
+                        {(role.proof.length ? role.proof : [{ label: host(role.href), href: role.href }]).map((link) => (
+                          <a key={link.href} className="cc-link" href={link.href} target="_blank" rel="noreferrer">
+                            {link.label} <span aria-hidden="true">↗</span>
+                          </a>
+                        ))}
+                      </p>
                     </div>
                   </li>
                 ))}
-              </ol>
+              </ul>
               {contact.cv ? (
                 <p className="section-more">
                   <a className="next-link" href={contact.cv}>

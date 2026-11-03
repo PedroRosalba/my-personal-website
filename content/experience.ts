@@ -96,6 +96,7 @@ export const earlierRoles: Role[] = [
     bullets: [],
     stack: [],
     proof: [],
+    emblem: "enor",
   },
   {
     slug: "mediolano",
@@ -113,5 +114,6 @@ export const earlierRoles: Role[] = [
         href: "https://github.com/mediolano-os/mediolano-contracts/pulls?q=is%3Apr+author%3APedroRosalba",
       },
     ],
+    emblem: "mediolano",
   },
 ];
