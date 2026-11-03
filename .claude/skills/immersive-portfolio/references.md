@@ -112,6 +112,24 @@ Do not copy:
 - warm interior light colour
 - real-estate site chrome, side menu, framed UI border
 
+## E1 — Ethereum 3D spinner
+
+URL: https://ethereum3d.netlify.app/
+Authoritative shape reference: https://ethereum.org/assets/
+
+Role: **SINGLE LANDMARK REFERENCE** (Ethereum diamond)
+
+Extract:
+- ETH diamond geometry (upper and lower pyramids, split faces)
+- slow rotation, subtle float
+- restrained glow / material treatment
+
+Do not copy:
+- its colours or bright presentation — ours is dark metallic/matte with a faint violet rim
+- any crypto branding, prices, token data or UI
+
+Used exactly once, as the landmark of the Web3-related project gateway.
+
 ## MCP log
 
 Budget: 3 calls. **Used: 1. Remaining: 2** — reserve for a concrete unresolved design problem only.

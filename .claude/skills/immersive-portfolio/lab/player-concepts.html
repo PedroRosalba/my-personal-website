@@ -1,0 +1,615 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Player Concept Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500&family=Geist+Mono:wght@400&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #050507; --ink: #edebe6; --ink-2: #b9b7be; --ink-3: #a3a1a9; --line: #2a2a32; --line-strong: #3a3a43;
+    --accent: #7b61ff; --accent-soft: rgba(123, 97, 255, 0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  body { min-height: 100vh; }
+  #sky { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  main { position: relative; z-index: 1; max-width: 1180px; margin: 0 auto; padding: 72px 16px 120px; }
+  .eyebrow { font-family: "Geist Mono", monospace; font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink-3); margin: 0 0 14px; }
+  h1 { font-weight: 300; font-size: clamp(34px, 5vw, 56px); line-height: 1.05; letter-spacing: -0.02em; margin: 0; }
+  h1 em { font-style: normal; color: var(--accent); text-shadow: 0 0 30px rgba(123, 97, 255, 0.6); }
+  .lede { max-width: 640px; color: var(--ink-2); font-size: 17px; line-height: 1.6; margin: 18px 0 0; }
+  h2 { font-weight: 300; font-size: 26px; margin: 72px 0 6px; letter-spacing: -0.01em; }
+  .sub { color: var(--ink-3); margin: 0 0 22px; font-size: 15px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  .opt { border: 1px solid var(--line); background: rgba(8, 8, 11, 0.7); border-radius: 3px; overflow: hidden; display: flex; flex-direction: column; }
+  .opt-still { position: relative; display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; padding: 0; background: #0e0e12; cursor: pointer; overflow: hidden; }
+  .opt-still img { width: 100%; height: 100%; object-fit: cover; display: block; filter: saturate(0.55) brightness(0.62); transition: filter 300ms, transform 600ms cubic-bezier(.2,.8,.2,1); }
+  .opt-still:hover img { filter: saturate(0.85) brightness(0.8); transform: scale(1.03); }
+  .opt-still .eclipse-btn { position: absolute; left: 50%; top: 50%; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: #030304;
+    box-shadow: 0 0 0 1px rgba(214, 205, 255, 0.55), 0 0 22px 2px rgba(123, 97, 255, 0.45), 0 0 70px 14px rgba(123, 97, 255, 0.15); transition: box-shadow 300ms; }
+  .opt-still:hover .eclipse-btn { box-shadow: 0 0 0 1px rgba(214, 205, 255, 0.85), 0 0 30px 4px rgba(123, 97, 255, 0.7), 0 0 110px 24px rgba(123, 97, 255, 0.25); }
+  .eclipse-btn::after { content: ""; position: absolute; left: 22px; top: 18px; border-style: solid; border-width: 10px 0 10px 15px; border-color: transparent transparent transparent var(--ink); }
+  .opt-body { padding: 16px 16px 18px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .opt-tag { font-family: "Geist Mono", monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.14em; }
+  .opt h3 { margin: 0; font-weight: 400; font-size: 19px; }
+  .opt p { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.55; }
+  .opt .motif { color: var(--ink-3); font-size: 12px; font-family: "Geist Mono", monospace; margin-top: auto; padding-top: 6px; }
+  .pick { margin-top: 40px; padding: 18px 20px; border: 1px solid var(--line-strong); border-left: 2px solid var(--accent); background: rgba(123, 97, 255, 0.05); color: var(--ink-2); font-size: 15px; line-height: 1.6; }
+  .pick b { color: var(--ink); font-weight: 500; }
+
+  /* ---------- overlay ---------- */
+  #ov { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; }
+  #ov.on { display: grid; }
+  #veil { position: absolute; inset: 0; background: rgba(3, 3, 6, 0.86); backdrop-filter: blur(14px) saturate(0.6); -webkit-backdrop-filter: blur(14px) saturate(0.6); opacity: 0; }
+  #amb { position: absolute; pointer-events: none; filter: blur(80px) saturate(1.4); opacity: 0; transition: opacity 900ms; }
+  #fx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  #theater { position: relative; width: min(1100px, calc(100vw - 32px)); aspect-ratio: 16 / 9; background: #000; border-radius: 3px; }
+  #theater video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 3px; display: block; }
+  .ctl { position: absolute; left: 0; right: 0; bottom: 0; padding: 50px 18px 10px; border-radius: 0 0 3px 3px;
+    background: linear-gradient(to bottom, transparent, rgba(3, 3, 6, 0.55) 35%, rgba(3, 3, 6, 0.92)); transition: opacity 300ms; }
+  #tl { display: block; width: 100%; height: 60px; cursor: pointer; touch-action: none; }
+  .row { display: flex; align-items: center; gap: 4px; margin-top: 2px; }
+  .row button { display: grid; place-items: center; min-width: 36px; height: 36px; border: 0; background: none; color: var(--ink-2); cursor: pointer; border-radius: 2px; }
+  .row button:hover { color: var(--ink); background: rgba(237, 235, 230, 0.07); }
+  .time { margin-left: 8px; font-family: "Geist Mono", monospace; font-size: 12px; font-variant-numeric: tabular-nums; }
+  .time span { color: var(--ink-3); }
+  .chap { flex: 1; min-width: 0; margin-left: 14px; font-size: 13px; color: var(--ink-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .chap i { font-style: normal; color: var(--accent); font-family: "Geist Mono", monospace; font-size: 11px; margin-right: 8px; }
+  #tip { position: absolute; bottom: 118px; transform: translateX(-50%); padding: 6px 10px; background: rgba(5, 5, 7, 0.92); border: 1px solid var(--line-strong);
+    border-radius: 2px; font-size: 12px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 150ms; text-align: center; }
+  #tip b { display: block; font-weight: 400; color: var(--ink); }
+  #tip span { font-family: "Geist Mono", monospace; color: var(--ink-3); font-size: 11px; }
+  #bar { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; align-items: center;
+    padding: 8px 12px; border: 1px solid var(--line); background: rgba(8, 8, 11, 0.85); border-radius: 999px; font-size: 12px; opacity: 0; transition: opacity 400ms 600ms; max-width: calc(100vw - 32px); }
+  #ov.ready #bar { opacity: 1; }
+  #bar .lbl { font-family: "Geist Mono", monospace; color: var(--ink-3); letter-spacing: 0.1em; text-transform: uppercase; font-size: 10px; }
+  #bar button { border: 1px solid transparent; background: none; color: var(--ink-2); font: inherit; padding: 4px 10px; border-radius: 999px; cursor: pointer; }
+  #bar button:hover { color: var(--ink); }
+  #bar button.on { color: var(--ink); border-color: var(--accent-soft); background: rgba(123, 97, 255, 0.12); }
+  .ov-close { position: absolute; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--line-strong); background: rgba(5,5,7,.7); color: var(--ink-2); cursor: pointer; font-size: 18px; opacity: 0; transition: opacity 400ms 600ms; }
+  #ov.ready .ov-close { opacity: 1; }
+  .ov-close:hover { color: var(--ink); border-color: var(--accent); }
+  .fx-el { position: fixed; pointer-events: none; z-index: 60; }
+  @media (max-width: 700px) { #tip { bottom: 100px; } .chap { display: none; } #bar { bottom: 10px; border-radius: 12px; } }
+</style>
+</head>
+<body>
+<canvas id="sky"></canvas>
+<main>
+  <p class="eyebrow">Talk player · concept lab</p>
+  <h1>Four ways in.<br />Four ways to <em>move through time</em>.</h1>
+  <p class="lede">Live prototypes on the real episode. Pick an <b>opening</b> by clicking its card. Inside the player, switch the <b>timeline</b> and toggle the <b>extras</b> from the bar at the bottom, so you can try any combination.</p>
+
+  <h2>1 · The opening</h2>
+  <p class="sub">What happens between the click and the first frame.</p>
+  <div class="grid" id="openings"></div>
+
+  <h2>2 · The timeline</h2>
+  <p class="sub">The progress bar, reimagined. Switch between these inside the player.</p>
+  <div class="grid" id="timelines"></div>
+
+  <h2>3 · Extras</h2>
+  <p class="sub">Small touches that work with any of the above. Toggle them inside the player.</p>
+  <div class="grid" id="extras"></div>
+
+  <div class="pick"><b>My pick:</b> <b>Eclipse Iris</b> to open, since the Eclipse is the site's signature and the click turns it into the video. Then <b>Aurora Ridge</b> as the timeline: it's the only one that carries information (you can see where the conversation gets animated), and <b>Corona Breath</b> keeps the frame alive without getting in the way. <b>Stardust</b> is the most spectacular, but probably too heavy for a section you scroll past.</div>
+</main>
+
+<div id="ov" aria-modal="true" role="dialog" aria-label="Podcast player">
+  <div id="veil"></div>
+  <canvas id="amb"></canvas>
+  <canvas id="fx"></canvas>
+  <div id="theater">
+    <video id="v" playsinline preload="auto" src="/media/vox-domus/episode-720p.mp4"></video>
+    <div class="ctl" id="ctl">
+      <div id="tip"><b></b><span></span></div>
+      <canvas id="tl"></canvas>
+      <div class="row">
+        <button id="pp" aria-label="Play/pause"></button>
+        <button id="back" aria-label="Back 10s"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 6l5 4V7a6 6 0 1 1-6 6H4a8 8 0 1 0 8-8z"/></svg></button>
+        <button id="fwd" aria-label="Forward 10s"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2l5 4-5 4V7a6 6 0 1 0 6 6h2a8 8 0 1 1-8-8z"/></svg></button>
+        <span class="time" id="time"></span>
+        <span class="chap" id="chap"></span>
+      </div>
+    </div>
+  </div>
+  <button class="ov-close" id="close" aria-label="Close">×</button>
+  <div id="bar">
+    <span class="lbl">Timeline</span>
+    <span id="tlBtns"></span>
+    <span class="lbl">Extras</span>
+    <span id="exBtns"></span>
+  </div>
+</div>
+
+<script>
+(() => {
+  const ACC = [123, 97, 255];
+  const START = 592; // Pedro on "what a blockchain actually is"
+  const DUR = 3519.7;
+  const CHAPTERS = [
+    [0, "Introductions"], [151, "Engineering turns property into an asset"], [282, "Investing without technique is a bet"],
+    [536, "What a blockchain actually is"], [790, "Tokens, NFTs and proving ownership"], [952, "Property becomes technology"],
+    [1054, "The investor's view: the gain is in the purchase"], [1225, "Price is not value"], [1641, "The engineer's view: old buildings, hidden risk"],
+    [1786, "Tokens as fractions of real property"], [2016, "Smart contracts aren't magic"], [2141, "How crypto markets price and lend"],
+    [2276, "Fractionalizing a property on-chain"], [2543, "Collective financing: three models"], [2735, "Registries, cartórios and the law"],
+    [2875, "Privacy and Drex"], [2984, "The future of buying property"], [3237, "Why the real world is messy"], [3336, "Closing thoughts"],
+  ].map(([s, t]) => ({ s, t }));
+
+  const OPENINGS = [
+    { id: "iris", tag: "A", name: "Eclipse Iris", motif: "motif: the Eclipse + corona",
+      text: "The play button is a tiny Eclipse. On click it drifts to the center and grows, its corona flares, and then it opens like an iris: a ring of violet light sweeps out to the edges and reveals the video." },
+    { id: "warp", tag: "B", name: "Gateway Warp", motif: "motif: gateways, the transit corridor",
+      text: "Stars stretch into light streaks as you fly forward. An arch, the same shape as the scene's gateways, rushes toward you and becomes the frame of the video. Then the stars slow down and drift." },
+    { id: "seam", tag: "C", name: "Light Seam", motif: "motif: the hairline seam over the arches",
+      text: "A single hairline of violet light draws across the screen, brightens, then splits open top and bottom like a slit in the dark, with the video inside. The quietest and most elegant of the four." },
+    { id: "dust", tag: "D", name: "Stardust", motif: "motif: the starfield",
+      text: "The screen fills with drifting stars. They fly in and settle into place, each one taking a pixel's color, until the stars become the video frame. Then the real video fades in under them." },
+  ];
+  const TIMELINES = [
+    { id: "aurora", tag: "1", name: "Aurora Ridge",
+      text: "The bar is the real loudness of the conversation, drawn as a ridge of light. Played time glows violet, the playhead is a small Eclipse that pulses with the voice, and chapters are breaks in the ridge." },
+    { id: "colonnade", tag: "2", name: "Colonnade",
+      text: "A causeway on the horizon with a monolith at every chapter. A small traveller walks it as the video plays, and each monolith wakes with a flash of light as you pass it, like the scene's light wave." },
+    { id: "orbit", tag: "3", name: "Orbit",
+      text: "Time follows a shallow orbital arc, like the ring arc in the sky. A comet with a fading tail travels along it, and the chapters are stars that brighten after the comet passes." },
+    { id: "constellation", tag: "4", name: "Constellation",
+      text: "Every chapter is a star, sized by how long it runs. As you watch, a line of light draws from star to star, so the whole episode becomes a constellation you can jump around in." },
+  ];
+  const EXTRAS = [
+    { id: "breath", name: "Corona Breath", on: true, text: "A violet glow around the frame breathes with whoever is speaking, driven by the real loudness of the audio." },
+    { id: "amb", name: "Nebula Spill", on: false, text: "The video's own colors spill into the dark around it as a soft nebula, like ambilight." },
+    { id: "warpseek", name: "Seek Warp", on: true, text: "Jumping far ahead or back makes the background stars streak in that direction for a moment." },
+  ];
+
+  const $ = (s) => document.querySelector(s);
+  const v = $("#v"), ov = $("#ov"), veil = $("#veil"), theater = $("#theater"), fx = $("#fx"), amb = $("#amb"), tl = $("#tl"), tip = $("#tip");
+  const state = { timeline: "aurora", extras: Object.fromEntries(EXTRAS.map((e) => [e.id, e.on])), open: false, opening: false };
+  let energy = new Array(3520).fill(0.3);
+  fetch("/media/vox-domus/energy.json").then((r) => r.json()).then((d) => (energy = d.perSecond)).catch(() => {});
+  const E = (t) => energy[Math.max(0, Math.min(energy.length - 1, Math.floor(t)))] ?? 0;
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+  const ease = { inOut: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2), out: (t) => 1 - Math.pow(1 - t, 3), in: (t) => t * t * t, expoIn: (t) => (t === 0 ? 0 : Math.pow(2, 10 * t - 10)) };
+  const fmt = (s) => { s = Math.max(0, Math.floor(s)); const m = Math.floor(s / 60); return `${m}:${String(s % 60).padStart(2, "0")}`; };
+  const chapterAt = (t) => { let i = 0; CHAPTERS.forEach((c, j) => { if (t >= c.s) i = j; }); return i; };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const anim = (dur, fn, ez = (x) => x) => new Promise((res) => { const t0 = performance.now(); const step = (now) => { const p = clamp((now - t0) / dur, 0, 1); fn(ez(p), p); p < 1 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
+
+  // ---------- page cards ----------
+  const optCard = (o, still) => `<article class="opt">${still ? `<button class="opt-still" data-open="${o.id}" aria-label="Open with ${o.name}"><img src="/media/vox-domus/poster.jpg" alt=""><span class="eclipse-btn"></span></button>` : ""}
+    <div class="opt-body"><span class="opt-tag">${o.tag ? o.tag + " · " : ""}${still ? "CLICK THE STILL" : "TRY IT IN THE PLAYER"}</span><h3>${o.name}</h3><p>${o.text}</p>${o.motif ? `<span class="motif">${o.motif}</span>` : ""}</div></article>`;
+  $("#openings").innerHTML = OPENINGS.map((o) => optCard(o, true)).join("");
+  $("#timelines").innerHTML = TIMELINES.map((o) => optCard(o, false)).join("");
+  $("#extras").innerHTML = EXTRAS.map((o) => optCard(o, false)).join("");
+  document.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => openWith(b.dataset.open, b.querySelector(".eclipse-btn").getBoundingClientRect())));
+
+  $("#tlBtns").innerHTML = TIMELINES.map((t) => `<button data-tl="${t.id}">${t.name}</button>`).join("");
+  $("#exBtns").innerHTML = EXTRAS.map((t) => `<button data-ex="${t.id}">${t.name}</button>`).join("");
+  const syncBar = () => {
+    document.querySelectorAll("[data-tl]").forEach((b) => b.classList.toggle("on", b.dataset.tl === state.timeline));
+    document.querySelectorAll("[data-ex]").forEach((b) => b.classList.toggle("on", state.extras[b.dataset.ex]));
+    amb.style.opacity = state.extras.amb && state.open ? 0.55 : 0;
+  };
+  document.querySelectorAll("[data-tl]").forEach((b) => b.addEventListener("click", () => { state.timeline = b.dataset.tl; wakes.clear(); syncBar(); }));
+  document.querySelectorAll("[data-ex]").forEach((b) => b.addEventListener("click", () => { state.extras[b.dataset.ex] = !state.extras[b.dataset.ex]; syncBar(); }));
+  syncBar();
+
+  // ---------- page sky ----------
+  const sky = $("#sky"), sctx = sky.getContext("2d");
+  const skyStars = Array.from({ length: 220 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.1 + 0.2, p: Math.random() * 6.28 }));
+  const drawSky = (now) => {
+    const w = (sky.width = innerWidth), h = (sky.height = innerHeight);
+    const g = sctx.createRadialGradient(w * 0.75, h * 0.1, 0, w * 0.75, h * 0.1, w * 0.6);
+    g.addColorStop(0, "rgba(123,97,255,0.10)"); g.addColorStop(1, "rgba(5,5,7,0)");
+    sctx.fillStyle = g; sctx.fillRect(0, 0, w, h);
+    for (const s of skyStars) { sctx.globalAlpha = 0.35 + 0.35 * Math.sin(now / 1400 + s.p); sctx.fillStyle = "#edebe6"; sctx.beginPath(); sctx.arc(s.x * w, s.y * h, s.r, 0, 6.28); sctx.fill(); }
+    sctx.globalAlpha = 1;
+  };
+  const skyLoop = (now) => { if (!state.open) drawSky(now); requestAnimationFrame(skyLoop); };
+  requestAnimationFrame(skyLoop);
+
+  // ---------- video prep ----------
+  const toStart = () => { if (v.currentTime < 1) v.currentTime = START; };
+  v.readyState >= 1 ? toStart() : v.addEventListener("loadedmetadata", toStart, { once: true });
+  const ready = () => new Promise((res) => (v.readyState >= 2 ? res() : v.addEventListener("loadeddata", res, { once: true })));
+
+  // ---------- fx canvas (full screen): idle stars, warp, stardust ----------
+  const fctx = fx.getContext("2d");
+  let fxMode = "idle"; // idle | none
+  const field = Array.from({ length: 420 }, () => ({ x: Math.random() * 2 - 1, y: Math.random() * 2 - 1, z: Math.random(), p: Math.random() * 6.28 }));
+  let warpV = 0, seekImpulse = 0;
+  const sizeFx = () => { fx.width = innerWidth; fx.height = innerHeight; };
+
+  function drawField(now, speed, lateral) {
+    const w = fx.width, h = fx.height, cx = w / 2, cy = h / 2;
+    fctx.lineCap = "round";
+    for (const s of field) {
+      const pz = s.z;
+      s.z -= speed * 0.02;
+      s.x += lateral * 0.004 * (1 - s.z);
+      if (s.x > 1.2) s.x -= 2.4; if (s.x < -1.2) s.x += 2.4;
+      if (s.z <= 0.02) { s.z = 1; s.x = Math.random() * 2 - 1; s.y = Math.random() * 2 - 1; continue; }
+      const k = 0.55 * w;
+      const x = cx + (s.x / s.z) * k * 0.6, y = cy + (s.y / s.z) * k * 0.6;
+      const px = cx + (s.x / pz) * k * 0.6 + lateral * 30 * (1 - s.z), py = cy + (s.y / pz) * k * 0.6;
+      const a = clamp((1 - s.z) * 1.4, 0, 1) * (0.55 + 0.45 * Math.sin(now / 900 + s.p));
+      const violet = s.p > 4.6;
+      fctx.strokeStyle = violet ? `rgba(${ACC},${a})` : `rgba(237,235,230,${a})`;
+      fctx.lineWidth = (1 - s.z) * 2 + 0.3;
+      fctx.beginPath(); fctx.moveTo(px, py); fctx.lineTo(x + 0.01, y); fctx.stroke();
+    }
+  }
+
+  // ---------- openings ----------
+  async function openWith(kind, from) {
+    if (state.open || state.opening) return;
+    state.opening = true; state.open = true;
+    ov.classList.add("on"); ov.classList.remove("ready");
+    sizeFx(); fctx.clearRect(0, 0, fx.width, fx.height);
+    theater.style.clipPath = ""; theater.style.opacity = "1"; theater.style.transform = ""; theater.style.boxShadow = "";
+    $("#ctl").style.opacity = 0;
+    syncBar();
+    veil.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 500, fill: "forwards", easing: "ease-out" });
+    const r = theater.getBoundingClientRect();
+    await ({ iris, warp, seam, dust })[kind](from, r);
+    theater.style.clipPath = "none";
+    fxMode = "idle";
+    $("#ctl").animate([{ opacity: 0, transform: "translateY(8px)" }, { opacity: 1, transform: "none" }], { duration: 500, fill: "forwards", easing: "cubic-bezier(.2,.8,.2,1)" });
+    $("#ctl").style.opacity = "";
+    ov.classList.add("ready");
+    state.opening = false;
+  }
+
+  function el(css) { const d = document.createElement("div"); d.className = "fx-el"; Object.assign(d.style, css); document.body.appendChild(d); return d; }
+
+  async function iris(from, r) {
+    fxMode = "none";
+    v.play().catch(() => {});
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    theater.style.clipPath = `circle(0px at 50% 50%)`;
+    const D = 56;
+    const disc = el({ left: from.left + "px", top: from.top + "px", width: D + "px", height: D + "px", borderRadius: "50%", background: "#030304",
+      boxShadow: "0 0 0 1px rgba(214,205,255,.6), 0 0 22px 2px rgba(123,97,255,.5), 0 0 70px 14px rgba(123,97,255,.18)" });
+    const dx = cx - (from.left + D / 2), dy = cy - (from.top + D / 2);
+    await disc.animate([
+      { transform: "translate(0,0) scale(1)" },
+      { transform: `translate(${dx}px,${dy}px) scale(2.4)`, boxShadow: "0 0 0 1px rgba(214,205,255,.9), 0 0 40px 8px rgba(123,97,255,.8), 0 0 160px 40px rgba(123,97,255,.35)" },
+    ], { duration: 650, easing: "cubic-bezier(.6,0,.2,1)", fill: "forwards" }).finished;
+    // corona flare
+    await disc.animate([
+      { boxShadow: "0 0 0 1px rgba(214,205,255,.9), 0 0 40px 8px rgba(123,97,255,.8), 0 0 160px 40px rgba(123,97,255,.35)" },
+      { boxShadow: "0 0 0 2px rgba(237,235,255,1), 0 0 70px 20px rgba(150,130,255,1), 0 0 260px 90px rgba(123,97,255,.5)" },
+    ], { duration: 260, easing: "ease-in", fill: "forwards" }).finished;
+    await ready();
+    const R = Math.hypot(r.width, r.height) / 2 + 4;
+    const ring = el({ left: cx + "px", top: cy + "px", width: "2px", height: "2px", borderRadius: "50%", transform: "translate(-50%,-50%)",
+      boxShadow: "0 0 0 1.5px rgba(237,235,255,.95), 0 0 24px 6px rgba(123,97,255,.9), inset 0 0 24px 6px rgba(123,97,255,.6)" });
+    // the disc becomes the ring: its black face vanishes at once, only the light expands
+    disc.style.background = "transparent";
+    disc.animate([{ opacity: 1, transform: `translate(${dx}px,${dy}px) scale(2.4)` }, { opacity: 0, transform: `translate(${dx}px,${dy}px) scale(4)` }], { duration: 160, easing: "ease-out", fill: "forwards" });
+    await anim(1050, (p) => {
+      const rr = p * R;
+      theater.style.clipPath = `circle(${rr}px at 50% 50%)`;
+      ring.style.width = ring.style.height = rr * 2 + "px";
+      ring.style.opacity = String(1 - Math.pow(p, 3));
+    }, (t) => 1 - Math.pow(1 - t, 3.2));
+    disc.remove(); ring.remove();
+  }
+
+  async function warp(from, r) {
+    fxMode = "none";
+    theater.style.clipPath = "inset(50% 50% 50% 50% round 0px)";
+    const w = r.width, h = r.height;
+    const t0 = performance.now();
+    const ld = ready();
+    // accelerate, the arch rushes in, decelerate
+    await anim(1700, (p, raw) => {
+      const now = performance.now();
+      const speed = raw < 0.7 ? 0.2 + 3.6 * ease.in(raw / 0.7) : 3.8 * (1 - ease.out((raw - 0.7) / 0.3)) + 0.05;
+      fctx.fillStyle = "rgba(3,3,6,0.32)"; fctx.fillRect(0, 0, fx.width, fx.height);
+      drawField(now, speed, 0);
+      const g = clamp((raw - 0.18) / 0.62, 0, 1), ge = ease.expoIn(g) * 0.92 + g * 0.08;
+      const aw = w * (0.05 + 0.95 * ge), ah = h * (0.09 + 0.91 * ge);
+      const top = (h - ah) / 2, side = (w - aw) / 2;
+      const rad = (aw / 2) * (1 - ge) + 3 * ge;
+      theater.style.clipPath = g > 0 ? `inset(${top}px ${side}px ${top}px ${side}px round ${rad}px ${rad}px 3px 3px)` : "inset(50% 50% 50% 50%)";
+      // arch outline
+      if (g > 0 && g < 1) {
+        const x0 = r.left + side, y0 = r.top + top;
+        fctx.save(); fctx.strokeStyle = `rgba(214,205,255,${0.9 * (1 - g)})`; fctx.shadowColor = `rgba(${ACC},1)`; fctx.shadowBlur = 24; fctx.lineWidth = 1.5;
+        fctx.beginPath(); fctx.moveTo(x0, y0 + ah); fctx.lineTo(x0, y0 + rad); fctx.arcTo(x0, y0, x0 + rad, y0, rad); fctx.lineTo(x0 + aw - rad, y0); fctx.arcTo(x0 + aw, y0, x0 + aw, y0 + rad, rad); fctx.lineTo(x0 + aw, y0 + ah); fctx.stroke(); fctx.restore();
+      }
+      if (raw > 0.5 && v.paused) v.play().catch(() => {});
+    });
+    await ld;
+    theater.animate([{ transform: "scale(1.04)" }, { transform: "scale(1)" }], { duration: 500, easing: "cubic-bezier(.2,.8,.2,1)" });
+  }
+
+  async function seam(from, r) {
+    fxMode = "none";
+    const ld = ready();
+    theater.style.clipPath = "inset(50% 0 50% 0)";
+    const cy = r.top + r.height / 2;
+    const line = el({ left: r.left + "px", top: cy - 1 + "px", width: r.width + "px", height: "2px", transform: "scaleX(0)",
+      background: "linear-gradient(90deg, transparent, rgba(214,205,255,1) 20%, #fff 50%, rgba(214,205,255,1) 80%, transparent)",
+      boxShadow: "0 0 18px 3px rgba(123,97,255,.9), 0 0 60px 10px rgba(123,97,255,.35)" });
+    await line.animate([{ transform: "scaleX(0)", opacity: 0.4 }, { transform: "scaleX(1)", opacity: 1 }], { duration: 650, easing: "cubic-bezier(.7,0,.2,1)", fill: "forwards" }).finished;
+    await line.animate([{ filter: "brightness(1)" }, { filter: "brightness(2.2)" }, { filter: "brightness(1.4)" }], { duration: 300, fill: "forwards" }).finished;
+    await ld; v.play().catch(() => {});
+    const top = el({ left: r.left + "px", top: cy - 1 + "px", width: r.width + "px", height: "2px", background: line.style.background, boxShadow: line.style.boxShadow });
+    const bot = el({ left: r.left + "px", top: cy - 1 + "px", width: r.width + "px", height: "2px", background: line.style.background, boxShadow: line.style.boxShadow });
+    line.remove();
+    await anim(900, (p) => {
+      const half = (r.height / 2) * p;
+      theater.style.clipPath = `inset(${50 - 50 * p}% 0 ${50 - 50 * p}% 0)`;
+      top.style.transform = `translateY(${-half}px)`; bot.style.transform = `translateY(${half}px)`;
+      top.style.opacity = bot.style.opacity = String(1 - Math.pow(p, 4) * 0.9);
+    }, ease.inOut);
+    await Promise.all([top, bot].map((e) => e.animate([{ opacity: 0.1 }, { opacity: 0 }], { duration: 400, fill: "forwards" }).finished));
+    top.remove(); bot.remove();
+  }
+
+  async function dust(from, r) {
+    fxMode = "none";
+    theater.style.opacity = "0";
+    await ready();
+    const GW = 176, GH = 99;
+    const off = document.createElement("canvas"); off.width = GW; off.height = GH;
+    const octx = off.getContext("2d"); octx.drawImage(v, 0, 0, GW, GH);
+    const px = octx.getImageData(0, 0, GW, GH).data;
+    const W = fx.width, H = fx.height, cell = r.width / GW;
+    const parts = [];
+    for (let j = 0; j < GH; j++) for (let i = 0; i < GW; i++) {
+      const k = (j * GW + i) * 4;
+      const tx = r.left + i * cell, ty = r.top + j * cell;
+      const d = Math.hypot(i / GW - 0.5, j / GH - 0.5);
+      parts.push({ sx: Math.random() * W, sy: Math.random() * H, tx, ty, r: px[k], g: px[k + 1], b: px[k + 2], delay: d * 900 + Math.random() * 350, tw: Math.random() * 6.28, vio: Math.random() < 0.12 });
+    }
+    const img = fctx.createImageData(W, H), buf = new Uint32Array(img.data.buffer);
+    const put = (x, y, s, r_, g_, b_, a) => {
+      const col = ((a & 255) << 24) | ((b_ & 255) << 16) | ((g_ & 255) << 8) | (r_ & 255);
+      x |= 0; y |= 0;
+      for (let yy = y; yy < y + s; yy++) { if (yy < 0 || yy >= H) continue; const row = yy * W; for (let xx = x; xx < x + s; xx++) if (xx >= 0 && xx < W) buf[row + xx] = col; }
+    };
+    const TOTAL = 2600, FLY = 1300;
+    v.pause();
+    await anim(TOTAL, (_, raw) => {
+      const ms = raw * TOTAL;
+      buf.fill(0);
+      for (const p of parts) {
+        const q = clamp((ms - 350 - p.delay) / FLY, 0, 1), e = ease.inOut(q);
+        const x = p.sx + (p.tx - p.sx) * e, y = p.sy + (p.ty - p.sy) * e;
+        const tw = 0.6 + 0.4 * Math.sin(ms / 160 + p.tw);
+        const sr = p.vio ? 160 : 237, sg = p.vio ? 140 : 235, sb = p.vio ? 255 : 230;
+        const cr = sr + (p.r - sr) * e, cg = sg + (p.g - sg) * e, cb = sb + (p.b - sb) * e;
+        const s = 1 + Math.round((Math.ceil(cell) - 1) * e * e);
+        put(x, y, s, cr, cg, cb, 255 * (q > 0 ? 1 : tw * 0.8));
+      }
+      fctx.putImageData(img, 0, 0);
+    });
+    v.play().catch(() => {});
+    theater.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 600, fill: "forwards" });
+    theater.style.opacity = "1";
+    await fx.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 700, easing: "ease-in" }).finished;
+    fctx.clearRect(0, 0, W, H);
+  }
+
+  // ---------- close ----------
+  async function close() {
+    if (!state.open || state.opening) return;
+    ov.classList.remove("ready");
+    v.pause();
+    await Promise.all([
+      theater.animate([{ opacity: 1, transform: "scale(1)", filter: "blur(0)" }, { opacity: 0, transform: "scale(.94)", filter: "blur(6px)" }], { duration: 380, easing: "ease-in", fill: "forwards" }).finished,
+      veil.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 420, fill: "forwards" }).finished,
+    ]);
+    theater.getAnimations().forEach((a) => a.cancel());
+    ov.classList.remove("on"); state.open = false; syncBar();
+  }
+  $("#close").addEventListener("click", close);
+  veil.addEventListener("click", close);
+  addEventListener("keydown", (e) => {
+    if (!state.open) return;
+    if (e.key === "Escape") close();
+    if (e.key === " ") { e.preventDefault(); v.paused ? v.play() : v.pause(); }
+    if (e.key === "ArrowRight") seek(v.currentTime + 10);
+    if (e.key === "ArrowLeft") seek(v.currentTime - 10);
+  });
+
+  // ---------- controls ----------
+  const ICON = { play: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg>', pause: '<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>' };
+  const pp = $("#pp");
+  pp.addEventListener("click", () => (v.paused ? v.play() : v.pause()));
+  $("#back").addEventListener("click", () => seek(v.currentTime - 10));
+  $("#fwd").addEventListener("click", () => seek(v.currentTime + 10));
+  v.addEventListener("click", () => (v.paused ? v.play() : v.pause()));
+  function seek(t) {
+    const d = t - v.currentTime;
+    if (Math.abs(d) > 20) seekImpulse = Math.sign(d) * Math.min(1, Math.abs(d) / 400 + 0.4);
+    v.currentTime = clamp(t, 0, DUR - 1);
+  }
+
+  // ---------- timeline canvas ----------
+  const tctx = tl.getContext("2d");
+  let hoverX = null, dragging = false;
+  const wakes = new Map();
+  let lastT = START;
+  const xToT = (x, w) => clamp(x / w, 0, 1) * DUR;
+  tl.addEventListener("pointerdown", (e) => { dragging = true; tl.setPointerCapture(e.pointerId); seek(xToT(e.offsetX, tl.clientWidth)); });
+  tl.addEventListener("pointermove", (e) => { hoverX = e.offsetX; if (dragging) seek(xToT(e.offsetX, tl.clientWidth)); });
+  tl.addEventListener("pointerup", () => (dragging = false));
+  tl.addEventListener("pointerleave", () => { if (!dragging) hoverX = null; });
+
+  const starY = CHAPTERS.map((c, i) => 0.2 + 0.6 * ((Math.sin(i * 12.9898 + 4.1) * 43758.5453) % 1 + 1) % 1);
+  const monoH = CHAPTERS.map((c, i) => 12 + ((i * 7) % 4) * 5);
+
+  function drawTimeline(now) {
+    const dpr = devicePixelRatio || 1, w = tl.clientWidth, h = tl.clientHeight;
+    if (tl.width !== Math.round(w * dpr)) { tl.width = Math.round(w * dpr); tl.height = Math.round(h * dpr); }
+    tctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    tctx.clearRect(0, 0, w, h);
+    const t = v.currentTime, X = (s) => (s / DUR) * w, px = X(t), level = E(t);
+    // chapter wakes when the playhead crosses a chapter start
+    CHAPTERS.forEach((c, i) => { if (lastT < c.s && t >= c.s && t - lastT < 5) wakes.set(i, now); });
+    lastT = t;
+
+    if (state.timeline === "aurora") {
+      const base = h - 12, amp = h - 20;
+      const ridge = (fill) => {
+        tctx.beginPath(); tctx.moveTo(0, base);
+        for (let x = 0; x <= w; x += 2) {
+          const s0 = Math.floor((x / w) * DUR), s1 = Math.floor(((x + 2) / w) * DUR);
+          let m = 0; for (let s = s0; s <= s1; s++) m = Math.max(m, energy[s] ?? 0);
+          const near = hoverX != null ? Math.exp(-Math.pow((x - hoverX) / 26, 2)) : 0;
+          tctx.lineTo(x, base - (0.08 + m * 0.92) * amp * (0.55 + 0.45 * near * 0 + 0.45));
+        }
+        tctx.lineTo(w, base); tctx.closePath(); fill();
+      };
+      tctx.fillStyle = "rgba(237,235,230,0.13)"; ridge(() => tctx.fill());
+      if (hoverX != null) { tctx.save(); const g = tctx.createRadialGradient(hoverX, base, 0, hoverX, base, 60); g.addColorStop(0, "rgba(237,235,230,.35)"); g.addColorStop(1, "rgba(237,235,230,0)"); tctx.fillStyle = g; ridge(() => tctx.fill()); tctx.restore(); }
+      tctx.save(); tctx.beginPath(); tctx.rect(0, 0, px, h); tctx.clip();
+      const g = tctx.createLinearGradient(0, base - amp, 0, base); g.addColorStop(0, "rgba(200,188,255,1)"); g.addColorStop(0.5, `rgba(${ACC},.95)`); g.addColorStop(1, `rgba(${ACC},.25)`);
+      tctx.shadowColor = `rgba(${ACC},.9)`; tctx.shadowBlur = 10 + level * 14; tctx.fillStyle = g; ridge(() => tctx.fill()); tctx.restore();
+      tctx.save(); tctx.globalCompositeOperation = "destination-out"; CHAPTERS.forEach((c) => { if (c.s > 0) tctx.fillRect(X(c.s) - 1, 0, 2, h); }); tctx.restore();
+      // baseline
+      tctx.fillStyle = "rgba(237,235,230,.18)"; tctx.fillRect(0, base, w, 1);
+      tctx.fillStyle = `rgba(${ACC},.9)`; tctx.fillRect(0, base, px, 1);
+      eclipse(px, base, 5 + level * 2.5, level);
+    } else if (state.timeline === "colonnade") {
+      const base = h - 14;
+      const fog = tctx.createLinearGradient(0, base, 0, h); fog.addColorStop(0, "rgba(60,54,92,.5)"); fog.addColorStop(1, "rgba(60,54,92,0)");
+      tctx.fillStyle = fog; tctx.fillRect(0, base, w, h - base);
+      tctx.fillStyle = "rgba(237,235,230,.2)"; tctx.fillRect(0, base, w, 1);
+      tctx.save(); tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 8; tctx.fillStyle = `rgba(${ACC},.95)`; tctx.fillRect(0, base - 0.5, px, 2); tctx.restore();
+      // light wave rolling ahead of the traveller, one beat every ~7.5s
+      const beat = ((now / 7500) % 1), wx = px + beat * (w - px + 120) - 60;
+      const wg = tctx.createRadialGradient(wx, base, 0, wx, base, 70); wg.addColorStop(0, `rgba(${ACC},${0.35 * (1 - beat)})`); wg.addColorStop(1, `rgba(${ACC},0)`);
+      tctx.fillStyle = wg; tctx.fillRect(wx - 70, base - 40, 140, 54);
+      CHAPTERS.forEach((c, i) => {
+        const x = X(c.s), mh = monoH[i], lit = t >= c.s;
+        const wk = wakes.has(i) ? Math.exp(-(now - wakes.get(i)) / 700) : 0;
+        const nearWave = Math.exp(-Math.pow((x - wx) / 40, 2)) * (1 - beat);
+        const hov = hoverX != null && Math.abs(hoverX - x) < 8;
+        tctx.save();
+        if (lit || wk > 0.01 || nearWave > 0.05 || hov) { tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 6 + 22 * wk + 10 * nearWave; }
+        const a = lit ? 0.75 + 0.25 * wk : 0.16 + 0.5 * nearWave + (hov ? 0.4 : 0);
+        tctx.fillStyle = lit ? `rgba(${Math.round(123 + 110 * wk)},${Math.round(97 + 130 * wk)},255,${a})` : `rgba(237,235,230,${a})`;
+        tctx.fillRect(x - 1.5, base - mh - wk * 6, 3, mh + wk * 6);
+        tctx.restore();
+      });
+      // traveller
+      const bob = Math.sin(now / 160) * (v.paused ? 0 : 0.8);
+      const pool = tctx.createRadialGradient(px, base, 0, px, base, 18); pool.addColorStop(0, "rgba(214,205,255,.55)"); pool.addColorStop(1, "rgba(214,205,255,0)");
+      tctx.fillStyle = pool; tctx.fillRect(px - 18, base - 10, 36, 20);
+      tctx.fillStyle = "#edebe6"; tctx.fillRect(px - 1, base - 11 + bob, 2, 10); tctx.beginPath(); tctx.arc(px, base - 13.5 + bob, 2.2, 0, 6.28); tctx.fill();
+    } else if (state.timeline === "orbit") {
+      const P = (u) => { const x0 = 8, x2 = w - 8, y0 = h - 10, y1 = -h * 0.55; const x = x0 + u * (x2 - x0); const y = (1 - u) * (1 - u) * y0 + 2 * u * (1 - u) * y1 + u * u * y0; return [x, y]; };
+      const arc = (u0, u1) => { tctx.beginPath(); for (let k = 0; k <= 80; k++) { const [x, y] = P(u0 + (u1 - u0) * (k / 80)); k ? tctx.lineTo(x, y) : tctx.moveTo(x, y); } tctx.stroke(); };
+      tctx.strokeStyle = "rgba(237,235,230,.16)"; tctx.lineWidth = 1; tctx.setLineDash([2, 4]); arc(0, 1); tctx.setLineDash([]);
+      const u = t / DUR;
+      tctx.save(); tctx.strokeStyle = `rgba(${ACC},.55)`; tctx.lineWidth = 1.5; tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 8; arc(0, u); tctx.restore();
+      // tail
+      for (let k = 0; k < 36; k++) { const uu = u - k * 0.0025; if (uu < 0) break; const [x, y] = P(uu); tctx.fillStyle = `rgba(200,188,255,${0.5 * (1 - k / 36)})`; tctx.beginPath(); tctx.arc(x, y, 2.6 * (1 - k / 36) + 0.4, 0, 6.28); tctx.fill(); }
+      CHAPTERS.forEach((c, i) => {
+        const [x, y] = P(c.s / DUR), lit = t >= c.s, wk = wakes.has(i) ? Math.exp(-(now - wakes.get(i)) / 800) : 0;
+        const hov = hoverX != null && Math.abs(hoverX - x) < 8;
+        sparkle(x, y, (lit ? 3.5 : 2.4) + wk * 5 + (hov ? 1.5 : 0), lit ? 0.9 : 0.35 + (hov ? 0.4 : 0), lit, now / 600 + i);
+      });
+      const [hx, hy] = P(u);
+      tctx.save(); const hg = tctx.createRadialGradient(hx, hy, 0, hx, hy, 14 + level * 8); hg.addColorStop(0, "rgba(255,255,255,1)"); hg.addColorStop(0.25, `rgba(180,165,255,.9)`); hg.addColorStop(1, `rgba(${ACC},0)`);
+      tctx.fillStyle = hg; tctx.beginPath(); tctx.arc(hx, hy, 14 + level * 8, 0, 6.28); tctx.fill(); tctx.restore();
+    } else {
+      // constellation
+      const pts = CHAPTERS.map((c, i) => [X(c.s) + Math.max(4, ((CHAPTERS[i + 1]?.s ?? DUR) - c.s) / DUR * w * 0.0), 6 + starY[i] * (h - 16)]);
+      pts[0][0] = Math.max(pts[0][0], 6);
+      for (let k = 0; k < 40; k++) { const x = ((k * 97.3) % 1) * w; const y = ((k * 53.7 + 11) % h); tctx.fillStyle = `rgba(237,235,230,${0.1 + 0.08 * Math.sin(now / 900 + k)})`; tctx.fillRect(((k * 137.508) % 1000) / 1000 * w, (k * 29) % h, 1, 1); }
+      for (let i = 0; i < pts.length - 1; i++) {
+        const [x0, y0] = pts[i], [x1, y1] = pts[i + 1], s0 = CHAPTERS[i].s, s1 = CHAPTERS[i + 1].s;
+        tctx.strokeStyle = "rgba(237,235,230,.14)"; tctx.setLineDash([1, 4]); tctx.lineWidth = 1; tctx.beginPath(); tctx.moveTo(x0, y0); tctx.lineTo(x1, y1); tctx.stroke(); tctx.setLineDash([]);
+        const f = clamp((t - s0) / (s1 - s0), 0, 1);
+        if (f > 0) { tctx.save(); tctx.strokeStyle = `rgba(${ACC},.95)`; tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 10; tctx.lineWidth = 1.6; tctx.beginPath(); tctx.moveTo(x0, y0); tctx.lineTo(x0 + (x1 - x0) * f, y0 + (y1 - y0) * f); tctx.stroke(); tctx.restore(); }
+        if (f > 0 && f < 1) { const hx = x0 + (x1 - x0) * f, hy = y0 + (y1 - y0) * f; tctx.save(); tctx.fillStyle = "#fff"; tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 12 + level * 10; tctx.beginPath(); tctx.arc(hx, hy, 2.2 + level, 0, 6.28); tctx.fill(); tctx.restore(); }
+      }
+      const cur = chapterAt(t);
+      pts.forEach(([x, y], i) => {
+        const len = ((CHAPTERS[i + 1]?.s ?? DUR) - CHAPTERS[i].s) / DUR, lit = t >= CHAPTERS[i].s, wk = wakes.has(i) ? Math.exp(-(now - wakes.get(i)) / 800) : 0;
+        const hov = hoverX != null && Math.abs(hoverX - x) < 10;
+        const r = 1.6 + len * 40;
+        if (i === cur) { tctx.save(); tctx.strokeStyle = `rgba(${ACC},${0.35 + 0.25 * Math.sin(now / 400)})`; tctx.beginPath(); tctx.arc(x, y, r + 5 + 2 * Math.sin(now / 400), 0, 6.28); tctx.stroke(); tctx.restore(); }
+        sparkle(x, y, r + wk * 5 + (hov ? 2 : 0), lit ? 1 : 0.4 + (hov ? 0.4 : 0), lit, now / 700 + i);
+      });
+    }
+
+    // hover tooltip
+    if (hoverX != null) {
+      const ht = xToT(hoverX, w), c = CHAPTERS[chapterAt(ht)];
+      tip.querySelector("b").textContent = c.t; tip.querySelector("span").textContent = fmt(ht);
+      tip.style.left = clamp(hoverX + 18, 90, w - 70) + "px"; tip.style.opacity = 1;
+    } else tip.style.opacity = 0;
+
+    function eclipse(x, y, r, lv) {
+      tctx.save();
+      tctx.strokeStyle = `rgba(${ACC},.5)`; tctx.lineWidth = 1; tctx.beginPath(); tctx.moveTo(x, 4); tctx.lineTo(x, y); tctx.stroke();
+      const g = tctx.createRadialGradient(x, y, r * 0.8, x, y, r * 3.2 + lv * 8); g.addColorStop(0, `rgba(${ACC},${0.55 + lv * 0.4})`); g.addColorStop(1, `rgba(${ACC},0)`);
+      tctx.fillStyle = g; tctx.beginPath(); tctx.arc(x, y, r * 3.2 + lv * 8, 0, 6.28); tctx.fill();
+      tctx.fillStyle = "#030304"; tctx.beginPath(); tctx.arc(x, y, r, 0, 6.28); tctx.fill();
+      tctx.strokeStyle = "rgba(237,235,255,.95)"; tctx.lineWidth = 1.2; tctx.stroke();
+      tctx.restore();
+    }
+    function sparkle(x, y, r, a, lit, ph) {
+      tctx.save();
+      tctx.globalAlpha = a * (0.8 + 0.2 * Math.sin(ph * 3));
+      const col = lit ? "rgba(214,205,255,1)" : "rgba(237,235,230,1)";
+      if (lit) { tctx.shadowColor = `rgba(${ACC},1)`; tctx.shadowBlur = 10; }
+      tctx.fillStyle = col;
+      tctx.beginPath(); tctx.moveTo(x, y - r * 1.8); tctx.quadraticCurveTo(x, y, x + r * 1.8, y); tctx.quadraticCurveTo(x, y, x, y + r * 1.8); tctx.quadraticCurveTo(x, y, x - r * 1.8, y); tctx.quadraticCurveTo(x, y, x, y - r * 1.8); tctx.fill();
+      tctx.beginPath(); tctx.arc(x, y, r * 0.45, 0, 6.28); tctx.fill();
+      tctx.restore();
+    }
+  }
+
+  // ---------- ambient: corona breath, nebula spill, idle field ----------
+  const actx = amb.getContext("2d");
+  const ambSrc = document.createElement("canvas"); ambSrc.width = 16; ambSrc.height = 9;
+  const asctx = ambSrc.getContext("2d");
+  let smooth = 0, lastAmb = 0;
+  function loop(now) {
+    if (state.open) {
+      const t = v.currentTime;
+      $("#time").innerHTML = `${fmt(t)} <span>/ ${fmt(DUR)}</span>`;
+      const ci = chapterAt(t); $("#chap").innerHTML = `<i>${String(ci + 1).padStart(2, "0")}</i>${CHAPTERS[ci].t}`;
+      pp.innerHTML = v.paused ? ICON.play : ICON.pause;
+      if (!state.opening) {
+        drawTimeline(now);
+        smooth += ((v.paused ? 0.15 : E(t)) - smooth) * 0.12;
+        theater.style.boxShadow = state.extras.breath
+          ? `0 0 0 1px rgba(214,205,255,${0.12 + smooth * 0.3}), 0 0 ${30 + smooth * 70}px ${smooth * 10}px rgba(123,97,255,${0.18 + smooth * 0.4}), 0 0 ${140 + smooth * 120}px rgba(123,97,255,${0.08 + smooth * 0.14})`
+          : "0 0 0 1px rgba(214,205,255,.12), 0 30px 120px rgba(0,0,0,.7)";
+        if (fxMode === "idle") {
+          seekImpulse *= 0.93;
+          const lateral = state.extras.warpseek ? seekImpulse * 14 : 0;
+          fctx.fillStyle = Math.abs(lateral) > 0.3 ? "rgba(3,3,6,0.35)" : "rgba(3,3,6,1)";
+          fctx.fillRect(0, 0, fx.width, fx.height);
+          drawField(now, v.paused ? 0.03 : 0.06, lateral);
+        }
+      }
+      if (state.extras.amb && now - lastAmb > 120 && v.readyState >= 2) {
+        lastAmb = now;
+        const r = theater.getBoundingClientRect();
+        const W = r.width * 1.5, H = r.height * 1.6;
+        if (amb.width !== Math.round(W / 4)) { amb.width = Math.round(W / 4); amb.height = Math.round(H / 4); }
+        amb.style.width = W + "px"; amb.style.height = H + "px"; amb.style.left = r.left - r.width * 0.25 + "px"; amb.style.top = r.top - r.height * 0.3 + "px";
+        asctx.drawImage(v, 0, 0, 16, 9);
+        actx.imageSmoothingEnabled = true; actx.drawImage(ambSrc, 0, 0, amb.width, amb.height);
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  requestAnimationFrame(loop);
+  addEventListener("resize", () => { if (state.open) sizeFx(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.env*.local
+.claude/scheduled_tasks.lock
+.vercel
+.env*
+
+# local video encodes (served from R2 in production)
+public/media/

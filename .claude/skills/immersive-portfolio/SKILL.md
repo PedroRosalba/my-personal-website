@@ -11,6 +11,7 @@ Before design or implementation, read these files in this directory:
 
 - `DESIGN.md` — creative brief and UX constraints
 - `references.md` — small curated reference board
+- `MOTION_LIBRARY.md` — prototyped motion and interaction ideas (openings, timelines, extras), with screenshots in `refs/motion/` and a runnable lab in `lab/`. Check it before inventing new motion.
 
 `DESIGN.md` is the current project brief. `references.md` provides visual vocabulary. Do not invent a second visual direction elsewhere.
 
