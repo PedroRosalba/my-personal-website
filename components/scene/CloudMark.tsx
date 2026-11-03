@@ -9,7 +9,7 @@ import { HologramTube, cloudGeometry, createPointsMaterial, emptyCloud, useHolog
 /*
  * The Cloudflare landmark, as a hologram: the logo's cloud as a puffy 3D shape with a flat base, made of ~12k
  * points in a containment tube (see hologram.tsx): squashed spheres cut flat at the floor. The small lobe on
- * the right is lighter, as in the logo.
+ * the right is lighter, as in the logo, and bobs a little on its own.
  */
 
 const TUBE_R = 1.72;
@@ -89,6 +89,12 @@ export function CloudMark({ position, index }: { position: [number, number, numb
   const parts = useMemo(() => Array.from({ length: 6 }, () => new Matrix4()), []);
   const material = useMemo(() => createPointsMaterial(parts, SPARK, 0.04), [parts]);
   const drive = useHologram({ index, material, points, spin, spinSpeed: 0.3, centerY: CY + 0.2 });
+
+  useFrame(() => {
+    const t = frame.time;
+    parts[MAIN].makeTranslation(0, Math.sin(t * 0.7) * 0.03, 0);
+    parts[SMALL].makeTranslation(0, Math.sin(t * 1.3 + 1) * 0.06, Math.sin(t * 0.8) * 0.04);
+  });
 
   return (
     <group position={position}>
