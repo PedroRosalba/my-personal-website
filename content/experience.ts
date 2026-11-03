@@ -1,6 +1,17 @@
 // Production experience. Featured roles get a station each on the causeway; the rest share one "Also" station. Numbers stay on the CV; the site keeps what a visitor can open.
 
 import type { LinkItem } from "./profile";
+import type { EmblemKind } from "./media";
+
+/** A product shipped in a role, shown as a row with its own cover under the role. */
+export type Build = {
+  title: string;
+  /** What it is, in a few words: the row's eyebrow. */
+  kind: string;
+  href: string;
+  summary: string;
+  emblem: EmblemKind;
+};
 
 export type Role = {
   slug: string;
@@ -15,9 +26,11 @@ export type Role = {
   proof: LinkItem[];
   /** Shown when the work itself can't be linked. */
   note?: string;
-  /** Products shipped there that a visitor can open, with a snapshot of the first. */
-  builds?: LinkItem[];
+  /** Products shipped there that a visitor can open. */
+  builds?: Build[];
   image?: { src: string; alt: string; href: string };
+  /** The company's mark as a living cover, beside the role. */
+  emblem?: EmblemKind;
 };
 
 export const featuredRoles: Role[] = [
@@ -41,9 +54,23 @@ export const featuredRoles: Role[] = [
       },
       { label: "HDP session, Invisible Garden 2025", href: "https://luma.com/porsxgac" },
     ],
+    emblem: "herodotus",
     builds: [
-      { label: "Daloc", href: "https://daloc.xyz" },
-      { label: "Risklayer", href: "https://risklayer.online" },
+      {
+        title: "Daloc",
+        kind: "Onchain prime brokerage",
+        href: "https://daloc.xyz",
+        summary:
+          "One account across chains: pledge collateral and trade on credit. I built the real-time order-book pipelines and RFQ quoting behind it.",
+        emblem: "daloc",
+      },
+      {
+        title: "Daloc Docs",
+        kind: "Documentation",
+        href: "https://docs.daloc.xyz",
+        summary: "How the platform works: Prime Trade, Borrow, Earn and Strategy Vaults, down to the margin account on Hyperliquid.",
+        emblem: "daloc-docs",
+      },
     ],
   },
 ];
@@ -60,6 +87,7 @@ export const earlierRoles: Role[] = [
     bullets: [],
     stack: [],
     proof: [],
+    emblem: "enor",
   },
   {
     slug: "mediolano",
@@ -77,5 +105,6 @@ export const earlierRoles: Role[] = [
         href: "https://github.com/mediolano-os/mediolano-contracts/pulls?q=is%3Apr+author%3APedroRosalba",
       },
     ],
+    emblem: "mediolano",
   },
 ];

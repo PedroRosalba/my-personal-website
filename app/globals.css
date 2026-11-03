@@ -276,8 +276,11 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 .focus li > a { color: var(--ink); }
 .focus li > a:hover { border-color: var(--accent); }
 .project-card .focus-label { margin-top: 18px; }
-.builds { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; }
-.builds .proof { margin-top: 0; }
+/* A role with its company's cover, and the builds under it: the Community-row shape. */
+.role-head-cover { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 18px; align-items: start; }
+.role-head-cover .cover { margin-top: 6px; }
+.builds .focus-label { margin-bottom: 4px; }
+.builds .card-row-title { font-weight: 500; font-size: 16px; }
 .role .snapshot { aspect-ratio: 16 / 6; }
 
 .series { border-top: 1px solid var(--line); padding-top: 16px; }
@@ -430,6 +433,8 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   .cards .card-row.card-row-plain { grid-template-columns: 1fr; }
   .card-row-title { font-size: 15px; }
   .card-row-text { font-size: 13px; }
+  .role-head-cover { grid-template-columns: 88px minmax(0, 1fr); gap: 12px; }
+  .role-head-cover .emblem, .builds .emblem, .also-roles .emblem { width: 88px; height: 50px; }
   .hero-overview { font-size: 15px; }
   .award summary, .award-plain { grid-template-columns: 76px minmax(0, 1fr) 14px; gap: 10px; padding: 9px 0; }
   .award-title { font-size: 14px; }
@@ -475,6 +480,7 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 
 /* The card object: the Eclipse over the Domus, with voice ripples. Same slot as a .card-thumb in .cards-wide. */
 .talk-object, .emblem {
+  --k: 1;
   position: relative; display: block; width: 112px; height: 63px; padding: 0; overflow: hidden; cursor: pointer;
   border: 1px solid var(--line); border-radius: 2px;
   background:
@@ -661,14 +667,48 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 @media (max-width: 900px) { .stage-caption { bottom: 88px; max-width: 92%; font-size: 13px; } }
 .side-head { position: sticky; top: -20px; z-index: 1; margin: -20px -20px 0; padding: 20px 20px 12px; background: #08080b; }
 
-/* ---------- event emblems (Community rows): the world's palette instead of a platform's share image ---------- */
+/* ---------- emblems (Community rows, roles, builds, project cards): the world's palette instead of a share image ---------- */
+
+/* A project card's cover: the same emblem at the card's width; --k scales every glow with it. */
+.emblem.emblem-lg { --k: 3; width: 100%; height: auto; aspect-ratio: 16 / 9; cursor: default; }
+.project-card:hover .emblem, .cover:focus-visible .emblem { border-color: rgba(123, 97, 255, 0.55); }
+.cover { display: block; border-radius: 2px; text-decoration: none; }
+.cover:focus-visible { outline-offset: 2px; }
 
 .em-art { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .em-line { fill: none; stroke: rgba(214, 205, 255, 0.78); stroke-width: 0.9; stroke-linecap: round; stroke-linejoin: round;
-  filter: drop-shadow(0 0 1.5px rgba(123, 97, 255, 0.85)); transition: stroke 300ms, filter 300ms; }
+  filter: drop-shadow(0 0 calc(1.5px * var(--k)) rgba(123, 97, 255, 0.85)); transition: stroke 300ms, filter 300ms; }
+.em-thin { stroke-width: 0.6; }
+.em-dim { fill: none; stroke: rgba(237, 235, 230, 0.24); stroke-width: 0.6; stroke-linecap: round; }
+.em-dash { stroke-dasharray: 1.2 1.8; }
+.em-hot { fill: none; stroke: rgb(237, 235, 255); stroke-width: 1; stroke-linecap: round; filter: drop-shadow(0 0 calc(2px * var(--k)) rgb(123, 97, 255)); }
+.em-void { fill: #030304; }
 .em-cable { stroke-dasharray: 1.2 1.6; stroke: rgba(214, 205, 255, 0.5); }
 .em-base { stroke: rgba(237, 235, 230, 0.22); stroke-width: 0.8; fill: none; }
-.card-row:hover .em-line { stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 2.5px rgba(123, 97, 255, 1)); }
+.card-row:hover .em-line, .project-card:hover .em-line {
+  stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 calc(2.5px * var(--k)) rgba(123, 97, 255, 1));
+}
+
+/* Herodotus: a pulse runs the H's outline; the two ghost blocks wake in turn as it passes. */
+.hd-run { stroke-dasharray: 0.16 0.84; animation: hd-run 6s linear infinite; }
+.hd-ghost { opacity: 0.35; animation: hd-ghost 6s ease-in-out infinite; }
+.hd-ghost-b { animation-delay: -3s; }
+@keyframes hd-run { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes hd-ghost { 0%, 100% { opacity: 0.35; } 10% { opacity: 1; } 30% { opacity: 0.35; } }
+
+/* Daloc Docs: the light wave reads down the page. */
+.dc-scan { animation: dc-scan 5.2s cubic-bezier(0.45, 0, 0.3, 1) infinite; }
+@keyframes dc-scan { 0% { transform: translateY(-14px); } 75%, 100% { transform: translateY(52px); } }
+
+/* eNor: halftone rows light from the open face upward. */
+.en-dot { fill: rgb(214, 205, 255); fill-opacity: 0.32; animation: en-post 5s ease-out infinite; animation-delay: var(--d); }
+@keyframes en-post { 0% { fill-opacity: 0.32; } 8% { fill-opacity: 1; } 34%, 100% { fill-opacity: 0.32; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hd-run, .hd-ghost, .dc-scan, .en-dot { animation: none; }
+  .hd-run { stroke-dashoffset: 0.3; }
+  .dc-scan { transform: translateY(16px); }
+}
 
 /* Rio: an Eclipse moon behind Sugarloaf, two tasks orbiting it at different speeds. */
 .em-moon {

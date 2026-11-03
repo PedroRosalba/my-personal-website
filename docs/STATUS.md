@@ -31,15 +31,18 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
 
 1. **Hero** — "A native problem solver, across the stack." Former mathlete, then cryptography and blockchain, now
    core software. CV button.
-2. **Experience** — Herodotus first (what Pedro did, hdp-cairo PRs, the Invisible Garden session, Daloc and
-   Risklayer as "Builds I worked on", a link into the Herodotus gateway). Then **Also**: eNor (one line, closed
-   source, scope on the CV) and Mediolano (PR links).
+2. **Experience** — Herodotus first, with its H as a living cover (what Pedro did, hdp-cairo PRs, the Invisible
+   Garden session, a link into the Herodotus gateway). Under it, "Builds I worked on": Daloc and Daloc Docs as rows,
+   each with its own cover. Then **Also**: eNor (one line, closed source, scope on the CV) and Mediolano (PR links),
+   as rows with covers. Covers are `EventEmblem` kinds (`components/html/EventEmblem.tsx`); Risklayer is gone (the
+   site is down).
 3. **Selected work** — four gateways, each with a card (one-line tagline, snapshot, "Focused on" chips that link to
    the matching blog post when it is public) and a panel (outcome, snapshot, focus, highlights, links):
    - **Herodotus** — Ethereum diamond, the only gateway that keeps the portal's tunnel of light. Daloc snapshot.
-   - **Ravi** — a floating robot that wakes as you arrive. ravi.bot snapshot, links to ravi.bot, the fork and the
-     upstream PRs.
-   - **Turborepo** — a ring of blue-to-pink arcs that spins up near the gateway and on open. turborepo.dev snapshot.
+   - **Ravi** — a floating robot that wakes as you arrive. The card's cover is the same robot as a living emblem;
+     the panel keeps the ravi.bot snapshot. Links to ravi.bot, the fork and the upstream PRs.
+   - **Turborepo** — a ring of blue-to-pink arcs that spins up near the gateway and on open. The card's cover is
+     a speedometer emblem; the panel keeps the turborepo.dev snapshot.
    - **Cloudflare Workers** — orange sparks that assemble into a cloud near the gateway. No snapshot yet.
 4. **Writing** — the blog's two series (Turborepo upstream, Agents on machines you control), linking only
    published posts in production.
@@ -88,8 +91,6 @@ When a post is published on the blog, set its `live: true` in `content/writing.t
 ## Open items
 
 - [ ] Podcast link(s) → `community` in `content/media.ts` (a YouTube link becomes a click-to-play clip)
-- [ ] Risklayer snapshot or screen recording: risklayer.online refuses connections from here (2026-10-21).
-      Pedro's idea: a muted loop playing inside the Herodotus arch
 - [ ] Cloudflare snapshot and a Cloudflare write-up (then add `post` to its focus chips)
 - [ ] Deploy the blog, then set `NEXT_PUBLIC_BLOG_URL` here
 - [ ] Review and publish the seven draft posts (two need edits first: an unsourced Ollama paragraph in "Where does

@@ -6,6 +6,7 @@ import { postHref } from "@/content/writing";
 import { useJourney } from "@/lib/store";
 import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
+import { EventEmblem } from "./EventEmblem";
 
 /** HTML twin of a 3D gateway: same URL, and hover/focus lights the gateway seam. */
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
@@ -20,7 +21,11 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         {project.title}
       </h3>
       <p className="card-outcome">{project.tagline}</p>
-      {image ? <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : (image.href ?? null)} /> : null}
+      {project.emblem ? (
+        <EventEmblem kind={project.emblem} large />
+      ) : image ? (
+        <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : (image.href ?? null)} />
+      ) : null}
       <p className="eyebrow focus-label">Focused on</p>
       <FocusList project={project} />
       <Link

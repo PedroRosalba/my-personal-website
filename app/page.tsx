@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { profile, siteUrl, type LinkItem, type TimelineItem } from "@/content/profile";
 import { projects } from "@/content/projects";
-import { featuredRoles, earlierRoles, type Role } from "@/content/experience";
+import { featuredRoles, earlierRoles, type Build, type Role } from "@/content/experience";
 import { community } from "@/content/media";
 import { hackathons } from "@/content/hackathons";
 import { writingBySeries } from "@/content/writing";
@@ -11,6 +11,7 @@ import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
 import { CommunityCard } from "@/components/html/CommunityCard";
 import { Snapshot } from "@/components/html/Snapshot";
+import { EventEmblem } from "@/components/html/EventEmblem";
 import { JsonLd } from "@/components/html/JsonLd";
 import { SceneLoader } from "@/components/scene/SceneLoader";
 
@@ -58,6 +59,50 @@ function Company({ role }: { role: Role }) {
   );
 }
 
+/** "daloc.xyz" for a link line: where the link goes, without the scheme. */
+function host(href: string) {
+  try {
+    return new URL(href).hostname.replace(/^www\./, "");
+  } catch {
+    return href;
+  }
+}
+
+/** A living cover that opens the same place as the title next to it. Decorative for assistive tech: the title link
+ * already names the destination. */
+function Cover({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <a className="cover" href={href} target="_blank" rel="noreferrer" tabIndex={-1} aria-hidden="true">
+      {children}
+    </a>
+  );
+}
+
+/** A build under a role, in the Community-row shape: cover, what it is, name, one line, where it lives. */
+function BuildRow({ build }: { build: Build }) {
+  return (
+    <li className="card-row">
+      <Cover href={build.href}>
+        <EventEmblem kind={build.emblem} />
+      </Cover>
+      <div>
+        <p className="timeline-period">{build.kind}</p>
+        <h4 className="card-row-title">
+          <a href={build.href} target="_blank" rel="noreferrer">
+            {build.title}
+          </a>
+        </h4>
+        <p className="card-row-text">{build.summary}</p>
+        <p className="cc-actions">
+          <a className="cc-link" href={build.href} target="_blank" rel="noreferrer" aria-label={`${build.title}: ${host(build.href)}`}>
+            {host(build.href)} <span aria-hidden="true">↗</span>
+          </a>
+        </p>
+      </div>
+    </li>
+  );
+}
+
 function RoleStation({ role, index }: { role: Role; index: number }) {
   const cv = profile.contact.cv;
   return (
@@ -69,18 +114,29 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
             <h2 id="experience-h">Experience</h2>
           </>
         ) : null}
-        <div className="role-head">
-          <p className="timeline-period">{role.period}</p>
-          <h3 className="role-title">
-            {role.role} · <Company role={role} />
-          </h3>
-          <p className="role-summary">{role.summary}</p>
+        <div className={role.emblem ? "role-head-cover" : undefined}>
+          {role.emblem ? (
+            <Cover href={role.href}>
+              <EventEmblem kind={role.emblem} />
+            </Cover>
+          ) : null}
+          <div className="role-head">
+            <p className="timeline-period">{role.period}</p>
+            <h3 className="role-title">
+              {role.role} · <Company role={role} />
+            </h3>
+            <p className="role-summary">{role.summary}</p>
+          </div>
         </div>
         {role.image ? <Snapshot src={role.image.src} alt={role.image.alt} href={role.image.href} /> : null}
         {role.builds?.length ? (
           <div className="builds">
             <p className="eyebrow focus-label">Builds I worked on</p>
-            <ProofLinks links={role.builds} />
+            <ul className="cards cards-wide">
+              {role.builds.map((b) => (
+                <BuildRow build={b} key={b.href} />
+              ))}
+            </ul>
           </div>
         ) : null}
         <ul className="project-highlights role-bullets">
@@ -93,7 +149,7 @@ function RoleStation({ role, index }: { role: Role; index: number }) {
         {role.slug === "herodotus" ? (
           <p className="section-more">
             <Link className="next-link" href="/projects/herodotus" scroll={false}>
-              See the work: Daloc, Risklayer, hdp-cairo <span aria-hidden="true">→</span>
+              See the work: Daloc, its docs and hdp-cairo <span aria-hidden="true">→</span>
             </Link>
           </p>
         ) : null}
@@ -146,24 +202,35 @@ export default function Home() {
           <div className="station" data-stop="experience-earlier">
             <div className="copy">
               <p className="eyebrow">Also</p>
-              <ol className="timeline">
+              <ul className="cards cards-wide also-roles">
                 {earlierRoles.map((role) => (
-                  <li key={role.slug}>
-                    <p className="timeline-period">{role.period}</p>
+                  <li key={role.slug} className={role.emblem ? "card-row" : "card-row card-row-plain"}>
+                    {role.emblem ? (
+                      <Cover href={role.href}>
+                        <EventEmblem kind={role.emblem} />
+                      </Cover>
+                    ) : null}
                     <div>
-                      <h3 className="timeline-title">
+                      <p className="timeline-period">{role.period}</p>
+                      <h3 className="card-row-title">
                         {role.role}
                         <span className="timeline-place">
                           {" "}
                           · <Company role={role} />
                         </span>
                       </h3>
-                      {role.summary ? <p className="timeline-detail">{role.summary}</p> : null}
-                      {role.proof.length ? <ProofLinks links={role.proof} /> : null}
+                      {role.summary ? <p className="card-row-text">{role.summary}</p> : null}
+                      <p className="cc-actions">
+                        {(role.proof.length ? role.proof : [{ label: host(role.href), href: role.href }]).map((link) => (
+                          <a key={link.href} className="cc-link" href={link.href} target="_blank" rel="noreferrer">
+                            {link.label} <span aria-hidden="true">↗</span>
+                          </a>
+                        ))}
+                      </p>
                     </div>
                   </li>
                 ))}
-              </ol>
+              </ul>
               {contact.cv ? (
                 <p className="section-more">
                   <a className="next-link" href={contact.cv}>
