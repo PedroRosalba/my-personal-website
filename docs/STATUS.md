@@ -36,15 +36,18 @@ Order along the causeway (each item is a scroll stop; `content/journey.ts`):
    hdp-cairo (repo and PRs) as rows, each with its own cover. Then **Also**: eNor (one line, closed source, scope on the CV) and Mediolano (PR links),
    as rows with covers. Covers are `EventEmblem` kinds (`components/html/EventEmblem.tsx`); Risklayer is gone (the
    site is down).
-3. **Selected work** — four gateways, each with a card (one-line tagline, snapshot, "Focused on" chips that link to
-   the matching blog post when it is public) and a panel (outcome, snapshot, focus, highlights, links):
-   - **Herodotus** — Ethereum diamond. Card and panel use the Daloc cover (no screenshot).
+3. **Selected work** — four gateways, each with a card (one-line tagline, living cover, "Focused on" chips that link to
+   the matching blog post when it is public) and a panel that opens the same way for all four: the card's cover, the
+   live product as a window tinted violet (true colours on hover, links to the site), then **Receipts**, two or three
+   real PRs as cards (status, repo and number, size, what it fixed, date). Then meta, focus, highlights, links. Data:
+   `product` and `receipts` in `content/projects.ts`; components `ProductWindow.tsx` and `Receipts.tsx`.
+   - **Herodotus** — Ethereum diamond. Card and panel use the Daloc cover; the panel's window is daloc.xyz.
    - **Ravi** — a floating robot that wakes as you arrive. The card's cover is the same robot as a living emblem;
-     the panel keeps the ravi.bot snapshot. Links to ravi.bot, the fork and the upstream PRs.
+     the panel's window is ravi.bot. Links to ravi.bot, the fork and the upstream PRs.
    - **Turborepo** — a ring of blue-to-pink arcs that spins up near the gateway and on open. The card's cover is
-     a speedometer emblem; the panel keeps the turborepo.dev snapshot.
+     a speedometer emblem; the panel's window is turborepo.dev.
    - **Cloudflare Workers** — orange sparks that assemble into a cloud near the gateway. The card's
-     cover is that cloud in light: Rust in the big cloud, a JS tile in the small one, a map entry crossing the cut.
+     cover is that cloud in light: Rust in the big cloud, a JS tile in the small one, a map entry crossing the cut. The panel's window is the Workers product page.
 4. **Writing** — the blog's two series (Turborepo upstream, Agents on machines you control), linking only
    published posts in production.
 5. **Community** — Devin Meetup Rio talk (2026), Invisible Garden mentor session (2025), Blockchain League founder,
