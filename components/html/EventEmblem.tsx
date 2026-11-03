@@ -12,6 +12,7 @@ import type { EmblemKind } from "@/content/media";
 const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   rio: () => <Rio />,
   obelisk: () => <Obelisk />,
+  herodotus: (id) => <Herodotus id={id} />,
 };
 
 /** `large` fills its container's width (a project card cover) and scales the glow with it. */
@@ -115,5 +116,33 @@ function Obelisk() {
         <i key={i} className="em-petal" style={{ ["--i" as string]: i }} />
       ))}
     </>
+  );
+}
+
+/** Herodotus: the outlined H from herodotus.dev with its two ghost blocks. A pulse of light runs the outline and
+ * the ghost blocks wake in turn as it passes: state read in one place, proven in another. */
+function Herodotus({ id }: { id: string }) {
+  const H = "M42.5 8.5 L34 0 V34 H0 V68 L17 85 V51 H51 V17 Z"; // 51 × 85 units
+  return (
+    <Art>
+      <defs>
+        <linearGradient id={`${id}-ga`} x1="0" y1="17" x2="0" y2="34" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(214,205,255)" />
+          <stop offset="1" stopColor="rgb(214,205,255)" stopOpacity="0" />
+        </linearGradient>
+        <linearGradient id={`${id}-gb`} x1="0" y1="68" x2="0" y2="51" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="rgb(214,205,255)" />
+          <stop offset="1" stopColor="rgb(214,205,255)" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <g transform="translate(41.7 5) scale(.56)">
+        <path d={H} fill="rgba(123,97,255,.1)" />
+        <path className="hd-ghost" d="M0 34 V17 H17 V34" fill="none" stroke={`url(#${id}-ga)`} strokeWidth="1.6" style={glow(1.5)} />
+        <path className="hd-ghost hd-ghost-b" d="M34 51 V68 H51 V51" fill="none" stroke={`url(#${id}-gb)`} strokeWidth="1.6" style={glow(1.5)} />
+        <path className="em-line" style={{ strokeWidth: 1.6 }} d={H} />
+        <path className="em-hot hd-run" style={{ strokeWidth: 2.2 }} pathLength={1} d={H} />
+      </g>
+      <path className="em-base" d="M22 56 H90" />
+    </Art>
   );
 }

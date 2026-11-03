@@ -682,6 +682,18 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
   stroke: rgba(237, 235, 255, 0.95); filter: drop-shadow(0 0 calc(2.5px * var(--k)) rgba(123, 97, 255, 1));
 }
 
+/* Herodotus: a pulse runs the H's outline; the two ghost blocks wake in turn as it passes. */
+.hd-run { stroke-dasharray: 0.16 0.84; animation: hd-run 6s linear infinite; }
+.hd-ghost { opacity: 0.35; animation: hd-ghost 6s ease-in-out infinite; }
+.hd-ghost-b { animation-delay: -3s; }
+@keyframes hd-run { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes hd-ghost { 0%, 100% { opacity: 0.35; } 10% { opacity: 1; } 30% { opacity: 0.35; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .hd-run, .hd-ghost { animation: none; }
+  .hd-run { stroke-dashoffset: 0.3; }
+}
+
 /* Rio: an Eclipse moon behind Sugarloaf, two tasks orbiting it at different speeds. */
 .em-moon {
   position: absolute; left: 86px; top: 13px; width: 12px; height: 12px; border-radius: 50%; background: #030304;

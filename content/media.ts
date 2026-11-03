@@ -25,8 +25,12 @@ export type TalkVideo = {
   thumbs?: { sheets: string[]; every: number; cols: number; rows: number; w: number; h: number };
 };
 
-/** A small living emblem drawn in the world's palette (components/html/EventEmblem), used instead of a share image. */
-export type EmblemKind = "rio" | "obelisk";
+/** A small living emblem drawn in the world's palette (components/html/EventEmblem), used instead of a share image.
+ * Events, roles, the builds under a role and project cards all use the same frame. */
+export type EmblemKind =
+  | "rio"
+  | "obelisk"
+  | "herodotus";
 
 export type CommunityItem = {
   title: string;
