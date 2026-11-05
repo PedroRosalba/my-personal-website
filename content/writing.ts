@@ -7,20 +7,18 @@ import { profile } from "./profile";
 export type PostRef = { slug: string; title: string; series: SeriesKey; live: boolean };
 
 export const series = {
-  turborepo: { title: "Turborepo, upstream", blurb: "How an agent loop found cache and hashing bugs, and what got merged." },
+  turborepo: { title: "Turborepo, upstream", blurb: "Cache keys, change detection and the remote cache for Cargo, Go and uv." },
   agents: { title: "Agents on machines you control", blurb: "Who may act, where the agent runs, and how Ravi contains it." },
 } as const;
 export type SeriesKey = keyof typeof series;
 
 export const posts: PostRef[] = [
-  { slug: "stress-testing-turborepo-rust-go-python", title: "Stress-testing Turborepo's Rust, Go and Python support", series: "turborepo", live: false },
-  { slug: "turbo-skipped-task-whose-inputs-changed", title: "Why did Turbo skip a task whose inputs changed?", series: "turborepo", live: false },
-  { slug: "turbo-cache-hit-wrong-outputs", title: "Why did Turbo say cache hit and leave my outputs wrong?", series: "turborepo", live: false },
-  { slug: "what-a-maintainer-needs-from-agent-found-bugs", title: "What a maintainer needs from agent-found bugs", series: "turborepo", live: false },
-  { slug: "bug-hunting-agent-loop-on-one-laptop", title: "How do you run a bug-hunting agent loop on one laptop?", series: "turborepo", live: false },
-  { slug: "who-is-typing-agents-shells-and-money", title: "Who is typing? Agents, shells and money", series: "agents", live: true },
-  { slug: "where-does-the-agent-live", title: "Where does the agent live? Docker, sandboxes and the bus", series: "agents", live: false },
-  { slug: "ravi-sandboxes-context-shared-data-security", title: "Ravi sandboxes: context, shared data and security", series: "agents", live: false },
+  { slug: "turbo-native-cache-keys", title: "When the Cache Key Lies", series: "turborepo", live: true },
+  { slug: "turbo-discovery-and-change-detection", title: "How Turbo Knows What Changed", series: "turborepo", live: true },
+  { slug: "turbo-remote-cache-native-toolchains", title: "The Remote Cache Under Cargo, Go and uv", series: "turborepo", live: true },
+  { slug: "who-is-typing-agents-shells-and-money", title: "Who Is Typing?", series: "agents", live: true },
+  { slug: "where-does-the-agent-live", title: "Where Does the Agent Live?", series: "agents", live: true },
+  { slug: "ravi-sandboxes-context-shared-data-security", title: "What a Ravi Sandbox Needs", series: "agents", live: true },
 ];
 
 const showDrafts = process.env.NEXT_PUBLIC_SHOW_DRAFTS === "1";

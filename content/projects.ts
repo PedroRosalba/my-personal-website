@@ -212,9 +212,9 @@ export const projects: Project[] = [
     year: "2026",
     stack: ["Rust", "Cargo", "uv", "pnpm", "Git internals"],
     focus: [
-      { label: "Caching", post: "turbo-cache-hit-wrong-outputs" },
-      { label: "Change detection", post: "turbo-skipped-task-whose-inputs-changed" },
-      { label: "Multi-language support", post: "stress-testing-turborepo-rust-go-python" },
+      { label: "Caching", post: "turbo-native-cache-keys" },
+      { label: "Change detection", post: "turbo-discovery-and-change-detection" },
+      { label: "Multi-language support", post: "turbo-remote-cache-native-toolchains" },
     ],
     highlights: [
       "Caching: improved local cache restores, symlinks included, so a cache hit leaves outputs exactly as a fresh build would.",
