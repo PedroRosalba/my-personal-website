@@ -8,6 +8,26 @@ import { postHref } from "./writing";
 
 export type Focus = { label: string; post?: string };
 
+/** The live product, shown in the panel as a window tinted into the world's violet; true colours on hover. */
+export type ProductWindow = { src: string; alt: string; href: string; /** The address shown in the window's bar. */ label: string };
+
+/** One pull request (or a reported issue) in the panel: what it is, how big, and what it changed for users. */
+export type Receipt = {
+  state: "merged" | "review" | "reported";
+  repo: string;
+  number: number;
+  /** For a reported issue: the PR that fixed it. */
+  fixedIn?: number;
+  added?: number;
+  removed?: number;
+  title: string;
+  /** One line on what it fixed, in plain words. */
+  what: string;
+  /** ISO date: merged, opened (in review) or reported. */
+  date: string;
+  href: string;
+};
+
 export type Project = {
   slug: string;
   title: string;
@@ -31,6 +51,10 @@ export type Project = {
   youtube?: YouTubeClip & { language?: string };
   /** More snapshots for the panel, shown after `image`. */
   gallery?: { src: string; alt: string; href?: string }[];
+  /** The live product, under the cover in the panel. */
+  product?: ProductWindow;
+  /** Two or three real PRs, under the product in the panel. */
+  receipts?: Receipt[];
   /** 3D hint only: which landmark the gateway carries. */
   landmark: "portal" | "eth" | "turbo" | "cloud" | "robot";
   /** The portal's tunnel of light behind the mark. Off everywhere now: the holograms carry the gateways. */
@@ -62,6 +86,42 @@ export const projects: Project[] = [
     image: null,
     video: null,
     emblem: "daloc",
+    product: { src: "/shots/daloc-site.jpg", alt: "daloc.xyz, onchain prime brokerage.", href: "https://daloc.xyz", label: "daloc.xyz" },
+    receipts: [
+      {
+        state: "merged",
+        repo: "HerodotusDev/hdp-cairo",
+        number: 196,
+        added: 15928,
+        removed: 2121,
+        title: "Injected state",
+        what: "Programs read state injected from off-chain systems and prove it against a Merkle root.",
+        date: "2025-09-19",
+        href: "https://github.com/HerodotusDev/hdp-cairo/pull/196",
+      },
+      {
+        state: "merged",
+        repo: "HerodotusDev/hdp-cairo",
+        number: 206,
+        added: 466,
+        removed: 295,
+        title: "Injected state: Patricia-trie reads",
+        what: "The same proofs over Patricia tries, the structure Ethereum's own state uses.",
+        date: "2025-08-27",
+        href: "https://github.com/HerodotusDev/hdp-cairo/pull/206",
+      },
+      {
+        state: "merged",
+        repo: "HerodotusDev/hdp-cairo",
+        number: 193,
+        added: 513,
+        removed: 344,
+        title: "MPT verifier abstraction",
+        what: "One verifier interface for Merkle-Patricia proofs, so new trie types plug in.",
+        date: "2025-08-12",
+        href: "https://github.com/HerodotusDev/hdp-cairo/pull/193",
+      },
+    ],
     landmark: "eth",
   },
   {
@@ -89,13 +149,45 @@ export const projects: Project[] = [
       { label: "Repository", href: "https://github.com/PedroRosalba/ravi" },
       { label: "PRs upstream", href: "https://github.com/filipexyz/ravi/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
-    image: {
-      src: "/shots/ravi-site.jpg",
-      alt: "ravi.bot: agents that work together, from anywhere.",
-      href: "https://ravi.bot",
-    },
+    image: null,
     video: null,
     emblem: "ravi",
+    product: { src: "/shots/ravi-site.jpg", alt: "ravi.bot: agents that work together, from anywhere.", href: "https://ravi.bot", label: "ravi.bot" },
+    receipts: [
+      {
+        state: "merged",
+        repo: "filipexyz/ravi",
+        number: 627,
+        added: 1801,
+        removed: 60,
+        title: "fix(security): stop sending API keys in cleartext; warn when NATS is reachable from the network",
+        what: "Keys stay off the wire, and the bus says so when it is open to more than this machine.",
+        date: "2026-11-02",
+        href: "https://github.com/filipexyz/ravi/pull/627",
+      },
+      {
+        state: "merged",
+        repo: "filipexyz/ravi",
+        number: 624,
+        added: 528,
+        removed: 35,
+        title: "fix(permissions): explicit-only agents and a stricter bash guard",
+        what: "An agent acts only with an explicit grant, and its shell commands pass a stricter guard.",
+        date: "2026-10-07",
+        href: "https://github.com/filipexyz/ravi/pull/624",
+      },
+      {
+        state: "review",
+        repo: "filipexyz/ravi",
+        number: 662,
+        added: 8782,
+        removed: 481,
+        title: "fix(sandbox): E2B isolation — deny-all egress, API key never in the VM, least-privilege worker, safe signals",
+        what: "Sandboxed agents can't reach the network unless allowed, and never see the API key.",
+        date: "2026-10-15",
+        href: "https://github.com/filipexyz/ravi/pull/662",
+      },
+    ],
     landmark: "robot",
   },
   {
@@ -124,34 +216,110 @@ export const projects: Project[] = [
         href: "https://github.com/vercel/turborepo/pulls?q=is%3Apr+author%3APedroRosalba+is%3Amerged",
       },
     ],
-    image: { src: "/shots/turborepo-site.jpg", alt: "turborepo.dev: your codebase, faster.", href: "https://turborepo.dev" },
+    image: null,
     video: null,
     emblem: "turborepo",
+    product: { src: "/shots/turborepo-site.jpg", alt: "turborepo.dev: your codebase, faster.", href: "https://turborepo.dev", label: "turborepo.dev" },
+    receipts: [
+      {
+        state: "merged",
+        repo: "vercel/turborepo",
+        number: 14448,
+        added: 183,
+        removed: 3,
+        title: "Hash Clippy configuration for Cargo lint tasks",
+        what: "Editing clippy.toml now reruns lint instead of replaying a stale pass from the cache.",
+        date: "2026-10-11",
+        href: "https://github.com/vercel/turborepo/pull/14448",
+      },
+      {
+        state: "merged",
+        repo: "vercel/turborepo",
+        number: 14807,
+        added: 632,
+        removed: 128,
+        title: "Restore cached symlinks when outputs are already on disk",
+        what: "A cache hit leaves symlinks exactly as a fresh build would.",
+        date: "2026-10-19",
+        href: "https://github.com/vercel/turborepo/pull/14807",
+      },
+      {
+        state: "merged",
+        repo: "vercel/turborepo",
+        number: 14656,
+        added: 233,
+        removed: 4,
+        title: "Attribute Cargo.lock changes to the crates whose dependencies changed",
+        what: "--affected reruns only the crates whose dependencies moved, not the whole workspace.",
+        date: "2026-10-16",
+        href: "https://github.com/vercel/turborepo/pull/14656",
+      },
+    ],
     landmark: "turbo",
   },
   {
     slug: "cloudflare",
     title: "Cloudflare Workers",
-    tagline: "Contributor to the Workers Rust SDK and the runtime's TypeScript types.",
+    tagline: "Async Rust on Cloudflare Workers: Rust on V8's event loop, through Emscripten.",
     outcome:
-      "I contribute to Cloudflare's Workers platform from Rust and TypeScript: bringing the Rust SDK's bindings in line with their JavaScript counterparts, and making the runtime's types describe what it really returns.",
+      "In a Worker the thread belongs to V8's event loop, so an async Rust runtime cannot block and sockets are JavaScript streams. Cloudflare's experimental runtime compiles Rust to Emscripten and lets the JavaScript loop drive it. I run real Rust apps on it, find what breaks at each layer, and fix it upstream in Emscripten and workers-rs.",
     role: "Open-source contributor",
     year: "2026",
-    stack: ["Rust", "wasm-bindgen", "TypeScript", "workerd"],
-    focus: [{ label: "Rust SDK parity" }, { label: "Runtime types" }, { label: "Build tooling" }],
+    stack: ["Rust", "Emscripten", "WebAssembly", "workerd"],
+    focus: [{ label: "Async Rust on the V8 event loop" }, { label: "Emscripten" }, { label: "Rust SDK" }],
     highlights: [
-      "Storage bindings: KV, Queues and R2 in workers-rs carry Rust data to JavaScript faithfully, maps and partial metadata included.",
-      "Durable Objects: alarm and storage options reach the runtime as it expects, with the read options JavaScript already had.",
-      "Runtime types: workerd's TypeScript definitions match the runtime for byte inputs, RPC exports and bulk KV reads.",
-      "Build tooling: worker-build reads wasm-bindgen's package metadata and keeps the project's pinned version.",
+      "Async Rust on the V8 event loop: tested the experimental runtime with axum, sqlx and reqwest and reported the gaps, such as four sockets leaked per cancelled request and bytes lost when a request ends.",
+      "Emscripten: pipe buffers that grow on demand as a ring (in review), and an epoll listener that could exhaust workerd's 10,000-timer cap, now fixed upstream.",
+      "Rust SDK: KV, Queues, R2 and Durable Object bindings in workers-rs carry Rust data to JavaScript faithfully, and workerd's TypeScript types match what the runtime returns.",
     ],
     links: [
-      { label: "workers-rs PRs", href: "https://github.com/cloudflare/workers-rs/pulls?q=is%3Apr+author%3APedroRosalba" },
+      { label: "Emscripten", href: "https://github.com/emscripten-core/emscripten/issues?q=involves%3APedroRosalba" },
+      { label: "workers-rs", href: "https://github.com/cloudflare/workers-rs/issues?q=involves%3APedroRosalba" },
       { label: "workerd PRs", href: "https://github.com/cloudflare/workerd/pulls?q=is%3Apr+author%3APedroRosalba" },
     ],
     image: null,
     video: null,
     emblem: "cloudflare",
+    product: {
+      src: "/shots/cf-workers.png",
+      alt: "Cloudflare Workers: deploy serverless functions globally in seconds.",
+      href: "https://www.cloudflare.com/products/workers/",
+      label: "cloudflare.com/products/workers",
+    },
+    receipts: [
+      {
+        state: "review",
+        repo: "emscripten-core/emscripten",
+        number: 28098,
+        added: 106,
+        removed: 123,
+        title: "[FS] Grow pipe buffers on demand as a ring",
+        what: "Pipes allocate as data arrives, like Linux, instead of one fixed 64 KiB buffer each.",
+        date: "2026-10-29",
+        href: "https://github.com/emscripten-core/emscripten/pull/28098",
+      },
+      {
+        state: "reported",
+        repo: "emscripten-core/emscripten",
+        number: 28073,
+        fixedIn: 28075,
+        title: "The epoll listener schedules one setImmediate per readiness edge",
+        what: "Busy sockets could exhaust workerd's 10,000-timer cap; the wakes are now coalesced.",
+        date: "2026-10-26",
+        href: "https://github.com/emscripten-core/emscripten/issues/28073",
+      },
+      {
+        state: "merged",
+        repo: "cloudflare/workers-rs",
+        number: 1097,
+        added: 96,
+        removed: 7,
+        title: "fix(r2): read Object::range() as a plain JS object",
+        what: "R2 range reads reach Rust intact.",
+        date: "2026-10-30",
+        href: "https://github.com/cloudflare/workers-rs/pull/1097",
+      },
+    ],
     landmark: "cloud",
   },
 ];
