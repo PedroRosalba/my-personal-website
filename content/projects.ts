@@ -11,6 +11,14 @@ export type Focus = { label: string; post?: string };
 /** The live product, shown in the panel as a window tinted into the world's violet; true colours on hover. */
 export type ProductWindow = { src: string; alt: string; href: string; /** The address shown in the window's bar. */ label: string };
 
+/** The work running in a terminal, in the same window as a product. `alt` says what it shows for screen readers. */
+export type TerminalWindow = {
+  label: string;
+  href: string;
+  alt: string;
+  lines: { text: string; tone?: "command" | "dim" | "good" | "warn"; task?: string; badge?: string }[];
+};
+
 /** One pull request (or a reported issue) in the panel: what it is, how big, and what it changed for users. */
 export type Receipt = {
   state: "merged" | "review" | "reported";
@@ -53,10 +61,14 @@ export type Project = {
   gallery?: { src: string; alt: string; href?: string }[];
   /** The live product, under the cover in the panel. */
   product?: ProductWindow;
+  /** Headline results, in place of receipts for a project with no public pull requests. */
+  stats?: { value: string; label: string }[];
+  /** Shown instead of `product` when the work reads better running than as a page. */
+  terminal?: TerminalWindow;
   /** Two or three real PRs, under the product in the panel. */
   receipts?: Receipt[];
   /** 3D hint only: which landmark the gateway carries. */
-  landmark: "portal" | "eth" | "turbo" | "cloud" | "robot";
+  landmark: "portal" | "eth" | "turbo" | "cloud" | "robot" | "di";
   /** The portal's tunnel of light behind the mark. Off everywhere now: the holograms carry the gateways. */
   portal?: boolean;
 };
@@ -200,9 +212,9 @@ export const projects: Project[] = [
     year: "2026",
     stack: ["Rust", "Cargo", "uv", "pnpm", "Git internals"],
     focus: [
-      { label: "Caching", post: "turbo-cache-hit-wrong-outputs" },
-      { label: "Change detection", post: "turbo-skipped-task-whose-inputs-changed" },
-      { label: "Multi-language support", post: "stress-testing-turborepo-rust-go-python" },
+      { label: "Caching", post: "turbo-native-cache-keys" },
+      { label: "Change detection", post: "turbo-discovery-and-change-detection" },
+      { label: "Multi-language support", post: "turbo-remote-cache-native-toolchains" },
     ],
     highlights: [
       "Caching: improved local cache restores, symlinks included, so a cache hit leaves outputs exactly as a fresh build would.",
@@ -219,7 +231,25 @@ export const projects: Project[] = [
     image: null,
     video: null,
     emblem: "turborepo",
-    product: { src: "/shots/turborepo-site.jpg", alt: "turborepo.dev: your codebase, faster.", href: "https://turborepo.dev", label: "turborepo.dev" },
+    terminal: {
+      label: "turbo run lint: vercel/turborepo#14448",
+      href: "https://github.com/vercel/turborepo/pull/14448",
+      alt: "A terminal: turbo run lint replays from the cache, clippy.toml is edited, and the next run misses the cache and lints again instead of replaying a stale pass.",
+      lines: [
+        { tone: "command", text: "turbo run lint" },
+        { task: "api:lint:", text: "cache hit, replaying logs" },
+        { tone: "dim", text: " Tasks:    1 successful, 1 total" },
+        { tone: "dim", text: "Cached:    1 cached, 1 total", badge: ">>> FULL TURBO" },
+        { text: " " },
+        { tone: "command", text: "echo 'msrv = \"1.85\"' >> clippy.toml" },
+        { tone: "command", text: "turbo run lint" },
+        { task: "api:lint:", tone: "warn", text: "cache miss, executing" },
+        { task: "api:lint:", text: "    Checking api v0.1.0" },
+        { task: "api:lint:", text: "    Finished `dev` profile" },
+        { tone: "good", text: " Tasks:    1 successful, 1 total" },
+        { tone: "dim", text: "Cached:    0 cached, 1 total" },
+      ],
+    },
     receipts: [
       {
         state: "merged",
@@ -281,10 +311,10 @@ export const projects: Project[] = [
     video: null,
     emblem: "cloudflare",
     product: {
-      src: "/shots/cf-workers.png",
-      alt: "Cloudflare Workers: deploy serverless functions globally in seconds.",
-      href: "https://www.cloudflare.com/products/workers/",
-      label: "cloudflare.com/products/workers",
+      src: "/shots/cf-workers-docs.jpg",
+      alt: "The Cloudflare Workers documentation.",
+      href: "https://developers.cloudflare.com/workers/",
+      label: "developers.cloudflare.com/workers",
     },
     receipts: [
       {
@@ -321,6 +351,36 @@ export const projects: Project[] = [
       },
     ],
     landmark: "cloud",
+  },
+  {
+    slug: "di-studio",
+    title: "di.studio",
+    tagline: "Booking and an owner's panel for barbershops, sold through the look of the shop.",
+    outcome:
+      "A booking site and owner's panel for appointment-based businesses, starting with barbers in Portugal.",
+    role: "Design and engineering",
+    year: "2026",
+    stack: ["React", "TanStack Start", "Supabase"],
+    focus: [{ label: "Booking without an account" }, { label: "Owner's panel" }],
+    highlights: [
+      "Booking: a client marks a time in under a minute without creating an account.",
+      "Owner's panel: agenda, clients, services, team and locations in one place, in light and dark.",
+    ],
+    links: [{ label: "Live landing", href: "https://di-studio-landing.vercel.app" }],
+    emblem: "distudio",
+    image: null,
+    video: null,
+    product: {
+      src: "/di-studio/landing.jpg",
+      alt: "The di.studio landing page: Eleva o teu negócio, over the D among orbiting planets.",
+      href: "https://di-studio-landing.vercel.app",
+      label: "di-studio-landing.vercel.app",
+    },
+    stats: [
+      { value: "10+", label: "barbershops in Portugal" },
+      { value: "€30k+", label: "revenue in about two months" },
+    ],
+    landmark: "di",
   },
 ];
 

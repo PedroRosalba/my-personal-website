@@ -82,13 +82,8 @@ Served at `/blog` on this domain (Next.js multi-zones): the blog has `basePath: 
 (`@view-transition` in both `globals.css`, mirrored): the name holds, the menus swap, the world goes out of focus.
 Links into the blog must stay plain `<a>`, never `<Link>`.
 
-`~/Projects/blog`, private GitHub repo `PedroRosalba/blog`, branch `feature/oss-posts` (3 commits). Eight posts
-ported from the Claude Docs drafts, grouped in two series, each dated by when its PRs merged or opened. Only
-"Who is typing?" is published (`draft: false`); the other seven are drafts, visible locally and on previews,
-hidden in production. Not deployed yet.
-
-**Blocked:** the repo has no `main` on GitHub (a local hook refuses agent pushes to `main`), so its PR can't be
-opened. Pedro: `cd ~/Projects/blog && git push -u origin main`, then open the PR from `feature/oss-posts`.
+Private GitHub repo `PedroRosalba/blog`; `feature/oss-posts` is its default and Vercel production branch. Every post is
+published (`draft: false`). The production deployment is `https://blog-pedro-rosalbas-projects.vercel.app`.
 
 When a post is published on the blog, set its `live: true` in `content/writing.ts` here so production links it.
 
@@ -96,9 +91,6 @@ When a post is published on the blog, set its `live: true` in `content/writing.t
 
 - [ ] Podcast link(s) → `community` in `content/media.ts` (a YouTube link becomes a click-to-play clip)
 - [ ] A Cloudflare write-up (then add `post` to its focus chips)
-- [ ] Deploy the blog, then set `NEXT_PUBLIC_BLOG_URL` here
-- [ ] Review and publish the seven draft posts (two need edits first: an unsourced Ollama paragraph in "Where does
-      the agent live?", and the Ravi sandboxes post had its security-findings table removed)
 - [ ] Commits from this session are unsigned (the SSH signing key needed its passphrase): `ssh-add
       ~/.ssh/id_ed25519_signing` before the next ones
 - [ ] Merge order for `main`: #3 → #4 → #6

@@ -5,6 +5,7 @@ import { YouTubeClip } from "./YouTubeClip";
 import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
 import { ProductWindow } from "./ProductWindow";
+import { TerminalWindow } from "./TerminalWindow";
 import { Receipts } from "./Receipts";
 
 /** The one project presentation, shared by the panel and the standalone page. */
@@ -45,11 +46,29 @@ export function ProjectArticle({
       ) : null}
 
       {/* the live product, in our light: the card already showed the cover */}
-      {project.product ? <ProductWindow product={project.product} /> : null}
+      {project.terminal ? (
+        <TerminalWindow terminal={project.terminal} />
+      ) : project.product ? (
+        <ProductWindow product={project.product} />
+      ) : null}
 
       {project.gallery?.map((shot) => (
         <Snapshot key={shot.src} src={shot.src} alt={shot.alt} href={shot.href ?? null} />
       ))}
+
+      {project.stats?.length ? (
+        <>
+          <h3 className="eyebrow">Results</h3>
+          <dl className="project-stats">
+            {project.stats.map((stat) => (
+              <div key={stat.label}>
+                <dd>{stat.value}</dd>
+                <dt>{stat.label}</dt>
+              </div>
+            ))}
+          </dl>
+        </>
+      ) : null}
 
       {/* receipts */}
       {project.receipts?.length ? (

@@ -37,7 +37,8 @@ export type EmblemKind =
   | "turborepo"
   | "enor"
   | "mediolano"
-  | "cloudflare";
+  | "cloudflare"
+  | "distudio";
 
 export type CommunityItem = {
   title: string;

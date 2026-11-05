@@ -303,9 +303,7 @@ export default function Home() {
                   </ol>
                 </div>
               ))
-            ) : (
-              <p className="muted">Write-ups on Turborepo and Ravi are on their way.</p>
-            )}
+            ) : null}
             {profile.writing ? (
               <p className="section-more">
                 <a className="next-link" href={profile.writing}>
