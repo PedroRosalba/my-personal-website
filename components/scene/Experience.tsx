@@ -1,15 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Canvas } from "@react-three/fiber";
 import { ACESFilmicToneMapping } from "three";
 import { useJourney } from "@/lib/store";
 import { World } from "./World";
+import { GatewayCue, GatewayCueTracker } from "./GatewayCue";
 
 export default function Experience() {
   const router = useRouter();
   const [ready, setReady] = useState(false);
+  const cue = useRef<HTMLDivElement>(null);
   const open = useCallback((slug: string) => router.push(`/projects/${slug}`, { scroll: false }), [router]);
 
   useEffect(() => {
@@ -30,7 +32,9 @@ export default function Experience() {
         }}
       >
         <World onOpen={open} />
+        <GatewayCueTracker cue={cue} />
       </Canvas>
+      <GatewayCue cue={cue} />
     </div>
   );
 }

@@ -4,7 +4,6 @@ import Link from "next/link";
 import type { Project } from "@/content/projects";
 import { postHref } from "@/content/writing";
 import { useJourney } from "@/lib/store";
-import { FocusList } from "./FocusList";
 import { Snapshot } from "./Snapshot";
 import { EventEmblem } from "./EventEmblem";
 
@@ -26,10 +25,8 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
       ) : image ? (
         <Snapshot src={image.src} alt={image.alt} href={image.post ? postHref(image.post) : (image.href ?? null)} />
       ) : null}
-      <p className="eyebrow focus-label">Focused on</p>
-      <FocusList project={project} />
       <Link
-        className="button button-primary"
+        className="button portal-link"
         href={`/projects/${project.slug}`}
         scroll={false}
         onMouseEnter={on}
@@ -37,7 +34,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         onFocus={on}
         onBlur={off}
       >
-        Open project <span aria-hidden="true">→</span>
+        Go to portal <span aria-hidden="true">→</span>
       </Link>
     </article>
   );

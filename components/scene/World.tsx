@@ -13,6 +13,7 @@ import { EthDiamond } from "./EthDiamond";
 import { TurboMark } from "./TurboMark";
 import { CloudMark } from "./CloudMark";
 import { RobotMark } from "./RobotMark";
+import { DiMark } from "./DiMark";
 import { LightWaveClock } from "./lightWave";
 
 export function World({ onOpen }: { onOpen: (slug: string) => void }) {
@@ -67,6 +68,7 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
           {project.landmark === "turbo" ? <TurboMark position={[0, 0, 1.2]} index={i} /> : null}
           {project.landmark === "cloud" ? <CloudMark position={[0, 0, 1.2]} index={i} /> : null}
           {project.landmark === "robot" ? <RobotMark position={[0, 0, 1.2]} index={i} /> : null}
+          {project.landmark === "di" ? <DiMark position={[0, 0, 1.2]} index={i} /> : null}
         </Gateway>
       ))}
 

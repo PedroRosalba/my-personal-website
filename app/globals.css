@@ -275,7 +275,6 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 }
 .focus li > a { color: var(--ink); }
 .focus li > a:hover { border-color: var(--accent); }
-.project-card .focus-label { margin-top: 18px; }
 /* A role with its company's cover, and the builds under it: the Community-row shape. */
 /* Their covers are bare icons (no frame), centred on the text beside them. */
 .role-head-cover { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 18px; align-items: center; }
@@ -364,9 +363,58 @@ a.snapshot:hover img { transform: scale(1.02); opacity: 1; }
 }
 .product-window:hover, .product-window:focus-visible { border-color: rgba(123, 97, 255, 0.6); box-shadow: 0 0 24px rgba(123, 97, 255, 0.18); }
 .product-window:hover .pw-seam, .product-window:focus-visible .pw-seam { opacity: 1; }
-.product-window:hover img, .product-window:focus-visible img { filter: none; }
+.product-window:hover img, .product-window:focus-visible img, .product-window:hover .pw-terminal, .product-window:focus-visible .pw-terminal { filter: none; }
 .product-window:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-@media (prefers-reduced-motion: reduce) { .product-window img { transition: none; } }
+.pw-terminal {
+  display: flex; flex-direction: column; justify-content: flex-start; padding: 12px 14px; overflow: hidden; background: #0b0b10;
+  font-family: var(--font-mono), monospace; font-size: 12px; line-height: 1.5; color: #e4e4e7; white-space: pre;
+  filter: grayscale(1) brightness(0.86) contrast(1.05) sepia(0.35) hue-rotate(205deg) saturate(2.2); transition: filter 600ms ease;
+}
+.t-line { display: block; min-height: 1.5em; opacity: 0; }
+.t-line[data-on="true"] { opacity: 1; }
+.t-prompt { color: #4ade80; }
+.t-command { color: #fafafa; }
+.t-task { color: #22d3ee; }
+.t-dim { color: #a1a1aa; }
+.t-good { color: #4ade80; }
+.t-warn { color: #fbbf24; }
+.t-badge { font-weight: 600; color: #f472b6; }
+@media (max-width: 560px) { .pw-terminal { padding: 10px; font-size: 10px; } }
+@media (prefers-reduced-motion: reduce) { .product-window img, .pw-terminal { transition: none; } }
+
+/* a project's headline results: the receipts' card, with the number first */
+.project-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 0; }
+.project-stats > div { display: flex; flex-direction: column; gap: 2px; padding: 14px 14px 13px; border: 1px solid var(--line); border-radius: 2px; background: rgba(123, 97, 255, 0.035); }
+.project-stats dd { margin: 0; font-size: clamp(30px, 3vw, 38px); font-weight: 300; line-height: 1.15; letter-spacing: -0.01em; color: var(--ink); text-shadow: 0 0 18px rgba(123, 97, 255, 0.75); }
+.project-stats dt { font-family: var(--font-mono), monospace; font-size: 11px; line-height: 1.45; color: var(--ink-3); }
+
+/* the sign that a landmark opens: pinned to the hologram by GatewayCueTracker; clicks pass through to the gateway */
+.gateway-cue { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; pointer-events: none; will-change: transform; }
+.cue-ripple {
+  position: absolute; top: var(--cue-h, 0px); left: calc(var(--cue-h, 0px) * -0.3); width: calc(var(--cue-h, 0px) * 0.6); height: calc(var(--cue-h, 0px) * 0.06);
+  margin-top: calc(var(--cue-h, 0px) * -0.03); border: 1px solid rgba(190, 178, 255, 0.55); border-radius: 50%; opacity: 0; animation: cue-ripple 5.5s ease-out infinite;
+}
+@keyframes cue-ripple { 0% { opacity: 0; transform: scale(0.6); } 12% { opacity: 0.5; } 60%, 100% { opacity: 0; transform: scale(1.5); } }
+/* the card's way in: the world's violet glass and seam rather than a white block; hovering it lights the gateway */
+.button.portal-link {
+  position: relative; overflow: hidden; min-height: 56px; padding: 0 30px; color: var(--ink); background: rgba(123, 97, 255, 0.14);
+  border: 1px solid rgba(160, 144, 255, 0.75); transition: background 300ms, border-color 300ms; animation: portal-glow 3.6s ease-in-out infinite;
+}
+@keyframes portal-glow {
+  0%, 100% { box-shadow: 0 0 16px rgba(123, 97, 255, 0.28); }
+  50% { box-shadow: 0 0 38px rgba(123, 97, 255, 0.62), inset 0 0 14px rgba(123, 97, 255, 0.2); }
+}
+.button.portal-link::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -1px; height: 1px; opacity: 0.6; transition: opacity 300ms;
+  background: linear-gradient(90deg, transparent, rgba(214, 205, 255, 0.95), transparent);
+}
+.button.portal-link span { display: inline-block; transition: transform 300ms ease; }
+.button.portal-link:hover, .button.portal-link:focus-visible {
+  color: var(--ink); background: rgba(123, 97, 255, 0.3); border-color: rgba(214, 205, 255, 1); animation: none; box-shadow: 0 0 46px rgba(123, 97, 255, 0.7);
+}
+.button.portal-link:hover::before, .button.portal-link:focus-visible::before { opacity: 1; }
+.button.portal-link:hover span, .button.portal-link:focus-visible span { transform: translateX(4px); }
+@media (prefers-reduced-motion: reduce) { .cue-ripple { animation: none; opacity: 0.25; } .button.portal-link, .button.portal-link::before, .button.portal-link span { transition: none; } .button.portal-link { animation: none; box-shadow: 0 0 26px rgba(123, 97, 255, 0.42); } }
 
 /* Receipts: real pull requests as cards. */
 .project-article .receipts { display: grid; gap: 8px; margin-top: 10px; }

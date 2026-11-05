@@ -20,6 +20,7 @@ const DRAW: Record<EmblemKind, (id: string) => React.ReactNode> = {
   enor: (id) => <Enor id={id} />,
   mediolano: (id) => <Mediolano id={id} />,
   cloudflare: () => <Cloudflare />,
+  distudio: () => <DiStudio />,
 };
 
 /** The drawings are made for a 112 × 63 frame. A small bare icon (no frame) shows only the middle 64 units, where every
@@ -496,6 +497,32 @@ function RustLogo({ cx, cy, r, spin }: { cx: number; cy: number; r: number; spin
  * the small one past the logo's curved cut holds JavaScript; the cut is the boundary and the dash the lane. A map
  * entry drops out of Rust, runs along the dash, crosses the cut (the star flashes) and lands in JS, which lights:
  * Rust data reaching JavaScript intact, which is what the workers-rs fixes are about. */
+/** di.studio's mark drawn in light: the two halves of the D are blades, and they part and close once per loop. */
+function DiStudio() {
+  const loop = { dur: "5s", repeatCount: "indefinite" } as const;
+  const star = "M0 -2.6 Q.4 -.4 2.6 0 Q.4 .4 0 2.6 Q-.4 .4 -2.6 0 Q-.4 -.4 0 -2.6Z";
+  const stem = "M38.4 19.7 L44.2 25.5 V44.9 H58.2 L69.9 35.4 L72.6 37.7 L60 50.3 H38.4 Z";
+  const bowl = "M46 11.6 H61.4 L73.3 23.1 V34.6 L67.2 29.2 V25.1 L58.6 17.4 H51.9 Z";
+  return (
+    <Art>
+      <path d={stem} fill="rgba(123,97,255,.14)" />
+      <path className="em-line" d={stem} />
+      <g>
+        <path d={bowl} fill="rgba(123,97,255,.1)" />
+        <path className="em-line" d={bowl} />
+        <animateTransform attributeName="transform" type="translate" values="0 0;0 0;1.6 -1.6;1.6 -1.6;0 0;0 0" keyTimes="0;.3;.44;.58;.66;1" {...loop} />
+      </g>
+      {/* the star where the blades meet, as they close */}
+      <g transform="translate(70.4 35.6)">
+        <path d={star} fill="rgb(237,235,255)" style={glow(2)} opacity="0">
+          <animate attributeName="opacity" values="0;0;1;0;0" keyTimes="0;.6;.66;.78;1" {...loop} />
+        </path>
+      </g>
+      <path className="em-base" d="M19 54 H93" />
+    </Art>
+  );
+}
+
 function Cloudflare() {
   const loop = { dur: "6s", repeatCount: "indefinite" } as const;
   const star = "M0 -2.6 Q.4 -.4 2.6 0 Q.4 .4 0 2.6 Q-.4 .4 -2.6 0 Q-.4 -.4 0 -2.6Z";
