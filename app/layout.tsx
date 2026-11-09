@@ -6,7 +6,7 @@ import "./globals.css";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-mono", display: "swap" });
 
-const description = `${profile.name} — ${profile.role}. ${profile.positioning}`;
+const description = `${profile.name} (${profile.alternateNames[0].toLowerCase()}) — ${profile.role} working on Rust, TypeScript, AI agents and build systems. ${profile.positioning}`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

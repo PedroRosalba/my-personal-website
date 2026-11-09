@@ -17,6 +17,8 @@ const cv = "/pedro-rosalba-cv.pdf";
 
 export const profile = {
   name: "Pedro Rosalba",
+  /** Other names people search for: the handle behind the domain and the X account. */
+  alternateNames: ["Rosalbito", "0xrosalbito"],
   role: "Software engineer",
   positioning: "A native problem solver, across the stack.",
   overview:
@@ -58,4 +60,6 @@ export const profile = {
   },
 };
 
-export const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+// The production origin, fixed in code: canonical URLs, the sitemap and Open Graph must name the live domain on every
+// deployment (previews included, which Vercel marks noindex), never a deployment URL that can disappear.
+export const siteUrl = "https://www.rosalbito.dev";
