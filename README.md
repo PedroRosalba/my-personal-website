@@ -13,7 +13,7 @@ npm run dev        # http://localhost:3000
 npm run build && npm start
 ```
 
-Set `NEXT_PUBLIC_SITE_URL` to the production origin for canonical URLs, sitemap and Open Graph.
+The production origin (`https://www.rosalbito.dev`) is fixed in `content/profile.ts` as `siteUrl`: canonical URLs, sitemap and Open Graph all use it. `NEXT_PUBLIC_SITE_URL` is no longer read.
 Append `?nowebgl` to any URL to see the static fallback.
 
 ## Where things live

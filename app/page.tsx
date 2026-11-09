@@ -396,7 +396,7 @@ export default function Home() {
           </div>
           <footer className="site-footer">
             <span>
-              © {new Date().getFullYear()} {profile.name}
+              © {new Date().getFullYear()} {profile.name} · {profile.alternateNames[0].toLowerCase()}
             </span>
             <Link href="#top">Back to top ↑</Link>
           </footer>
@@ -407,17 +407,31 @@ export default function Home() {
         data={[
           {
             "@context": "https://schema.org",
-            "@type": "Person",
-            name: profile.name,
+            "@type": "ProfilePage",
             url: siteUrl,
-            description: profile.positioning,
-            jobTitle: "Software Engineer",
-            email: contact.email ? `mailto:${contact.email}` : undefined,
-            alumniOf: { "@type": "CollegeOrUniversity", name: "IMPA Tech" },
-            knowsAbout: ["Rust", "TypeScript", "Payments", "Zero-knowledge proofs", "AI agents", "Build systems"],
-            sameAs: contact.links.map((l) => l.href),
+            mainEntity: {
+              "@type": "Person",
+              "@id": `${siteUrl}/#person`,
+              name: profile.name,
+              alternateName: profile.alternateNames,
+              url: siteUrl,
+              image: `${siteUrl}/opengraph-image`,
+              description: `${profile.overview} ${profile.positioning}`,
+              jobTitle: "Software Engineer",
+              email: contact.email ? `mailto:${contact.email}` : undefined,
+              alumniOf: { "@type": "CollegeOrUniversity", name: "IMPA Tech" },
+              knowsAbout: ["Rust", "TypeScript", "Payments", "Zero-knowledge proofs", "AI agents", "Build systems"],
+              sameAs: contact.links.map((l) => l.href),
+            },
           },
-          { "@context": "https://schema.org", "@type": "WebSite", name: profile.name, url: siteUrl },
+          {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            name: profile.name,
+            alternateName: profile.alternateNames[0],
+            url: siteUrl,
+            author: { "@id": `${siteUrl}/#person` },
+          },
         ]}
       />
     </>
