@@ -68,13 +68,15 @@ const buildColonnade = () => {
   const items: { p: [number, number, number]; s: [number, number, number] }[] = [];
   const base = -60;
   let n = 0;
-  // inner avenue: ordered pairs flanking the causeway
+  // inner avenue: ordered pairs flanking the causeway. Floating road: each pair is mirrored across the
+  // causeway (one draw per pair), so the centred camera sees a symmetric avenue, not a lopsided one.
   for (let z = 70; z > FINAL_GATE_Z - 20; z -= 46) {
+    n++;
+    const height = 90 + hash(n) * 80;
+    const offset = 54 + hash(n + 50) * 8;
+    const w = 7 + hash(n + 90) * 4;
     for (const side of [-1, 1]) {
-      n++;
-      const height = 90 + hash(n) * 80;
-      const x = side * (54 + hash(n + 50) * 8);
-      const w = 7 + hash(n + 90) * 4;
+      const x = side * offset;
       if (n % 3 === 0) {
         // broken monolith: an aligned floating segment above a gap
         const cut = height * 0.6;
@@ -85,13 +87,12 @@ const buildColonnade = () => {
       }
     }
   }
-  // outer rows: taller, wider, mostly lost in fog
+  // outer rows: taller, wider, mostly lost in fog (mirrored too)
   for (let z = 120; z > FINAL_GATE_Z - 260; z -= 78) {
-    for (const side of [-1, 1]) {
-      n++;
-      const height = 210 + hash(n) * 160;
-      items.push({ p: [side * (135 + hash(n + 20) * 40), base + height / 2, z - 20], s: [20, height, 20] });
-    }
+    n++;
+    const height = 210 + hash(n) * 160;
+    const offset = 135 + hash(n + 20) * 40;
+    for (const side of [-1, 1]) items.push({ p: [side * offset, base + height / 2, z - 20], s: [20, height, 20] });
   }
   return items;
 };

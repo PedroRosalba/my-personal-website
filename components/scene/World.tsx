@@ -25,8 +25,9 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
 
       {/* The Eclipse is the only "sun": a cold backlight from the end of the causeway. */}
       <ambientLight intensity={0.75} color="#9a9aa8" />
-      <directionalLight position={[40, 90, -300]} intensity={1.0} color="#e2def2" />
-      <directionalLight position={[-40, 50, 120]} intensity={0.5} color="#8c8c98" />
+      {/* floating road: both lights on the causeway's axis, so neither side of the avenue is lit more than the other */}
+      <directionalLight position={[0, 90, -300]} intensity={1.0} color="#e2def2" />
+      <directionalLight position={[0, 50, 120]} intensity={0.5} color="#8c8c98" />
 
       <Rig />
       <LightWaveClock />
