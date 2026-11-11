@@ -7,7 +7,7 @@ import { useJourney } from "@/lib/store";
 import { Snapshot } from "./Snapshot";
 import { EventEmblem } from "./EventEmblem";
 
-/** HTML twin of a 3D gateway: same URL, and hover/focus lights the gateway seam. */
+/** HTML twin of a floating mark: same URL, and hover/focus lights the mark's cue. */
 export function ProjectCard({ project, index }: { project: Project; index: number }) {
   const set = useJourney((s) => s.set);
   const on = () => set({ hoverProject: project.slug });
@@ -34,7 +34,7 @@ export function ProjectCard({ project, index }: { project: Project; index: numbe
         onFocus={on}
         onBlur={off}
       >
-        Go to portal <span aria-hidden="true">→</span>
+        Open the project <span aria-hidden="true">→</span>
       </Link>
     </article>
   );

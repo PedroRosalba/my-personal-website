@@ -1,10 +1,11 @@
 "use client";
 
 import { projects } from "@/content/projects";
-import { FINAL_GATE_Z, GATE_X, TRANSIT_Z, gateZ } from "@/content/journey";
+import { FINAL_GATE_Z, TRANSIT_Z } from "@/content/journey";
 import { FOG_COLOR, FOG_DENSITY } from "./state";
 import { Rig } from "./Rig";
-import { Figure } from "./Figure";
+import { Guide } from "./Guide";
+import { FloatingMark } from "./FloatingMark";
 import { Sky } from "./Sky";
 import { FogSea } from "./FogSea";
 import { Causeway, Colonnade, Stele } from "./Structures";
@@ -33,7 +34,8 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
       <FogSea />
       <Colonnade />
       <Causeway />
-      <Figure />
+      {/* no traveller: the camera is you. `?guide` adds a small light that leads the way. */}
+      <Guide />
 
       {/* 00 → 01: the first threshold. The causeway passes through it. */}
       <Gateway
@@ -48,28 +50,15 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
 
       <Stele position={[7.5, 0, -114]} />
 
-      {/* 03: one gateway per project, in content order. */}
+      {/* 03: no gateways. Each project floats beside the road, on the right; its card floats on the left. */}
       {projects.map((project, i) => (
-        <Gateway
-          key={project.slug}
-          kind="project"
-          index={i}
-          slug={project.slug}
-          portal={project.portal ?? false}
-          onOpen={onOpen}
-          position={[GATE_X, 0, gateZ(i)]}
-          width={14}
-          height={36}
-          depth={5}
-          openWidth={4.8}
-          openHeight={9.6}
-        >
-          {project.landmark === "eth" ? <EthDiamond position={[0, 0, 1.2]} index={i} /> : null}
-          {project.landmark === "turbo" ? <TurboMark position={[0, 0, 1.2]} index={i} /> : null}
-          {project.landmark === "cloud" ? <CloudMark position={[0, 0, 1.2]} index={i} /> : null}
-          {project.landmark === "robot" ? <RobotMark position={[0, 0, 1.2]} index={i} /> : null}
-          {project.landmark === "di" ? <DiMark position={[0, 0, 1.2]} index={i} /> : null}
-        </Gateway>
+        <FloatingMark key={project.slug} index={i} slug={project.slug} onOpen={onOpen}>
+          {project.landmark === "eth" ? <EthDiamond position={[0, 0, 0]} index={i} /> : null}
+          {project.landmark === "turbo" ? <TurboMark position={[0, 0, 0]} index={i} /> : null}
+          {project.landmark === "cloud" ? <CloudMark position={[0, 0, 0]} index={i} /> : null}
+          {project.landmark === "robot" ? <RobotMark position={[0, 0, 0]} index={i} /> : null}
+          {project.landmark === "di" ? <DiMark position={[0, 0, 0]} index={i} /> : null}
+        </FloatingMark>
       ))}
 
       {/* 05: the last gateway, open and lit, at the edge of the void. */}

@@ -7,6 +7,7 @@ import { hackathons } from "@/content/hackathons";
 import { writingBySeries } from "@/content/writing";
 import { skillsPage } from "@/content/skills";
 import { SiteNav } from "@/components/html/SiteNav";
+import { GuideToggle } from "@/components/html/GuideToggle";
 import { ScrollDriver } from "@/components/html/ScrollDriver";
 import { ProjectCard } from "@/components/html/ProjectCard";
 import { CommunityCard } from "@/components/html/CommunityCard";
@@ -173,6 +174,7 @@ export default function Home() {
       <div className="scrim" aria-hidden="true" />
       <ScrollDriver />
       <SiteNav onHome />
+      <GuideToggle />
 
       <main id="top">
         <section className="station hero" data-stop="top" aria-labelledby="hero-name">

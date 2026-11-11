@@ -4,6 +4,12 @@
 import { projects } from "./projects";
 
 export const GATE_X = 9; // project gateways stand to the right of the causeway
+/** Floating road: each project's mark hangs this far right of the causeway (phones bring it in). */
+export const FLOAT_X = 8.2;
+/** …and this far past the visitor's stop for it, so it is seen whole, not filling the right half. */
+export const FLOAT_BACK = 5;
+export const FLOAT_X_MOBILE = 2.3;
+
 // wider than the camera's trailing distance, so an earlier gateway never blocks the next one
 export const GATE_SPACING = 70;
 export const FIRST_GATE_Z = -215;

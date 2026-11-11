@@ -9,7 +9,9 @@ import {
   Float32BufferAttribute,
   Group,
   Matrix4,
+  Color,
   Mesh,
+  MeshBasicMaterial,
   Plane,
   PointLight,
   Points,
@@ -19,11 +21,12 @@ import {
   Vector3,
 } from "three";
 import { gateZ } from "@/content/journey";
+import { projects } from "@/content/projects";
+import { useJourney } from "@/lib/store";
 import { clamp01, damp, frame } from "./state";
 
 /*
- * Shared pieces of the hologram landmarks: a figure made of points standing in a containment tube between
- * glowing rings. The points stream up out of a spark when the traveller comes near, fray and snap back every
+ * Shared pieces of the hologram landmarks: a figure made of points, projected from a floating stone emitter. The points stream up out of a spark when the traveller comes near, fray and snap back every
  * few seconds, and light up and get swept aside where the cursor passes. Everything is in the site's violet.
  */
 
@@ -32,6 +35,7 @@ const SHADOW = new Vector3(0.15, 0.12, 0.27);
 const LIT = new Vector3(0.74, 0.68, 0.98);
 const RIM = new Vector3(0.78, 0.72, 1.0);
 export const GLOW = new Vector3(0.48, 0.38, 1.0);
+const GLOW_COLOR = new Color(0.48, 0.38, 1.0);
 const EMISSIVE = new Vector3(0.86, 0.8, 1.0);
 const HOVER = new Vector3(1.15, 1.0, 1.7);
 
@@ -237,7 +241,8 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
 
 /* ---------- the drive: proximity, build, fray, turntable, cursor ---------- */
 
-export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number };
+/** `hover`: 0..1, eased, while the pointer is on this mark, its cue, or its card's link. */
+export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
 
 const FAR = new Vector3(1e4, 1e4, 1e4);
 
@@ -264,7 +269,7 @@ export function useHologram({
   centerY?: number;
 }): MutableRefObject<Drive> {
   usePointer();
-  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0 });
+  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
   const tmp = useMemo(
     () => ({
       ray: new Raycaster(),
@@ -289,6 +294,8 @@ export function useHologram({
     const near = 1 - clamp01(Math.abs(frame.z - (gateZ(index) + 13)) / 45);
     s.open = frame.revealIndex === index ? frame.reveal : 0;
     s.awake = damp(s.awake, Math.max(near, s.open), 3, dt);
+    const hovered = useJourney.getState().hoverProject === projects[index]?.slug ? 1 : 0;
+    s.hover = frame.reduced ? hovered : damp(s.hover, hovered, 8, dt);
 
     // assemble when the traveller gets close, fall back into the spark when they leave
     const target = s.awake > 0.2 ? 1 : 0;
@@ -303,7 +310,7 @@ export function useHologram({
 
     // a slow turntable; when the project opens it turns to face the visitor
     if (s.open > 0.05) s.yaw = damp(s.yaw, Math.round(s.yaw / (Math.PI * 2)) * Math.PI * 2, 2.5, dt);
-    else if (!frame.reduced) s.yaw += dt * spinSpeed;
+    else if (!frame.reduced) s.yaw += dt * spinSpeed * (1 + s.hover * 1.5);
     if (spin.current) {
       spin.current.rotation.y = s.yaw;
       spin.current.position.y = Math.sin(t * 1.1) * 0.08;
@@ -345,97 +352,23 @@ export function useHologram({
     u.uBuild.value = s.build;
     u.uScatter.value = scatter;
     u.uViewH.value = gl.domElement.height;
-    u.uOpacity.value = 0.55 + s.awake * 0.45;
+    u.uOpacity.value = Math.min(1.25, 0.55 + s.awake * 0.45 + s.hover * 0.25);
     u.uMouseEnergy.value = s.energy;
   });
 
   return drive;
 }
 
-/* ---------- the containment tube ---------- */
+/* ---------- the floating emitter ---------- */
 
-/** A faint lit wall with a triangle-lattice texture, brighter at the silhouette and near the floor. */
-const tubeVertex = /* glsl */ `
-  varying vec2 vUv;
-  varying vec3 vN;
-  varying vec3 vV;
-  void main() {
-    vUv = uv;
-    vec4 mv = modelViewMatrix * vec4(position, 1.0);
-    vN = normalize(normalMatrix * normal);
-    vV = normalize(-mv.xyz);
-    gl_Position = projectionMatrix * mv;
-  }
-`;
+/*
+ * Floating road: there is no gateway floor to stand a tube on, so each hologram is projected from a stone emitter
+ * that floats beside the road: a hexagonal dais in the causeway's stone, tapering underneath into a shard, with a
+ * violet seam inlaid in its top and a lens at the centre. A soft fan of light rises from the lens into the figure.
+ */
 
-const tubeFragment = /* glsl */ `
-  uniform vec3 uColor;
-  uniform float uIntensity;
-  uniform float uTime;
-  varying vec2 vUv;
-  varying vec3 vN;
-  varying vec3 vV;
-
-  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
-
-  // distance to the nearest edge of a triangle lattice
-  float lattice(vec2 p) {
-    float da = abs(fract(p.y) - 0.5);
-    float db = abs(fract(p.x * 0.5 + p.y * 0.866) - 0.5);
-    float dc = abs(fract(p.x * 0.5 - p.y * 0.866) - 0.5);
-    return 0.5 - max(da, max(db, dc));
-  }
-
-  void main() {
-    float edge = 1.0 - abs(dot(normalize(vN), normalize(vV)));
-    float sil = pow(edge, 2.2);
-    vec2 p = vec2(vUv.x * 64.0, vUv.y * 30.0);
-    // jitter the lattice per cell so it reads like a fine irregular mesh, not graph paper
-    vec2 cell = floor(p);
-    p += (vec2(hash(cell), hash(cell + 7.1)) - 0.5) * 0.35;
-    float line = 1.0 - smoothstep(0.0, 0.06, lattice(p));
-    float sparkle = step(0.82, hash(cell + floor(uTime * 2.0))) * 0.6 + 0.4;
-    float floorGlow = exp(-vUv.y * 3.2);
-    float fade = smoothstep(1.0, 0.75, vUv.y) * smoothstep(0.0, 0.03, vUv.y);
-    float a = (0.035 + sil * 0.55 + floorGlow * 0.3) + line * sparkle * (0.05 + sil * 0.7);
-    gl_FragColor = vec4(uColor * a * fade * uIntensity, 1.0);
-  }
-`;
-
-/** A flat ring in the XZ plane: a hot core line with a soft halo (our stand-in for bloom), cut into rotating arcs. */
-const ringVertex = /* glsl */ `
-  varying vec2 vP;
-  void main() {
-    vP = position.xy;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const ringFragment = /* glsl */ `
-  uniform float uRadius;
-  uniform float uRot;
-  uniform float uSegments;
-  uniform float uGap;
-  uniform float uIntensity;
-  uniform vec3 uCore;
-  uniform vec3 uColor;
-  varying vec2 vP;
-  void main() {
-    float r = length(vP);
-    float d = abs(r - uRadius);
-    float ang = atan(vP.y, vP.x) / 6.28318 + 0.5;
-    float seg = fract(ang * uSegments + uRot);
-    // soft ends on each arc
-    float arc = smoothstep(0.0, 0.02, seg - uGap) * smoothstep(1.0, 0.98, seg);
-    float core = exp(-pow(d / 0.045, 2.0));
-    float halo = exp(-d / 0.12) * 0.6 + exp(-d / 0.45) * 0.18;
-    vec3 col = uCore * core * arc * 1.6 + uColor * (halo * mix(0.35, 1.0, arc));
-    gl_FragColor = vec4(col * uIntensity, 1.0);
-  }
-`;
-
-/** A camera-facing soft column of light behind and around the tube: fakes the volume glow of a bloom pass. */
-const hazeVertex = /* glsl */ `
+/** Camera-facing fan of light from the lens upward: narrow at the stone, widening and fading with height. */
+const beamVertex = /* glsl */ `
   varying vec2 vUv;
   void main() {
     vUv = uv;
@@ -443,40 +376,30 @@ const hazeVertex = /* glsl */ `
   }
 `;
 
-const hazeFragment = /* glsl */ `
+const beamFragment = /* glsl */ `
   uniform vec3 uColor;
   uniform float uIntensity;
   varying vec2 vUv;
   void main() {
-    vec2 c = vUv - 0.5;
-    float x = exp(-pow(abs(c.x) / 0.26, 3.0));
-    float y = smoothstep(0.5, 0.25, abs(c.y + 0.03));
-    float floorPool = exp(-pow((vUv.y - 0.12) / 0.07, 2.0)) * exp(-pow(c.x / 0.3, 2.0));
-    gl_FragColor = vec4(uColor * (x * y * 0.22 + floorPool * 0.35) * uIntensity, 1.0);
+    float x = vUv.x - 0.5;
+    float v = vUv.y;
+    float spread = mix(0.05, 0.42, pow(v, 0.7));
+    float across = exp(-pow(abs(x) / spread, 2.0));
+    float up = pow(1.0 - v, 1.6) * smoothstep(0.0, 0.04, v);
+    float lens = exp(-pow(v / 0.05, 2.0)) * exp(-pow(x / 0.08, 2.0));
+    gl_FragColor = vec4(uColor * (across * up * 0.28 + lens * 0.9) * uIntensity, 1.0);
   }
 `;
 
 const additive = { transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false } as const;
 
-function ringMaterial(radius: number, segments: number, gap: number) {
-  return new ShaderMaterial({
-    vertexShader: ringVertex,
-    fragmentShader: ringFragment,
-    uniforms: {
-      uRadius: { value: radius },
-      uRot: { value: 0 },
-      uSegments: { value: segments },
-      uGap: { value: gap },
-      uIntensity: { value: 1 },
-      uCore: { value: new Vector3(0.93, 0.9, 1.0) },
-      uColor: { value: GLOW.clone() },
-    },
-    side: DoubleSide,
-    ...additive,
-  });
-}
+const DAIS_H = 0.34;
+const SHARD_H = 2.6;
 
-/** The tube, its rings, the haze around it and a violet light on the stone, all driven by a figure's `drive`. */
+/**
+ * The emitter under a figure, its light fan and a violet light on the stone, all driven by the figure's `drive`.
+ * `bottom` is where the figure's spark sits (the lens sits just under it); `top` bounds the fan.
+ */
 export function HologramTube({
   drive,
   radius,
@@ -488,79 +411,65 @@ export function HologramTube({
   bottom: number;
   top: number;
 }) {
-  const haze = useRef<Mesh>(null!);
+  const beam = useRef<Mesh>(null!);
   const light = useRef<PointLight>(null!);
-  const tube = useMemo(
+  const r = radius * 0.82;
+  const beamMaterial = useMemo(
     () =>
       new ShaderMaterial({
-        vertexShader: tubeVertex,
-        fragmentShader: tubeFragment,
-        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 }, uTime: { value: 0 } },
+        vertexShader: beamVertex,
+        fragmentShader: beamFragment,
+        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 } },
         side: DoubleSide,
         ...additive,
       }),
     [],
   );
-  const hazeMaterial = useMemo(
-    () =>
-      new ShaderMaterial({
-        vertexShader: hazeVertex,
-        fragmentShader: hazeFragment,
-        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 } },
-        ...additive,
-      }),
+  const seam = useMemo(() => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), toneMapped: false }), []);
+  const lens = useMemo(
+    () => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false }),
     [],
-  );
-  const rings = useMemo(
-    () => ({
-      top: ringMaterial(radius, 2, 0.06),
-      bottom: ringMaterial(radius, 2, 0.03),
-      outer: ringMaterial(radius + 0.35, 3, 0.22),
-    }),
-    [radius],
   );
 
   useFrame(({ camera }) => {
-    const t = frame.time;
     const s = drive.current;
-    const glow = 0.35 + s.awake * 0.65;
-    tube.uniforms.uTime.value = t;
-    tube.uniforms.uIntensity.value = glow;
-    hazeMaterial.uniforms.uIntensity.value = glow * (0.6 + s.build * 0.4);
-    haze.current.quaternion.copy(camera.quaternion);
-
-    rings.top.uniforms.uRot.value = t * 0.06;
-    rings.bottom.uniforms.uRot.value = -t * 0.09;
-    rings.outer.uniforms.uRot.value = t * 0.04;
-    // the bottom ring flares while it feeds the build
-    const feeding = s.build > 0.001 && s.build < 0.999 ? 0.6 : 0;
-    rings.top.uniforms.uIntensity.value = glow * 0.8;
-    rings.bottom.uniforms.uIntensity.value = glow * (1 + feeding);
-    rings.outer.uniforms.uIntensity.value = glow * 0.55;
-    light.current.intensity = 6 + s.awake * 16 + s.energy * 10;
+    const glow = 0.35 + s.awake * 0.65 + s.hover * 0.6;
+    beamMaterial.uniforms.uIntensity.value = glow * (0.5 + s.build * 0.5);
+    beam.current.quaternion.copy(camera.quaternion);
+    // the seam answers the cursor a little, like the points do
+    seam.color.copy(GLOW_COLOR).multiplyScalar(0.25 + glow * 1.1 + s.energy * 0.6);
+    lens.color.copy(GLOW_COLOR).multiplyScalar(0.4 + glow * 0.9);
+    light.current.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
   });
 
-  const ringGeo = (r: number) => <ringGeometry args={[Math.max(0.01, r - 0.9), r + 0.9, 128, 1]} />;
   const height = top - bottom;
+  const deck = bottom - 0.12; // top face of the dais, just under the spark
 
   return (
     <>
-      <mesh ref={haze} position={[0, bottom + height / 2, 0]} material={hazeMaterial} renderOrder={1}>
-        <planeGeometry args={[radius * 4.2, height * 1.25]} />
+      <mesh ref={beam} position={[0, deck + height / 2, 0]} material={beamMaterial} renderOrder={1}>
+        <planeGeometry args={[radius * 3.2, height]} />
       </mesh>
-      <mesh position={[0, bottom + height / 2, 0]} material={tube} renderOrder={2}>
-        <cylinderGeometry args={[radius, radius, height, 96, 1, true]} />
+
+      {/* the dais and the shard it tapers into; flat-shaded so each face catches the light differently */}
+      <mesh position={[0, deck - DAIS_H / 2, 0]}>
+        <cylinderGeometry args={[r, r * 0.96, DAIS_H, 6]} />
+        <meshStandardMaterial color="#4a4a55" roughness={0.94} flatShading />
       </mesh>
-      <mesh position={[0, top, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.top} renderOrder={3}>
-        {ringGeo(radius)}
+      <mesh position={[0, deck - DAIS_H - SHARD_H / 2, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[r * 0.96, SHARD_H, 6]} />
+        <meshStandardMaterial color="#34343c" roughness={1} flatShading />
       </mesh>
-      <mesh position={[0, bottom, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.bottom} renderOrder={3}>
-        {ringGeo(radius)}
+
+      {/* the inlaid seam and the lens */}
+      <mesh position={[0, deck + 0.006, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 6]} material={seam}>
+        <ringGeometry args={[r * 0.78, r * 0.84, 6, 1]} />
       </mesh>
-      <mesh position={[0, bottom - 0.25, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.outer} renderOrder={3}>
-        {ringGeo(radius + 0.35)}
+      <mesh position={[0, deck + 0.01, 0]} rotation={[-Math.PI / 2, 0, 0]} material={lens} renderOrder={2}>
+        <circleGeometry args={[r * 0.26, 32]} />
       </mesh>
-      <pointLight ref={light} position={[0, 2.5, 2.2]} color="#8f66ff" intensity={10} distance={12} decay={2} />
+
+      <pointLight ref={light} position={[0, deck + 1.4, 1.6]} color="#8f66ff" intensity={10} distance={9} decay={2} />
     </>
   );
 }

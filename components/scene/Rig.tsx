@@ -5,18 +5,17 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { PerspectiveCamera, Vector3 } from "three";
 import { useJourney } from "@/lib/store";
 import { projects } from "@/content/projects";
-import { FINAL_GATE_Z, GATE_X, gateZ } from "@/content/journey";
-import { clamp01, damp, frame, smooth } from "./state";
+import { FINAL_GATE_Z } from "@/content/journey";
+import { CAM, clamp01, damp, frame } from "./state";
 
 const pos = new Vector3();
 const look = new Vector3();
-const revealPos = new Vector3();
-const revealLook = new Vector3();
 
-/** How long the traveller takes to cross the forecourt and step into the gateway. */
-const WALK_SECONDS = 2.8;
-
-/** Camera choreography. Everything is derived from scroll progress — nothing is steered directly. */
+/**
+ * Floating road: the camera is the traveller. It stands at eye level on the causeway, always looking straight
+ * down the road — it never leans toward a landmark and never swings round when a project opens. The projects
+ * come to it instead, floating beside the road (see FloatingMark).
+ */
 export function Rig() {
   const camera = useThree((s) => s.camera) as PerspectiveCamera;
   const size = useThree((s) => s.size);
@@ -40,61 +39,36 @@ export function Rig() {
     frame.mobile = mobile;
     if (!frame.reduced) frame.time += dt;
 
-    // figure position: eased toward the scroll target (a nav jump becomes a ~1s dash)
+    // position: eased toward the scroll target (a nav jump becomes a ~1s dash)
     const prevZ = frame.z;
     frame.z = frame.reduced ? s.targetZ : damp(frame.z, s.targetZ, 3.4, dt);
     frame.speed = (frame.z - prevZ) / dt;
     frame.focusX = frame.reduced ? s.focusX : damp(frame.focusX, s.focusX, 2.6, dt);
     frame.progress = clamp01(-frame.z / -(FINAL_GATE_Z + 44));
 
-    // project reveal
+    // project reveal: no camera move any more, but the marks and the guide still answer to it
     const activeIndex = s.activeProject ? projects.findIndex((p) => p.slug === s.activeProject) : -1;
     if (activeIndex >= 0) frame.revealIndex = activeIndex;
     const revealTarget = activeIndex >= 0 ? 1 : 0;
-    frame.reveal = frame.reduced ? revealTarget : damp(frame.reveal, revealTarget, 4.2, dt);
+    frame.reveal = frame.reduced ? revealTarget : damp(frame.reveal, revealTarget, 3.2, dt);
     if (frame.reveal < 0.002 && revealTarget === 0) frame.revealIndex = -1;
-    const r = smooth(clamp01(frame.reveal));
 
-    // the traveller walks into the open gateway while the camera swings round to it,
-    // and walks back out to the causeway when the panel closes
-    const step = dt / WALK_SECONDS;
-    if (frame.reduced) frame.walk = activeIndex >= 0 ? 1 : 0;
-    else frame.walk = activeIndex >= 0 ? Math.min(1, frame.walk + step) : Math.max(0, frame.walk - step);
-
-    // journey camera: low, behind the figure, long lens
-    const back = mobile ? 31 : 26;
-    // The camera never leaves the causeway (it would pass through earlier gateways);
-    // it only turns toward the landmark.
-    pos.set(frame.focusX * 0.12, 3, frame.z + back);
-    look.set(frame.focusX * (mobile ? 1.25 : 0.62), 4.4, frame.z - 40);
-
-    if (frame.revealIndex >= 0) {
-      const gz = gateZ(frame.revealIndex);
-      revealPos.set(GATE_X - 0.8, 3.8, gz + (mobile ? 34 : 25));
-      revealLook.set(GATE_X - 0.4, 4.6, gz);
-      pos.lerp(revealPos, r);
-      look.lerp(revealLook, r);
-    }
-
+    // a faint step in the eye line while moving; still when standing
+    const speed = Math.abs(frame.speed);
+    const bob = frame.reduced || speed > 45 ? 0 : clamp01(speed / 1.2);
+    frame.walk += Math.min(speed, 2.4) * dt * 4.4;
+    // level: no pitch, no roll; the step bob moves the eye and its target together so the horizon never tips
+    const y = CAM.y + Math.abs(Math.cos(frame.walk)) * 0.05 * bob;
+    pos.set(0, y, frame.z + CAM.back);
+    look.set(0, y, frame.z - 30);
     camera.position.copy(pos);
     camera.lookAt(look);
 
-    const kick = frame.reduced ? 0 : Math.min(16, Math.abs(frame.speed) * 0.07);
-    camera.fov = damp(camera.fov, (mobile ? 46 : 32) + kick, 6, dt);
+    const kick = frame.reduced ? 0 : Math.min(16, speed * 0.07);
+    camera.fov = damp(camera.fov, (mobile ? CAM.fovMobile : CAM.fov) + kick, 6, dt);
 
-    // Keep the world clear of the HTML: shift the picture, not the camera.
-    const journeyX = mobile ? 0 : -0.12 * size.width;
-    const journeyY = mobile ? 0.21 * size.height : 0;
-    const revealX = mobile ? 0 : Math.min(280, size.width * 0.2);
-    const revealY = mobile ? 0.27 * size.height : 0;
-    camera.setViewOffset(
-      size.width,
-      size.height,
-      journeyX + (revealX - journeyX) * r,
-      journeyY + (revealY - journeyY) * r,
-      size.width,
-      size.height,
-    );
+    // centred: the road runs down the middle of the screen; phones lift the world above the copy
+    camera.setViewOffset(size.width, size.height, 0, mobile ? 0.21 * size.height : 0, size.width, size.height);
   });
 
   return null;

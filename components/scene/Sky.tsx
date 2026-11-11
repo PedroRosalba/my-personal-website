@@ -2,7 +2,7 @@
 
 import { useMemo, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { AdditiveBlending, BackSide, BufferAttribute, BufferGeometry, DoubleSide, Group, ShaderMaterial } from "three";
+import { BackSide, BufferAttribute, BufferGeometry, Group, ShaderMaterial } from "three";
 import { ACCENT_RAW, HORIZON_GLSL, frame } from "./state";
 
 const ECLIPSE_DISTANCE = 1700;
@@ -73,7 +73,7 @@ function makeStars(count: number) {
   return geometry;
 }
 
-/** Sparse stars, one faint ring arc, and the Eclipse at the end of the causeway. */
+/** Sparse stars and the Eclipse at the end of the causeway. */
 export function Sky() {
   const group = useRef<Group>(null!);
   const stars = useRef<Group>(null!);
@@ -149,18 +149,7 @@ export function Sky() {
           />
         </points>
       </group>
-      <mesh position={[0, ECLIPSE_HEIGHT, -ECLIPSE_DISTANCE]} rotation={[1.26, 0, 0.3]} renderOrder={-25}>
-        <ringGeometry args={[1180, 1184, 180]} />
-        <meshBasicMaterial
-          color="#8d89a8"
-          transparent
-          opacity={0.22}
-          side={DoubleSide}
-          blending={AdditiveBlending}
-          depthWrite={false}
-          fog={false}
-        />
-      </mesh>
+      {/* floating road: no ring arc. Seen from the level eye-line, its edge cut across the frame at a slant. */}
       <mesh position={[0, ECLIPSE_HEIGHT, -ECLIPSE_DISTANCE]} renderOrder={-20} material={eclipse}>
         <planeGeometry args={[2200, 2200]} />
       </mesh>

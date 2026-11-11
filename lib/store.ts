@@ -11,6 +11,8 @@ type JourneyState = {
   /** Project hovered/focused in HTML or 3D (drives the gateway seam). */
   hoverProject: string | null;
   sceneReady: boolean;
+  /** Exploration: a small light leads the way (`?guide`). Off, the camera is the traveller and nothing walks. */
+  guide: boolean;
   set: (partial: Partial<Omit<JourneyState, "set">>) => void;
 };
 
@@ -21,5 +23,6 @@ export const useJourney = create<JourneyState>((set) => ({
   activeProject: null,
   hoverProject: null,
   sceneReady: false,
+  guide: false,
   set: (partial) => set(partial),
 }));
