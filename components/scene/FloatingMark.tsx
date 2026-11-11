@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Vector3, type Group } from "three";
 import { FLOAT_BACK, FLOAT_X, FLOAT_X_MOBILE, gateZ } from "@/content/journey";
-import { projects } from "@/content/projects";
 import { useJourney } from "@/lib/store";
 import { CAM, clamp01, damp, frame, markPositions, smooth } from "./state";
 
@@ -24,12 +23,10 @@ function offsetWithin(el: HTMLElement, ancestor: HTMLElement) {
 
 /** The visitor's stop for a project stands this far in front of its mark (see `stops`). */
 const STOP_OFFSET = 13;
-/** How far from the stop, in metres, the cue has fully faded. */
-const REACH = 12;
 
 /**
  * Floating road: a project's hologram hangs in the air beside the causeway instead of standing in a gateway.
- * It is the thing you click. Its panel opens on the left, where the card was, so the mark stays in view and the
+ * The object itself is clickable (the card's button on the left is the labelled way in). Its panel opens on the left, where the card was, so the mark stays in view and the
  * camera never has to move.
  */
 export function FloatingMark({
@@ -122,70 +119,5 @@ export function FloatingMark({
       </mesh>
       {children}
     </group>
-  );
-}
-
-/**
- * Keeps the "open" cue under the mark of the project the visitor is standing at. The cue is HTML so it stays sharp
- * and uses the site's type; this writes straight to the element every frame.
- */
-export function FloatCueTracker({ cue }: { cue: RefObject<HTMLButtonElement | null> }) {
-  const p = useRef(new Vector3());
-
-  useFrame(({ camera, size }) => {
-    const el = cue.current;
-    if (!el) return;
-    const index = projects.reduce(
-      (best, _, i) => (Math.abs(frame.z - (gateZ(i) + STOP_OFFSET)) < Math.abs(frame.z - (gateZ(best) + STOP_OFFSET)) ? i : best),
-      0,
-    );
-    const mark = markPositions[index];
-    if (!mark) return;
-    const { activeProject, hoverProject } = useJourney.getState();
-    const near = 1 - clamp01(Math.abs(frame.z - (gateZ(index) + STOP_OFFSET)) / REACH);
-    const opacity = activeProject || frame.reveal > 0.02 ? 0 : clamp01(near * 2.5 - 0.4);
-
-    // just under the emitter's dais, on its front edge
-    const a = p.current.set(mark.x, mark.y - 0.35, mark.z + 1.5).project(camera);
-    const x = ((a.x + 1) / 2) * size.width;
-    const y = ((1 - a.y) / 2) * size.height;
-
-    const project = projects[index];
-    if (el.dataset.slug !== project.slug) {
-      el.dataset.slug = project.slug;
-      el.querySelector(".float-cue-index")!.textContent = String(index + 1).padStart(2, "0");
-      el.querySelector(".float-cue-title")!.textContent = project.title;
-    }
-    el.dataset.hover = String(hoverProject === project.slug);
-    el.style.opacity = opacity.toFixed(3);
-    el.style.pointerEvents = opacity > 0.5 ? "auto" : "none";
-    el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translate(-50%, 10px)`;
-  });
-
-  return null;
-}
-
-/** The clickable sign under a floating mark. A mouse twin of the card's link, so it stays out of the tab order. */
-export function FloatCue({ cue, onOpen }: { cue: RefObject<HTMLButtonElement | null>; onOpen: (slug: string) => void }) {
-  const set = useJourney((s) => s.set);
-  return (
-    <button
-      ref={cue}
-      type="button"
-      className="float-cue"
-      tabIndex={-1}
-      onClick={(e) => {
-        const slug = e.currentTarget.dataset.slug;
-        if (slug) onOpen(slug);
-      }}
-      onMouseEnter={(e) => set({ hoverProject: e.currentTarget.dataset.slug ?? null })}
-      onMouseLeave={() => set({ hoverProject: null })}
-    >
-      <span className="float-cue-index" />
-      <span className="float-cue-title" />
-      <span className="float-cue-open">
-        Open <span aria-hidden="true">→</span>
-      </span>
-    </button>
   );
 }

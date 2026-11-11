@@ -241,7 +241,7 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
 
 /* ---------- the drive: proximity, build, fray, turntable, cursor ---------- */
 
-/** `hover`: 0..1, eased, while the pointer is on this mark, its cue, or its card's link. */
+/** `hover`: 0..1, eased, while the pointer is on this mark or its card's link. */
 export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
 
 const FAR = new Vector3(1e4, 1e4, 1e4);

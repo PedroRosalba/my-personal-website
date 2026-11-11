@@ -18,7 +18,7 @@ export const frame = {
  * dead level, so a point at the camera's height sits on the screen's horizontal centre line at any distance. */
 export const CAM = { y: 1.9, back: 5, fov: 48, fovMobile: 60 };
 
-/** Live world position of each project's floating mark (FloatingMark writes, the guide and the cue read). */
+/** Live world position of each project's floating mark (FloatingMark writes, the guide reads). */
 export const markPositions: Vector3[] = [];
 
 export const ACCENT = new Color("#8f66ff");
