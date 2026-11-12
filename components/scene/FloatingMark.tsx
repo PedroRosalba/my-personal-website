@@ -84,10 +84,10 @@ export function FloatingMark({
     const ndc = frame.mobile ? 0 : 1 - 2 * align.current;
     const mid = CAM.y + ndc * Math.tan(((CAM.fov / 2) * Math.PI) / 180) * distance;
 
-    // it stays where it is when its panel opens (the panel takes the card's side); it only lifts a touch
+    // it stays where it is when its panel opens (the panel takes the card's side); it only floats up a little
     g.position.set(
       frame.mobile ? FLOAT_X_MOBILE : FLOAT_X,
-      mid - OBJECT_MID * scale + Math.sin(t * 0.7 + index * 1.3) * 0.15 + Math.max(open * 0.3, hover.current * 0.35) - (1 - rise) * 9,
+      mid - OBJECT_MID * scale + Math.sin(t * 0.7 + index * 1.3) * 0.15 + Math.max(open * 0.6, hover.current * 0.35) - (1 - rise) * 9,
       gateZ(index) - FLOAT_BACK,
     );
     g.scale.setScalar(scale);

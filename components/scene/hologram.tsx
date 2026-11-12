@@ -270,6 +270,7 @@ export function useHologram({
 }): MutableRefObject<Drive> {
   usePointer();
   const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
+  const spinRate = useRef(1);
   const tmp = useMemo(
     () => ({
       ray: new Raycaster(),
@@ -308,9 +309,11 @@ export function useHologram({
     const pulse = cyc > 0.6 ? Math.sin(((cyc - 0.6) / 0.4) * Math.PI) ** 2 : 0;
     const scatter = frame.reduced ? 0 : pulse * (1 - s.open * 0.8) + (1 - s.build) * 0.4;
 
-    // a slow turntable; when the project opens it turns to face the visitor
-    if (s.open > 0.05) s.yaw = damp(s.yaw, Math.round(s.yaw / (Math.PI * 2)) * Math.PI * 2, 2.5, dt);
-    else if (!frame.reduced) s.yaw += dt * spinSpeed * (1 + s.hover * 1.5);
+    // a slow turntable. Opening the project never swings it back to a "front" (that read as the object flipping
+    // sides): it keeps turning the same way and eases down to a slow drift while the panel is open.
+    const rate = s.open > 0.05 ? 0.25 : 1 + s.hover * 1.5;
+    spinRate.current = frame.reduced ? rate : damp(spinRate.current, rate, 2.5, dt);
+    if (!frame.reduced) s.yaw += dt * spinSpeed * spinRate.current;
     if (spin.current) {
       spin.current.rotation.y = s.yaw;
       spin.current.position.y = Math.sin(t * 1.1) * 0.08;
