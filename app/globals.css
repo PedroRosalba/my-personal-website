@@ -137,6 +137,8 @@ main a, main button, .copy { pointer-events: auto; }
   font-size: 12px; font-weight: 400; letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-3);
 }
 h1 { font-size: clamp(46px, 6vw, 80px); font-weight: 300; letter-spacing: -0.025em; line-height: 1; }
+/* the header already carries the name, so the hero states it at a quieter size and lets the lead line speak */
+.hero h1 { font-size: clamp(38px, 4.4vw, 58px); }
 h2 { font-size: clamp(32px, 3.4vw, 44px); font-weight: 300; letter-spacing: -0.015em; line-height: 1.12; }
 .contact-title { font-size: clamp(40px, 4.4vw, 58px); }
 .copy p { color: var(--ink-2); }

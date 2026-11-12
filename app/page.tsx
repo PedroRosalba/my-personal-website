@@ -184,7 +184,7 @@ export default function Home() {
             <p className="lead">{profile.positioning}</p>
             <p className="hero-overview">{profile.overview}</p>
             <div className="actions">
-              <Link className="button button-primary" href="#experience">
+              <Link className="button portal-link" href="#experience">
                 See the work <span aria-hidden="true">→</span>
               </Link>
               {contact.cv ? (
