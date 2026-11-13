@@ -64,7 +64,9 @@ export function Rig() {
     camera.position.copy(pos);
     camera.lookAt(look);
 
-    const kick = frame.reduced ? 0 : Math.min(16, speed * 0.07);
+    // desktop: the lens widens a little with speed. Phones: never. A finger flick spikes the speed, and the
+    // picture pumped out and back in, stretching the marks at its edge as if they tilted.
+    const kick = frame.reduced || mobile ? 0 : Math.min(16, speed * 0.07);
     camera.fov = damp(camera.fov, (mobile ? CAM.fovMobile : CAM.fov) + kick, 6, dt);
 
     // centred: the road runs down the middle of the screen; phones lift the world above the copy, and at a
