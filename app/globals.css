@@ -69,6 +69,9 @@ ol, ul { list-style: none; }
 }
 .scene[data-ready="true"] { opacity: 1; }
 .scene canvas { display: block; }
+/* touch screens: the world is drawn at the largest viewport height, so the browser's toolbar showing and hiding as
+   you scroll never resizes the canvas (each resize reallocated it and re-framed the camera: a jump and a stall) */
+@media (pointer: coarse) { .scene { bottom: auto; height: 100lvh; } }
 
 .scrim {
   position: fixed; inset: 0; z-index: 1; pointer-events: none; transition: opacity 300ms;

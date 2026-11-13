@@ -20,6 +20,8 @@ export default function Experience() {
     <div className="scene" data-ready={ready} aria-hidden="true">
       <Canvas
         dpr={[1, 1.5]}
+        // the canvas is fixed: it never needs re-measuring on scroll, and a burst of resizes settles into one
+        resize={{ scroll: false, debounce: { scroll: 0, resize: 150 } }}
         gl={{ antialias: true, powerPreference: "high-performance" }}
         camera={{ fov: 32, near: 0.5, far: 7000, position: [0, 3, 26] }}
         onCreated={({ gl }) => {
