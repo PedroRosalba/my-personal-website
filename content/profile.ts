@@ -20,9 +20,8 @@ export const profile = {
   /** Other names people search for: the handle behind the domain and the X account. */
   alternateNames: ["Rosalbito", "0xrosalbito"],
   role: "Software engineer",
-  positioning: "A native problem solver, across the stack.",
-  overview:
-    "Former mathlete, then cryptography and blockchain. Now building core software, for the web and beyond.",
+  positioning: "Problem solver across the stack.",
+  overview: "Former mathlete. Building the core engines that move software.",
   education: [
     {
       title: "Mathematics and Computer Science",
