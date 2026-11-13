@@ -927,9 +927,12 @@ body:has(.panel-layer) .guide-toggle { opacity: 0; pointer-events: none; }
   border-color: transparent transparent transparent var(--ink);
 }
 
-/* floating road, phones: the copy sits at the bottom, so the exploration control moves under the header */
+/* floating road, phones: no guide (the exploration control stays on desktop), and once the world is running the
+   project's hologram beside the road is the card's cover, so the flat cover goes. Without WebGL it stays. */
 @media (max-width: 760px) {
-  .guide-toggle { bottom: auto; right: auto; left: 20px; top: calc(var(--header-h) + 8px); min-height: 34px; }
+  .guide-toggle { display: none; }
+  body:has(.scene[data-ready="true"]) .project-card > .emblem,
+  body:has(.scene[data-ready="true"]) .project-card > .snapshot { display: none; }
 }
 
 /* floating road: the panel opens on the card's side (left) and the project's mark stays in view on the right */

@@ -71,7 +71,7 @@ export function FloatingMark({
     const t = frame.time;
     const hovered = useJourney.getState().hoverProject === slug ? 1 : 0;
     hover.current = frame.reduced ? hovered : damp(hover.current, hovered, 8, dt);
-    const scale = (frame.mobile ? 0.72 : 1.15) * (1 + hover.current * 0.04);
+    const scale = (frame.mobile ? 0.95 : 1.15) * (1 + hover.current * 0.04);
     // it rises out of the fog as you come up the road, and sinks back once you are well past
     const open = frame.revealIndex === index ? smooth(clamp01(frame.reveal)) : 0;
     const distanceAway = Math.abs(frame.z - (gateZ(index) + STOP_OFFSET));
