@@ -940,3 +940,12 @@ body:has(.panel-layer) .guide-toggle { opacity: 0; pointer-events: none; }
   .panel { left: 0; right: auto; border-left: 0; border-right: 1px solid #24242b; animation-name: panel-in-left; }
   @keyframes panel-in-left { from { opacity: 0; transform: translateX(-32px); } }
 }
+
+/* floating road, desktop: the project cards read a little larger (~15%): column, cover image, logo and type */
+@media (min-width: 761px) {
+  .copy:has(> .project-card) { width: min(530px, 100%); }
+  .project-card .eyebrow { font-size: 13px; }
+  .project-card .card-title { font-size: clamp(30px, 3vw, 40px); }
+  .project-card .card-outcome { font-size: 18px; }
+  .project-card .emblem.emblem-bare.emblem-lg { --k: 3.4; width: min(100%, 350px); }
+}
