@@ -13,7 +13,6 @@ import {
   Mesh,
   MeshBasicMaterial,
   Plane,
-  PointLight,
   Points,
   Raycaster,
   ShaderMaterial,
@@ -23,10 +22,11 @@ import {
 import { gateZ } from "@/content/journey";
 import { projects } from "@/content/projects";
 import { useJourney } from "@/lib/store";
-import { clamp01, damp, frame } from "./state";
+import { clamp01, damp, frame, markLight } from "./state";
 
 /*
- * Shared pieces of the hologram landmarks: a figure made of points, projected from a floating stone emitter. The points stream up out of a spark when the traveller comes near, fray and snap back every
+ * Shared pieces of the hologram landmarks: a figure made of points, standing in a containment tube between glowing
+ * rings on desktop and projected from a floating stone emitter on phones. The points stream up out of a spark when the traveller comes near, fray and snap back every
  * few seconds, and light up and get swept aside where the cursor passes. Everything is in the site's violet.
  */
 
@@ -242,7 +242,7 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
 /* ---------- the drive: proximity, build, fray, turntable, cursor ---------- */
 
 /** `hover`: 0..1, eased, while the pointer is on this mark or its card's link. */
-export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
+export type Drive = { index: number; awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
 
 const FAR = new Vector3(1e4, 1e4, 1e4);
 
@@ -269,7 +269,7 @@ export function useHologram({
   centerY?: number;
 }): MutableRefObject<Drive> {
   usePointer();
-  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
+  const drive = useRef<Drive>({ index, awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
   const spinRate = useRef(1);
   const tmp = useMemo(
     () => ({
@@ -362,7 +362,111 @@ export function useHologram({
   return drive;
 }
 
-/* ---------- the floating emitter ---------- */
+/* ---------- desktop: the containment tube ---------- */
+
+/** A faint lit wall with a triangle-lattice texture, brighter at the silhouette and near the floor. */
+const tubeVertex = /* glsl */ `
+  varying vec2 vUv;
+  varying vec3 vN;
+  varying vec3 vV;
+  void main() {
+    vUv = uv;
+    vec4 mv = modelViewMatrix * vec4(position, 1.0);
+    vN = normalize(normalMatrix * normal);
+    vV = normalize(-mv.xyz);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const tubeFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  uniform float uTime;
+  varying vec2 vUv;
+  varying vec3 vN;
+  varying vec3 vV;
+
+  float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+
+  // distance to the nearest edge of a triangle lattice
+  float lattice(vec2 p) {
+    float da = abs(fract(p.y) - 0.5);
+    float db = abs(fract(p.x * 0.5 + p.y * 0.866) - 0.5);
+    float dc = abs(fract(p.x * 0.5 - p.y * 0.866) - 0.5);
+    return 0.5 - max(da, max(db, dc));
+  }
+
+  void main() {
+    float edge = 1.0 - abs(dot(normalize(vN), normalize(vV)));
+    float sil = pow(edge, 2.2);
+    vec2 p = vec2(vUv.x * 64.0, vUv.y * 30.0);
+    // jitter the lattice per cell so it reads like a fine irregular mesh, not graph paper
+    vec2 cell = floor(p);
+    p += (vec2(hash(cell), hash(cell + 7.1)) - 0.5) * 0.35;
+    float line = 1.0 - smoothstep(0.0, 0.06, lattice(p));
+    float sparkle = step(0.82, hash(cell + floor(uTime * 2.0))) * 0.6 + 0.4;
+    float floorGlow = exp(-vUv.y * 3.2);
+    float fade = smoothstep(1.0, 0.75, vUv.y) * smoothstep(0.0, 0.03, vUv.y);
+    float a = (0.035 + sil * 0.55 + floorGlow * 0.3) + line * sparkle * (0.05 + sil * 0.7);
+    gl_FragColor = vec4(uColor * a * fade * uIntensity, 1.0);
+  }
+`;
+
+/** A flat ring in the XZ plane: a hot core line with a soft halo (our stand-in for bloom), cut into rotating arcs. */
+const ringVertex = /* glsl */ `
+  varying vec2 vP;
+  void main() {
+    vP = position.xy;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const ringFragment = /* glsl */ `
+  uniform float uRadius;
+  uniform float uRot;
+  uniform float uSegments;
+  uniform float uGap;
+  uniform float uIntensity;
+  uniform vec3 uCore;
+  uniform vec3 uColor;
+  varying vec2 vP;
+  void main() {
+    float r = length(vP);
+    float d = abs(r - uRadius);
+    float ang = atan(vP.y, vP.x) / 6.28318 + 0.5;
+    float seg = fract(ang * uSegments + uRot);
+    // soft ends on each arc
+    float arc = smoothstep(0.0, 0.02, seg - uGap) * smoothstep(1.0, 0.98, seg);
+    float core = exp(-pow(d / 0.045, 2.0));
+    float halo = exp(-d / 0.12) * 0.6 + exp(-d / 0.45) * 0.18;
+    vec3 col = uCore * core * arc * 1.6 + uColor * (halo * mix(0.35, 1.0, arc));
+    gl_FragColor = vec4(col * uIntensity, 1.0);
+  }
+`;
+
+/** A camera-facing soft column of light behind and around the tube: fakes the volume glow of a bloom pass. */
+const hazeVertex = /* glsl */ `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const hazeFragment = /* glsl */ `
+  uniform vec3 uColor;
+  uniform float uIntensity;
+  varying vec2 vUv;
+  void main() {
+    vec2 c = vUv - 0.5;
+    float x = exp(-pow(abs(c.x) / 0.26, 3.0));
+    float y = smoothstep(0.5, 0.25, abs(c.y + 0.03));
+    float floorPool = exp(-pow((vUv.y - 0.12) / 0.07, 2.0)) * exp(-pow(c.x / 0.3, 2.0));
+    gl_FragColor = vec4(uColor * (x * y * 0.22 + floorPool * 0.35) * uIntensity, 1.0);
+  }
+`;
+
+/* ---------- phones: the floating emitter ---------- */
 
 /*
  * Floating road: there is no gateway floor to stand a tube on, so each hologram is projected from a stone emitter
@@ -400,10 +504,10 @@ const DAIS_H = 0.34;
 const SHARD_H = 2.6;
 
 /**
- * The emitter under a figure, its light fan and a violet light on the stone, all driven by the figure's `drive`.
- * `bottom` is where the figure's spark sits (the lens sits just under it); `top` bounds the fan.
+ * Phones: the emitter under a figure, its light fan and its violet light (lent by MarkLights), all driven by the figure's
+ * `drive`. `bottom` is where the figure's spark sits (the lens sits just under it); `top` bounds the fan.
  */
-export function HologramTube({
+function FloatingEmitter({
   drive,
   radius,
   bottom,
@@ -415,7 +519,6 @@ export function HologramTube({
   top: number;
 }) {
   const beam = useRef<Mesh>(null!);
-  const light = useRef<PointLight>(null!);
   const r = radius * 0.82;
   const beamMaterial = useMemo(
     () =>
@@ -428,6 +531,8 @@ export function HologramTube({
       }),
     [],
   );
+  const height = top - bottom;
+  const deck = bottom - 0.12; // top face of the dais, just under the spark
   const seam = useMemo(() => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), toneMapped: false }), []);
   const lens = useMemo(
     () => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false }),
@@ -442,11 +547,13 @@ export function HologramTube({
     // the seam answers the cursor a little, like the points do
     seam.color.copy(GLOW_COLOR).multiplyScalar(0.25 + glow * 1.1 + s.energy * 0.6);
     lens.color.copy(GLOW_COLOR).multiplyScalar(0.4 + glow * 0.9);
-    light.current.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+    if (frame.mobile) {
+      const l = markLight(s.index);
+      l.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+      l.offset.set(0, deck + 1.4, 1.6);
+      l.distance = 9;
+    }
   });
-
-  const height = top - bottom;
-  const deck = bottom - 0.12; // top face of the dais, just under the spark
 
   return (
     <>
@@ -472,7 +579,141 @@ export function HologramTube({
         <circleGeometry args={[r * 0.26, 32]} />
       </mesh>
 
-      <pointLight ref={light} position={[0, deck + 1.4, 1.6]} color="#8f66ff" intensity={10} distance={9} decay={2} />
+    </>
+  );
+}
+
+function ringMaterial(radius: number, segments: number, gap: number) {
+  return new ShaderMaterial({
+    vertexShader: ringVertex,
+    fragmentShader: ringFragment,
+    uniforms: {
+      uRadius: { value: radius },
+      uRot: { value: 0 },
+      uSegments: { value: segments },
+      uGap: { value: gap },
+      uIntensity: { value: 1 },
+      uCore: { value: new Vector3(0.93, 0.9, 1.0) },
+      uColor: { value: GLOW.clone() },
+    },
+    side: DoubleSide,
+    ...additive,
+  });
+}
+
+/** Desktop: the tube, its rings and the haze around it, all driven by a figure's `drive`. */
+function ContainmentTube({
+  drive,
+  radius,
+  bottom,
+  top,
+}: {
+  drive: MutableRefObject<Drive>;
+  radius: number;
+  bottom: number;
+  top: number;
+}) {
+  const haze = useRef<Mesh>(null!);
+  const tube = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: tubeVertex,
+        fragmentShader: tubeFragment,
+        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 }, uTime: { value: 0 } },
+        side: DoubleSide,
+        ...additive,
+      }),
+    [],
+  );
+  const hazeMaterial = useMemo(
+    () =>
+      new ShaderMaterial({
+        vertexShader: hazeVertex,
+        fragmentShader: hazeFragment,
+        uniforms: { uColor: { value: GLOW.clone() }, uIntensity: { value: 1 } },
+        ...additive,
+      }),
+    [],
+  );
+  const rings = useMemo(
+    () => ({
+      top: ringMaterial(radius, 2, 0.06),
+      bottom: ringMaterial(radius, 2, 0.03),
+      outer: ringMaterial(radius + 0.35, 3, 0.22),
+    }),
+    [radius],
+  );
+
+  useFrame(({ camera }) => {
+    const t = frame.time;
+    const s = drive.current;
+    const glow = 0.35 + s.awake * 0.65 + s.hover * 0.6;
+    tube.uniforms.uTime.value = t;
+    tube.uniforms.uIntensity.value = glow;
+    hazeMaterial.uniforms.uIntensity.value = glow * (0.6 + s.build * 0.4);
+    haze.current.quaternion.copy(camera.quaternion);
+
+    rings.top.uniforms.uRot.value = t * 0.06;
+    rings.bottom.uniforms.uRot.value = -t * 0.09;
+    rings.outer.uniforms.uRot.value = t * 0.04;
+    // the bottom ring flares while it feeds the build
+    const feeding = s.build > 0.001 && s.build < 0.999 ? 0.6 : 0;
+    rings.top.uniforms.uIntensity.value = glow * 0.8;
+    rings.bottom.uniforms.uIntensity.value = glow * (1 + feeding);
+    rings.outer.uniforms.uIntensity.value = glow * 0.55;
+    if (!frame.mobile) {
+      const l = markLight(s.index);
+      l.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+      l.offset.set(0, 2.5, 2.2);
+      l.distance = 12;
+    }
+  });
+
+  const ringGeo = (r: number) => <ringGeometry args={[Math.max(0.01, r - 0.9), r + 0.9, 128, 1]} />;
+  const height = top - bottom;
+
+  return (
+    <>
+      <mesh ref={haze} position={[0, bottom + height / 2, 0]} material={hazeMaterial} renderOrder={1}>
+        <planeGeometry args={[radius * 4.2, height * 1.25]} />
+      </mesh>
+      <mesh position={[0, bottom + height / 2, 0]} material={tube} renderOrder={2}>
+        <cylinderGeometry args={[radius, radius, height, 96, 1, true]} />
+      </mesh>
+      <mesh position={[0, top, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.top} renderOrder={3}>
+        {ringGeo(radius)}
+      </mesh>
+      <mesh position={[0, bottom, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.bottom} renderOrder={3}>
+        {ringGeo(radius)}
+      </mesh>
+      <mesh position={[0, bottom - 0.25, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.outer} renderOrder={3}>
+        {ringGeo(radius + 0.35)}
+      </mesh>
+    </>
+  );
+}
+
+type TubeProps = { drive: MutableRefObject<Drive>; radius: number; bottom: number; top: number };
+
+/**
+ * What a figure is projected from: on desktop the containment tube it stands in, on phones a small stone emitter
+ * floating under it (lighter, and it keeps the narrow picture minimal). Both are mounted; the frame shows one.
+ */
+export function HologramTube(props: TubeProps) {
+  const desktop = useRef<Group>(null!);
+  const phone = useRef<Group>(null!);
+  useFrame(() => {
+    desktop.current.visible = !frame.mobile;
+    phone.current.visible = frame.mobile;
+  });
+  return (
+    <>
+      <group ref={desktop}>
+        <ContainmentTube {...props} />
+      </group>
+      <group ref={phone}>
+        <FloatingEmitter {...props} />
+      </group>
     </>
   );
 }

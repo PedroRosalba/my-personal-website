@@ -69,6 +69,9 @@ ol, ul { list-style: none; }
 }
 .scene[data-ready="true"] { opacity: 1; }
 .scene canvas { display: block; }
+/* touch screens: the world is drawn at the largest viewport height, so the browser's toolbar showing and hiding as
+   you scroll never resizes the canvas (each resize reallocated it and re-framed the camera: a jump and a stall) */
+@media (pointer: coarse) { .scene { bottom: auto; height: 100lvh; } }
 
 .scrim {
   position: fixed; inset: 0; z-index: 1; pointer-events: none; transition: opacity 300ms;
@@ -927,13 +930,25 @@ body:has(.panel-layer) .guide-toggle { opacity: 0; pointer-events: none; }
   border-color: transparent transparent transparent var(--ink);
 }
 
-/* floating road, phones: the copy sits at the bottom, so the exploration control moves under the header */
+/* floating road, phones: no guide (the exploration control stays on desktop), and once the world is running the
+   project's hologram beside the road is the card's cover, so the flat cover goes. Without WebGL it stays. */
 @media (max-width: 760px) {
-  .guide-toggle { bottom: auto; right: auto; left: 20px; top: calc(var(--header-h) + 8px); min-height: 34px; }
+  .guide-toggle { display: none; }
+  body:has(.scene[data-ready="true"]) .project-card > .emblem,
+  body:has(.scene[data-ready="true"]) .project-card > .snapshot { display: none; }
 }
 
 /* floating road: the panel opens on the card's side (left) and the project's mark stays in view on the right */
 @media (min-width: 761px) {
   .panel { left: 0; right: auto; border-left: 0; border-right: 1px solid #24242b; animation-name: panel-in-left; }
   @keyframes panel-in-left { from { opacity: 0; transform: translateX(-32px); } }
+}
+
+/* floating road, desktop: the project cards read a little larger (~15%): column, cover image, logo and type */
+@media (min-width: 761px) {
+  .copy:has(> .project-card) { width: min(530px, 100%); }
+  .project-card .eyebrow { font-size: 13px; }
+  .project-card .card-title { font-size: clamp(30px, 3vw, 40px); }
+  .project-card .card-outcome { font-size: 18px; }
+  .project-card .emblem.emblem-bare.emblem-lg { --k: 3.4; width: min(100%, 350px); }
 }

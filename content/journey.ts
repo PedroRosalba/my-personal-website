@@ -4,11 +4,15 @@
 import { projects } from "./projects";
 
 export const GATE_X = 9; // project gateways stand to the right of the causeway
-/** Floating road: each project's mark hangs this far right of the causeway (phones bring it in). */
+/** Floating road: each project's mark hangs this far right of the causeway. */
 export const FLOAT_X = 8.2;
 /** …and this far past the visitor's stop for it, so it is seen whole, not filling the right half. */
 export const FLOAT_BACK = 5;
-export const FLOAT_X_MOBILE = 2.3;
+/** Phones: the road slides to the left third at a project stop (MOBILE_ROAD_SHIFT, Rig) and the mark fills the
+ * right of the picture, above the copy. */
+export const FLOAT_X_MOBILE = 5.6;
+/** How far the picture slides left at a project stop on phones, as a fraction of the screen width. */
+export const MOBILE_ROAD_SHIFT = 0.18;
 
 // wider than the camera's trailing distance, so an earlier gateway never blocks the next one
 export const GATE_SPACING = 70;

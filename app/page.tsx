@@ -418,7 +418,7 @@ export default function Home() {
               alternateName: profile.alternateNames,
               url: siteUrl,
               image: `${siteUrl}/opengraph-image`,
-              description: `${profile.overview} ${profile.positioning}`,
+              description: `${profile.positioning} ${profile.overview}`,
               jobTitle: "Software Engineer",
               email: contact.email ? `mailto:${contact.email}` : undefined,
               alumniOf: { "@type": "CollegeOrUniversity", name: "IMPA Tech" },

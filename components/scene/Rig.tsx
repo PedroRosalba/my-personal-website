@@ -5,7 +5,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { PerspectiveCamera, Vector3 } from "three";
 import { useJourney } from "@/lib/store";
 import { projects } from "@/content/projects";
-import { FINAL_GATE_Z } from "@/content/journey";
+import { FINAL_GATE_Z, GATE_X, MOBILE_ROAD_SHIFT } from "@/content/journey";
 import { CAM, clamp01, damp, frame } from "./state";
 
 const pos = new Vector3();
@@ -64,11 +64,16 @@ export function Rig() {
     camera.position.copy(pos);
     camera.lookAt(look);
 
-    const kick = frame.reduced ? 0 : Math.min(16, speed * 0.07);
+    // desktop: the lens widens a little with speed. Phones: never. A finger flick spikes the speed, and the
+    // picture pumped out and back in, stretching the marks at its edge as if they tilted.
+    const kick = frame.reduced || mobile ? 0 : Math.min(16, speed * 0.07);
     camera.fov = damp(camera.fov, (mobile ? CAM.fovMobile : CAM.fov) + kick, 6, dt);
 
-    // centred: the road runs down the middle of the screen; phones lift the world above the copy
-    camera.setViewOffset(size.width, size.height, 0, mobile ? 0.21 * size.height : 0, size.width, size.height);
+    // centred: the road runs down the middle of the screen; phones lift the world above the copy, and at a
+    // project stop slide the road to the left third so the mark has the right of the picture to itself.
+    // focusX is GATE_X at a project stop and ~0 elsewhere, so the slide follows the scroll.
+    const shift = mobile ? MOBILE_ROAD_SHIFT * clamp01(frame.focusX / GATE_X) * size.width : 0;
+    camera.setViewOffset(size.width, size.height, shift, mobile ? 0.21 * size.height : 0, size.width, size.height);
   });
 
   return null;

@@ -5,11 +5,13 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Vector3, type Group } from "three";
 import { FLOAT_BACK, FLOAT_X, FLOAT_X_MOBILE, gateZ } from "@/content/journey";
 import { useJourney } from "@/lib/store";
-import { CAM, clamp01, damp, frame, markPositions, smooth } from "./state";
+import { CAM, clamp01, damp, frame, markLight, markPositions, smooth } from "./state";
 
-/** Middle of the whole floating object above its origin: from the figure's top (~5.5 m) down to the tip of the
- * emitter's shard (~-2.7 m). This is what lines up with the card, so the object and the card share one band. */
-const OBJECT_MID = 1.4;
+/** Middle of the whole floating object above its origin, which is what lines up with the card so the object and
+ * the card share one band. Desktop: the containment tube, 0.35 m to 6.55 m. Phones: from the figure's top (~5.5 m)
+ * down to the tip of the emitter's shard (~-2.7 m). */
+const OBJECT_MID = 3.45;
+const OBJECT_MID_MOBILE = 1.4;
 /** An element's layout offset from the top of one of its positioned ancestors. */
 function offsetWithin(el: HTMLElement, ancestor: HTMLElement) {
   let y = 0;
@@ -71,7 +73,7 @@ export function FloatingMark({
     const t = frame.time;
     const hovered = useJourney.getState().hoverProject === slug ? 1 : 0;
     hover.current = frame.reduced ? hovered : damp(hover.current, hovered, 8, dt);
-    const scale = (frame.mobile ? 0.72 : 1.15) * (1 + hover.current * 0.04);
+    const scale = (frame.mobile ? 0.95 : 1.15) * (1 + hover.current * 0.04);
     // it rises out of the fog as you come up the road, and sinks back once you are well past
     const open = frame.revealIndex === index ? smooth(clamp01(frame.reveal)) : 0;
     const distanceAway = Math.abs(frame.z - (gateZ(index) + STOP_OFFSET));
@@ -87,11 +89,14 @@ export function FloatingMark({
     // it stays where it is when its panel opens (the panel takes the card's side); it only floats up a little
     g.position.set(
       frame.mobile ? FLOAT_X_MOBILE : FLOAT_X,
-      mid - OBJECT_MID * scale + Math.sin(t * 0.7 + index * 1.3) * 0.15 + Math.max(open * 0.6, hover.current * 0.35) - (1 - rise) * 9,
+      mid - (frame.mobile ? OBJECT_MID_MOBILE : OBJECT_MID) * scale + Math.sin(t * 0.7 + index * 1.3) * 0.15 + Math.max(open * 0.6, hover.current * 0.35) - (1 - rise) * 9,
       gateZ(index) - FLOAT_BACK,
     );
     g.scale.setScalar(scale);
     markPositions[index].copy(g.position);
+    const light = markLight(index);
+    light.shown = g.visible;
+    light.scale = scale;
   });
 
   const handlers = {
