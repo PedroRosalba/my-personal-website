@@ -13,7 +13,6 @@ import {
   Mesh,
   MeshBasicMaterial,
   Plane,
-  PointLight,
   Points,
   Raycaster,
   ShaderMaterial,
@@ -23,7 +22,7 @@ import {
 import { gateZ } from "@/content/journey";
 import { projects } from "@/content/projects";
 import { useJourney } from "@/lib/store";
-import { clamp01, damp, frame } from "./state";
+import { clamp01, damp, frame, markLight } from "./state";
 
 /*
  * Shared pieces of the hologram landmarks: a figure made of points, standing in a containment tube between glowing
@@ -243,7 +242,7 @@ export function createPointsMaterial(parts: Matrix4[], spark: Vector3, size = 0.
 /* ---------- the drive: proximity, build, fray, turntable, cursor ---------- */
 
 /** `hover`: 0..1, eased, while the pointer is on this mark or its card's link. */
-export type Drive = { awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
+export type Drive = { index: number; awake: number; build: number; open: number; yaw: number; energy: number; hover: number };
 
 const FAR = new Vector3(1e4, 1e4, 1e4);
 
@@ -270,7 +269,7 @@ export function useHologram({
   centerY?: number;
 }): MutableRefObject<Drive> {
   usePointer();
-  const drive = useRef<Drive>({ awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
+  const drive = useRef<Drive>({ index, awake: 0, build: 0, open: 0, yaw: 0, energy: 0, hover: 0 });
   const spinRate = useRef(1);
   const tmp = useMemo(
     () => ({
@@ -505,7 +504,7 @@ const DAIS_H = 0.34;
 const SHARD_H = 2.6;
 
 /**
- * Phones: the emitter under a figure, its light fan and a violet light on the stone, all driven by the figure's
+ * Phones: the emitter under a figure, its light fan and its violet light (lent by MarkLights), all driven by the figure's
  * `drive`. `bottom` is where the figure's spark sits (the lens sits just under it); `top` bounds the fan.
  */
 function FloatingEmitter({
@@ -520,7 +519,6 @@ function FloatingEmitter({
   top: number;
 }) {
   const beam = useRef<Mesh>(null!);
-  const light = useRef<PointLight>(null!);
   const r = radius * 0.82;
   const beamMaterial = useMemo(
     () =>
@@ -533,6 +531,8 @@ function FloatingEmitter({
       }),
     [],
   );
+  const height = top - bottom;
+  const deck = bottom - 0.12; // top face of the dais, just under the spark
   const seam = useMemo(() => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), toneMapped: false }), []);
   const lens = useMemo(
     () => new MeshBasicMaterial({ color: GLOW_COLOR.clone(), transparent: true, blending: AdditiveBlending, depthWrite: false, toneMapped: false }),
@@ -547,11 +547,13 @@ function FloatingEmitter({
     // the seam answers the cursor a little, like the points do
     seam.color.copy(GLOW_COLOR).multiplyScalar(0.25 + glow * 1.1 + s.energy * 0.6);
     lens.color.copy(GLOW_COLOR).multiplyScalar(0.4 + glow * 0.9);
-    light.current.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+    if (frame.mobile) {
+      const l = markLight(s.index);
+      l.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+      l.offset.set(0, deck + 1.4, 1.6);
+      l.distance = 9;
+    }
   });
-
-  const height = top - bottom;
-  const deck = bottom - 0.12; // top face of the dais, just under the spark
 
   return (
     <>
@@ -577,7 +579,6 @@ function FloatingEmitter({
         <circleGeometry args={[r * 0.26, 32]} />
       </mesh>
 
-      <pointLight ref={light} position={[0, deck + 1.4, 1.6]} color="#8f66ff" intensity={10} distance={9} decay={2} />
     </>
   );
 }
@@ -613,7 +614,6 @@ function ContainmentTube({
   top: number;
 }) {
   const haze = useRef<Mesh>(null!);
-  const light = useRef<PointLight>(null!);
   const tube = useMemo(
     () =>
       new ShaderMaterial({
@@ -661,7 +661,12 @@ function ContainmentTube({
     rings.top.uniforms.uIntensity.value = glow * 0.8;
     rings.bottom.uniforms.uIntensity.value = glow * (1 + feeding);
     rings.outer.uniforms.uIntensity.value = glow * 0.55;
-    light.current.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+    if (!frame.mobile) {
+      const l = markLight(s.index);
+      l.intensity = 6 + s.awake * 16 + s.energy * 10 + s.hover * 18;
+      l.offset.set(0, 2.5, 2.2);
+      l.distance = 12;
+    }
   });
 
   const ringGeo = (r: number) => <ringGeometry args={[Math.max(0.01, r - 0.9), r + 0.9, 128, 1]} />;
@@ -684,7 +689,6 @@ function ContainmentTube({
       <mesh position={[0, bottom - 0.25, 0]} rotation={[-Math.PI / 2, 0, 0]} material={rings.outer} renderOrder={3}>
         {ringGeo(radius + 0.35)}
       </mesh>
-      <pointLight ref={light} position={[0, 2.5, 2.2]} color="#8f66ff" intensity={10} distance={12} decay={2} />
     </>
   );
 }

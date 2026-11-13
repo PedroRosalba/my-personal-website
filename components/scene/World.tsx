@@ -6,6 +6,8 @@ import { FOG_COLOR, FOG_DENSITY } from "./state";
 import { Rig } from "./Rig";
 import { Guide } from "./Guide";
 import { FloatingMark } from "./FloatingMark";
+import { MarkLights } from "./MarkLights";
+import { Warmup } from "./Warmup";
 import { Sky } from "./Sky";
 import { FogSea } from "./FogSea";
 import { Causeway, Colonnade, Stele } from "./Structures";
@@ -30,6 +32,8 @@ export function World({ onOpen }: { onOpen: (slug: string) => void }) {
       <directionalLight position={[0, 50, 120]} intensity={0.5} color="#8c8c98" />
 
       <Rig />
+      <Warmup />
+      <MarkLights />
       <LightWaveClock />
       <Sky />
       <FogSea />

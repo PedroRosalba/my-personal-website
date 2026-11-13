@@ -21,6 +21,17 @@ export const CAM = { y: 1.9, back: 5, fov: 48, fovMobile: 60 };
 /** Live world position of each project's floating mark (FloatingMark writes, the guide reads). */
 export const markPositions: Vector3[] = [];
 
+/**
+ * Each project mark's violet light, in a slot instead of a light object of its own: the marks hide while you are
+ * far from them, and a hidden light changes the scene's light count, which recompiles every material (a visible
+ * stall mid-scroll). MarkLights lends its two pooled lights to whichever marks are up. FloatingMark writes `shown`
+ * and `scale`; the mark's tube or emitter writes `intensity`, `offset` (in the mark's own space) and `distance`.
+ */
+export type MarkLight = { shown: boolean; scale: number; intensity: number; offset: Vector3; distance: number };
+export const markLights: MarkLight[] = [];
+export const markLight = (index: number): MarkLight =>
+  (markLights[index] ??= { shown: false, scale: 1, intensity: 0, offset: new Vector3(0, 2.5, 2.2), distance: 12 });
+
 export const ACCENT = new Color("#8f66ff");
 /** The same accent as display-space RGB, for raw shaders that write straight to the screen. */
 export const ACCENT_RAW = new Vector3(0.56, 0.4, 1.0);

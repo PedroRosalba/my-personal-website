@@ -5,7 +5,7 @@ import { useFrame, type ThreeEvent } from "@react-three/fiber";
 import { Vector3, type Group } from "three";
 import { FLOAT_BACK, FLOAT_X, FLOAT_X_MOBILE, gateZ } from "@/content/journey";
 import { useJourney } from "@/lib/store";
-import { CAM, clamp01, damp, frame, markPositions, smooth } from "./state";
+import { CAM, clamp01, damp, frame, markLight, markPositions, smooth } from "./state";
 
 /** Middle of the whole floating object above its origin, which is what lines up with the card so the object and
  * the card share one band. Desktop: the containment tube, 0.35 m to 6.55 m. Phones: from the figure's top (~5.5 m)
@@ -94,6 +94,9 @@ export function FloatingMark({
     );
     g.scale.setScalar(scale);
     markPositions[index].copy(g.position);
+    const light = markLight(index);
+    light.shown = g.visible;
+    light.scale = scale;
   });
 
   const handlers = {
